@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, createContext, useContext } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,8 +33,351 @@ import {
   Palmtree,
   Ship,
   Flower2,
-  Mountain
+  Mountain,
+  Globe
 } from 'lucide-react'
+
+// Language Context
+type Language = 'en' | 'ml'
+
+interface LanguageContextType {
+  lang: Language
+  setLang: (lang: Language) => void
+  t: (key: string) => string
+}
+
+const LanguageContext = createContext<LanguageContextType | null>(null)
+
+// Translations
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Navigation
+    'nav.about': 'About',
+    'nav.accommodations': 'Accommodations',
+    'nav.experiences': 'Experiences',
+    'nav.ayurveda': 'Ayurveda',
+    'nav.dining': 'Dining',
+    'nav.gallery': 'Gallery',
+    'nav.book': 'Book Your Stay',
+    
+    // Hero
+    'hero.welcome': "Welcome to God's Own Country",
+    'hero.title': 'Munroe Morris',
+    'hero.tagline': 'Where Backwaters Meet Luxury',
+    'hero.houseboats': 'Houseboats',
+    'hero.ayurveda': 'Ayurveda',
+    'hero.ghats': 'Western Ghats',
+    'hero.cta': 'Explore Kerala Paradise',
+    'hero.tour': 'Virtual Tour',
+    'hero.scroll': 'Scroll',
+    
+    // About
+    'about.label': 'Our Heritage',
+    'about.title': "A Jewel in Kerala's Crown",
+    'about.p1': "Nestled amidst the serene backwaters of Kerala, Munroe Morris represents the perfect harmony of traditional Kerala architecture and contemporary luxury. Our resort is named after Colonel John Munro, whose legacy is intertwined with this beautiful land.",
+    'about.p2': "Experience the warmth of Kerala hospitality, where every guest is treated as family. From the moment you arrive, you'll be embraced by the tranquil beauty of swaying coconut palms, pristine waters, and the gentle rhythm of village life.",
+    'about.villas': 'Luxury Villas',
+    'about.guests': 'Happy Guests',
+    'about.rating': 'Rating',
+    'about.established': 'Est. 2009',
+    'about.location': 'Kerala, India',
+    
+    // Accommodations
+    'accommodations.label': 'Accommodations',
+    'accommodations.title': 'Your Home in Paradise',
+    'accommodations.subtitle': "Each villa is designed to reflect Kerala's rich heritage while providing modern comforts for an unforgettable stay.",
+    'accommodations.from': 'Starting from',
+    'accommodations.night': '/night',
+    'accommodations.guests': 'Guests',
+    'accommodations.details': 'View Details',
+    
+    // Villa names
+    'villa.backwater.name': 'Backwater Villa',
+    'villa.backwater.desc': 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
+    'villa.coconut.name': 'Coconut Grove Suite',
+    'villa.coconut.desc': "Nestled among swaying coconut palms with authentic Kerala decor",
+    'villa.heritage.name': 'Heritage Nalukettu',
+    'villa.heritage.desc': 'Traditional Kerala courtyard house with wooden architecture',
+    
+    // Features
+    'feature.deck': 'Private Deck',
+    'feature.canoe': 'Canoe Ride',
+    'feature.sunset': 'Sunset View',
+    'feature.garden': 'Garden View',
+    'feature.bath': 'Outdoor Bath',
+    'feature.birds': 'Bird Watching',
+    'feature.courtyard': 'Courtyard',
+    'feature.wood': 'Wood Carvings',
+    'feature.heritage': 'Heritage Style',
+    
+    // Experiences
+    'experiences.label': 'Kerala Experiences',
+    'experiences.title': "Discover God's Own Country",
+    'experiences.subtitle': "From serene backwaters to ancient healing traditions, experience the authentic soul of Kerala.",
+    'exp.houseboat.name': 'Houseboat Cruise',
+    'exp.houseboat.desc': 'Drift through the enchanting backwaters on a traditional Kettuvallam houseboat',
+    'exp.ayurveda.name': 'Ayurveda Wellness',
+    'exp.ayurveda.desc': 'Rejuvenate with authentic Ayurvedic treatments and therapies',
+    'exp.village.name': 'Village Life Experience',
+    'exp.village.desc': "Immerse yourself in Kerala's rich culture and traditions",
+    
+    // Ayurveda section
+    'ayurveda.label': 'Ayurveda & Wellness',
+    'ayurveda.title': 'Ancient Healing, Modern Comfort',
+    'ayurveda.p1': "Kerala is the birthplace of Ayurveda, the 5000-year-old science of life. Our wellness center offers authentic treatments passed down through generations, using traditional herbs and oils sourced from Kerala's pristine forests.",
+    'ayurveda.panchakarma': 'Panchakarma',
+    'ayurveda.panchakarmaDesc': 'Complete detoxification program',
+    'ayurveda.shirodhara': 'Shirodhara',
+    'ayurveda.shirodharaDesc': 'Meditative oil therapy',
+    'ayurveda.abhyanga': 'Abhyanga',
+    'ayurveda.abhyangaDesc': 'Full body massage',
+    'ayurveda.nasyam': 'Nasyam',
+    'ayurveda.nasyamDesc': 'Nasal treatment therapy',
+    'ayurveda.book': 'Book Wellness Package',
+    'ayurveda.certified': 'Certified',
+    'ayurveda.center': 'Ayurveda Center',
+    
+    // Dining
+    'dining.label': 'Kerala Cuisine',
+    'dining.title': 'Flavors of Kerala',
+    'dining.p1': 'Savor the authentic tastes of Kerala, from traditional Sadya served on banana leaves to fresh Karimeen (Pearl Spot) caught from the backwaters. Our chefs use recipes passed down through generations.',
+    'dining.restaurant': 'The Backwater Restaurant',
+    'dining.restaurantDesc': 'Traditional Kerala Sadya & Seafood specialties',
+    'dining.lounge': 'Sunset Chai Lounge',
+    'dining.loungeDesc': 'Fresh chai & local snacks with backwater views',
+    'dining.cooking': 'Cooking Classes',
+    'dining.cookingDesc': 'Learn to make authentic Kerala dishes',
+    'dining.menu': 'View Our Menu',
+    
+    // Gallery
+    'gallery.label': 'Gallery',
+    'gallery.title': 'Moments in Kerala',
+    
+    // Contact
+    'contact.label': 'Get in Touch',
+    'contact.title': 'Plan Your Kerala Escape',
+    'contact.subtitle': 'Our team is ready to help you plan an unforgettable Kerala experience. We speak English, Malayalam, Hindi, and more.',
+    'contact.firstname': 'First Name',
+    'contact.phone': 'Phone',
+    'contact.email': 'Email',
+    'contact.checkin': 'Check-in',
+    'contact.checkout': 'Check-out',
+    'contact.message': 'Message',
+    'contact.messagePlaceholder': 'Tell us about your dream Kerala vacation...',
+    'contact.send': 'Send Inquiry',
+    'contact.info': 'Contact Information',
+    'contact.location': 'Location',
+    'contact.locationValue': 'Munroe Island, Kollam District\nKerala 691502, India',
+    'contact.phoneValue': '+91 474 XXXXXXX\n+91 XXXXX XXXXX (WhatsApp)',
+    'contact.emailValue': 'reservations@munroemorris.com',
+    'contact.reception': 'Reception',
+    'contact.receptionValue': '24 Hours, 7 Days a Week',
+    'contact.newsletter': 'Stay Connected',
+    'contact.newsletterDesc': 'Subscribe for Kerala travel tips and exclusive offers.',
+    'contact.reach': 'How to Reach',
+    'contact.airport1': 'Trivandrum Airport: 90 km (2 hours)',
+    'contact.railway': 'Kollam Railway Station: 25 km (45 min)',
+    'contact.airport2': 'Kochi Airport: 160 km (4 hours)',
+    
+    // Footer
+    'footer.tagline': "Experience the magic of Kerala's backwaters in luxury. Your journey to God's Own Country begins here.",
+    'footer.quickLinks': 'Quick Links',
+    'footer.experiences': 'Experiences',
+    'footer.contact': 'Contact',
+    'footer.backwater': 'Backwater Cruise',
+    'footer.therapy': 'Ayurveda Therapy',
+    'footer.tour': 'Village Tour',
+    'footer.kathakali': 'Kathakali Show',
+    'footer.cooking': 'Cooking Class',
+    'footer.birds': 'Bird Watching',
+    'footer.copyright': '© 2024 Munroe Morris Resort. All rights reserved.',
+    'footer.privacy': 'Privacy Policy',
+    'footer.terms': 'Terms',
+    'footer.cookies': 'Cookie Policy',
+  },
+  ml: {
+    // Navigation
+    'nav.about': 'ഞങ്ങളേക്കുറിച്ച്',
+    'nav.accommodations': 'താമസം',
+    'nav.experiences': 'അനുഭവങ്ങൾ',
+    'nav.ayurveda': 'ആയുർവേദം',
+    'nav.dining': 'ഭക്ഷണം',
+    'nav.gallery': 'ഗാലറി',
+    'nav.book': 'ബുക്ക് ചെയ്യുക',
+    
+    // Hero
+    'hero.welcome': 'ദൈവത്തിന്റെ സ്വന്തം നാട്ടിലേക്ക് സ്വാഗതം',
+    'hero.title': 'മുൻറോ മോറിസ്',
+    'hero.tagline': 'ബാക്ക്‌വാട്ടേഴ്‌സ് ആഡംബരത്തെ കണ്ടുമുട്ടുന്ന സ്ഥലം',
+    'hero.houseboats': 'ഹൗസ്ബോട്ടുകൾ',
+    'hero.ayurveda': 'ആയുർവേദം',
+    'hero.ghats': 'പശ്ചിമഘട്ടം',
+    'hero.cta': 'കേരള പറുദീസ കണ്ടെത്തുക',
+    'hero.tour': 'വിർച്വൽ ടൂർ',
+    'hero.scroll': 'സ്ക്രോൾ ചെയ്യുക',
+    
+    // About
+    'about.label': 'ഞങ്ങളുടെ പൈതൃകം',
+    'about.title': 'കേരളത്തിന്റെ കിരീടത്തിലെ രത്നം',
+    'about.p1': 'കേരളത്തിലെ ശാന്തമായ ബാക്ക്‌വാട്ടറുകൾക്കിടയിൽ, മുൻറോ മോറിസ് പരമ്പരാഗത കേരള വാസ്തുവിദ്യയുടെയും ആധുനിക ആഡംബരത്തിന്റെയും തികഞ്ഞ സന്തുലിതാവസ്ഥ പ്രതിനിധീകരിക്കുന്നു.',
+    'about.p2': 'ഓരോ അതിഥിയെയും കുടുംബാംഗമായി കണക്കാക്കുന്ന കേരള ആതിഥ്യത്തിന്റെ ആർദ്രത അനുഭവിക്കുക.',
+    'about.villas': 'ആഡംബര വില്ലകൾ',
+    'about.guests': 'സന്തുഷ്ട അതിഥികൾ',
+    'about.rating': 'റേറ്റിംഗ്',
+    'about.established': 'സ്ഥാപിച്ചത് 2009',
+    'about.location': 'കേരളം, ഇന്ത്യ',
+    
+    // Accommodations
+    'accommodations.label': 'താമസ സൗകര്യങ്ങൾ',
+    'accommodations.title': 'പറുദീസയിലെ നിങ്ങളുടെ വീട്',
+    'accommodations.subtitle': 'ഓരോ വില്ലയും കേരളത്തിന്റെ സമ്പന്നമായ പൈതൃകം പ്രതിഫലിപ്പിക്കുന്നു.',
+    'accommodations.from': 'ആരംഭ വില',
+    'accommodations.night': '/രാത്രി',
+    'accommodations.guests': 'അതിഥികൾ',
+    'accommodations.details': 'വിശദാംശങ്ങൾ കാണുക',
+    
+    // Villa names
+    'villa.backwater.name': 'ബാക്ക്‌വാട്ടർ വില്ല',
+    'villa.backwater.desc': 'ബാക്ക്‌വാട്ടറുകളുടെ കാഴ്ചയോടെ പരമ്പരാഗത കേരള വാസ്തുവിദ്യ',
+    'villa.coconut.name': 'തെങ്ങ് തോപ്പ് സ്യൂട്ട്',
+    'villa.coconut.desc': 'തെങ്ങിൻ തോപ്പുകൾക്കിടയിൽ സ്ഥിതി ചെയ്യുന്ന സ്യൂട്ട്',
+    'villa.heritage.name': 'ഹെറിറ്റേജ് നാലുകെട്ട്',
+    'villa.heritage.desc': 'തടി വാസ്തുവിദ്യയുള്ള പരമ്പരാഗത കേരള വീട്',
+    
+    // Features
+    'feature.deck': 'സ്വകാര്യ ഡെക്ക്',
+    'feature.canoe': 'വഞ്ചി സവാരി',
+    'feature.sunset': 'സൂര്യാസ്ത കാഴ്ച',
+    'feature.garden': 'പൂന്തോട്ട കാഴ്ച',
+    'feature.bath': 'ഔട്ട്ഡോർ ബാത്ത്',
+    'feature.birds': 'പക്ഷി നിരീക്ഷണം',
+    'feature.courtyard': 'മുറ്റം',
+    'feature.wood': 'മരം കൊത്തുപണി',
+    'feature.heritage': 'ഹെറിറ്റേജ് ശൈലി',
+    
+    // Experiences
+    'experiences.label': 'കേരള അനുഭവങ്ങൾ',
+    'experiences.title': 'ദൈവത്തിന്റെ സ്വന്തം നാട് കണ്ടെത്തുക',
+    'experiences.subtitle': 'ശാന്തമായ ബാക്ക്‌വാട്ടറുകൾ മുതൽ പുരാതന ചികിത്സാ പാരമ്പര്യങ്ങൾ വരെ.',
+    'exp.houseboat.name': 'ഹൗസ്ബോട്ട് യാത്ര',
+    'exp.houseboat.desc': 'പരമ്പരാഗത കെട്ടുവള്ളത്തിൽ ബാക്ക്‌വാട്ടർ യാത്ര',
+    'exp.ayurveda.name': 'ആയുർവേദ വെൽനസ്',
+    'exp.ayurveda.desc': 'യഥാർത്ഥ ആയുർവേദ ചികിത്സകൾ',
+    'exp.village.name': 'ഗ്രാമീണ ജീവിത അനുഭവം',
+    'exp.village.desc': 'കേരളത്തിന്റെ സമ്പന്നമായ സംസ്കാരം',
+    
+    // Ayurveda section
+    'ayurveda.label': 'ആയുർവേദവും വെൽനസും',
+    'ayurveda.title': 'പുരാതന ചികിത്സ, ആധുനിക സൗകര്യം',
+    'ayurveda.p1': 'കേരളം ആയുർവേദത്തിന്റെ ജന്മസ്ഥലമാണ്. ഞങ്ങളുടെ വെൽനസ് സെന്റർ തലമുറകളായി കൈമാറ്റം ചെയ്യപ്പെടുന്ന യഥാർത്ഥ ചികിത്സകൾ വാഗ്ദാനം ചെയ്യുന്നു.',
+    'ayurveda.panchakarma': 'പഞ്ചകർമ്മം',
+    'ayurveda.panchakarmaDesc': 'പൂർണ്ണ ഡിറ്റോക്സ് പ്രോഗ്രാം',
+    'ayurveda.shirodhara': 'ശിരോധാര',
+    'ayurveda.shirodharaDesc': 'ധ്യാന എണ്ണ തെറാപ്പി',
+    'ayurveda.abhyanga': 'അഭ്യംഗ',
+    'ayurveda.abhyangaDesc': 'ശരീര മസാജ്',
+    'ayurveda.nasyam': 'നസ്യം',
+    'ayurveda.nasyamDesc': 'മൂക്ക് ചികിത്സ',
+    'ayurveda.book': 'വെൽനസ് പാക്കേജ് ബുക്ക് ചെയ്യുക',
+    'ayurveda.certified': 'സർട്ടിഫൈഡ്',
+    'ayurveda.center': 'ആയുർവേദ സെന്റർ',
+    
+    // Dining
+    'dining.label': 'കേരള പാചകം',
+    'dining.title': 'കേരളത്തിന്റെ രുചികൾ',
+    'dining.p1': 'വാഴയിലയിൽ വിളമ്പുന്ന പരമ്പരാഗത സദ്യ മുതൽ ബാക്ക്‌വാട്ടറിൽ നിന്ന് പിടിക്കുന്ന കരിമീൻ വരെ ആസ്വദിക്കുക.',
+    'dining.restaurant': 'ബാക്ക്‌വാട്ടർ റസ്റ്റോറന്റ്',
+    'dining.restaurantDesc': 'പരമ്പരാഗത കേരള സദ്യയും സീഫുഡും',
+    'dining.lounge': 'സൂര്യാസ്ത ചായ ലൗഞ്ച്',
+    'dining.loungeDesc': 'ബാക്ക്‌വാട്ടർ കാഴ്ചയോടെ ചായയും പലഹാരവും',
+    'dining.cooking': 'പാചക ക്ലാസുകൾ',
+    'dining.cookingDesc': 'യഥാർത്ഥ കേരള വിഭവങ്ങൾ പഠിക്കുക',
+    'dining.menu': 'മെനു കാണുക',
+    
+    // Gallery
+    'gallery.label': 'ഗാലറി',
+    'gallery.title': 'കേരളത്തിലെ നിമിഷങ്ങൾ',
+    
+    // Contact
+    'contact.label': 'ബന്ധപ്പെടുക',
+    'contact.title': 'നിങ്ങളുടെ കേരള യാത്ര ആസൂത്രണം ചെയ്യുക',
+    'contact.subtitle': 'ഞങ്ങളുടെ ടീം നിങ്ങളെ സഹായിക്കാൻ തയ്യാറാണ്. ഞങ്ങൾ ഇംഗ്ലീഷ്, മലയാളം, ഹിന്ദി സംസാരിക്കുന്നു.',
+    'contact.firstname': 'പേര്',
+    'contact.phone': 'ഫോൺ',
+    'contact.email': 'ഇമെയിൽ',
+    'contact.checkin': 'ചെക്ക്-ഇൻ',
+    'contact.checkout': 'ചെക്ക്-ഔട്ട്',
+    'contact.message': 'സന്ദേശം',
+    'contact.messagePlaceholder': 'നിങ്ങളുടെ സ്വപ്ന കേരള അവധിക്കാലത്തെക്കുറിച്ച് പറയുക...',
+    'contact.send': 'അന്വേഷണം അയയ്ക്കുക',
+    'contact.info': 'ബന്ധപ്പെടൽ വിവരങ്ങൾ',
+    'contact.location': 'സ്ഥാനം',
+    'contact.locationValue': 'മുൻറോ ദ്വീപ്, കൊല്ലം ജില്ല\nകേരളം 691502, ഇന്ത്യ',
+    'contact.phoneValue': '+91 474 XXXXXXX\n+91 XXXXX XXXXX (വാട്ട്‌സ്ആപ്പ്)',
+    'contact.emailValue': 'reservations@munroemorris.com',
+    'contact.reception': 'റിസപ്ഷൻ',
+    'contact.receptionValue': '24 മണിക്കൂർ, ആഴ്ചയിൽ 7 ദിവസം',
+    'contact.newsletter': 'ബന്ധം നിലനിർത്തുക',
+    'contact.newsletterDesc': 'കേരള യാത്രാ നുറുങ്ങുകൾക്കും പ്രത്യേക ഓഫറുകൾക്കുമായി സബ്‌സ്ക്രൈബ് ചെയ്യുക.',
+    'contact.reach': 'എങ്ങനെ എത്താം',
+    'contact.airport1': 'തിരുവനന്തപുരം എയർപ്പോർട്ട്: 90 കി.മീ (2 മണിക്കൂർ)',
+    'contact.railway': 'കൊല്ലം റെയിൽവേ സ്റ്റേഷൻ: 25 കി.മീ (45 മിനിറ്റ്)',
+    'contact.airport2': 'കൊച്ചി എയർപ്പോർട്ട്: 160 കി.മീ (4 മണിക്കൂർ)',
+    
+    // Footer
+    'footer.tagline': 'ആഡംബരത്തിൽ കേരളത്തിന്റെ ബാക്ക്‌വാട്ടറുകളുടെ മാജിക്ക് അനുഭവിക്കുക.',
+    'footer.quickLinks': 'ദ്രുത ലിങ്കുകൾ',
+    'footer.experiences': 'അനുഭവങ്ങൾ',
+    'footer.contact': 'ബന്ധപ്പെടുക',
+    'footer.backwater': 'ബാക്ക്‌വാട്ടർ ക്രൂസ്',
+    'footer.therapy': 'ആയുർവേദ തെറാപ്പി',
+    'footer.tour': 'വില്ലേജ് ടൂർ',
+    'footer.kathakali': 'കഥകളി',
+    'footer.cooking': 'പാചക ക്ലാസ്',
+    'footer.birds': 'പക്ഷി നിരീക്ഷണം',
+    'footer.copyright': '© 2024 മുൻറോ മോറിസ് റിസോർട്ട്. എല്ലാ അവകാശങ്ങളും സംരക്ഷിച്ചിരിക്കുന്നു.',
+    'footer.privacy': 'സ്വകാര്യതാ നയം',
+    'footer.terms': 'നിബന്ധനകൾ',
+    'footer.cookies': 'കുക്കി നയം',
+  }
+}
+
+// Language Provider Component
+function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLang] = useState<Language>('en')
+
+  useEffect(() => {
+    const storedLang = localStorage.getItem('lang') as Language | null
+    if (storedLang) {
+      // Use microtask to avoid synchronous setState warning
+      Promise.resolve().then(() => setLang(storedLang))
+    }
+  }, [])
+
+  const handleSetLang = (newLang: Language) => {
+    setLang(newLang)
+    localStorage.setItem('lang', newLang)
+  }
+
+  const t = (key: string): string => {
+    return translations[lang][key] || key
+  }
+
+  return (
+    <LanguageContext.Provider value={{ lang, setLang: handleSetLang, t }}>
+      {children}
+    </LanguageContext.Provider>
+  )
+}
+
+// Hook to use language context
+function useLang() {
+  const context = useContext(LanguageContext)
+  if (!context) {
+    throw new Error('useLang must be used within a LanguageProvider')
+  }
+  return context
+}
 
 // Theme Toggle Component
 function ThemeToggle() {
@@ -94,8 +437,27 @@ function ThemeToggle() {
   )
 }
 
+// Language Toggle Component
+function LanguageToggle() {
+  const { lang, setLang } = useLang()
+  
+  return (
+    <button
+      onClick={() => setLang(lang === 'en' ? 'ml' : 'en')}
+      className="flex items-center gap-2 px-3 py-1.5 skeuo-inset rounded-lg hover:bg-primary/10 transition-colors"
+      aria-label="Toggle language"
+    >
+      <Globe className="h-4 w-4 text-primary" />
+      <span className="text-sm font-medium text-foreground">
+        {lang === 'en' ? 'ML' : 'EN'}
+      </span>
+    </button>
+  )
+}
+
 // Navigation Component
 function Navigation() {
+  const { t } = useLang()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -108,12 +470,12 @@ function Navigation() {
   }, [])
 
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Accommodations', href: '#accommodations' },
-    { name: 'Experiences', href: '#experiences' },
-    { name: 'Ayurveda', href: '#ayurveda' },
-    { name: 'Dining', href: '#dining' },
-    { name: 'Gallery', href: '#gallery' },
+    { name: t('nav.about'), href: '#about' },
+    { name: t('nav.accommodations'), href: '#accommodations' },
+    { name: t('nav.experiences'), href: '#experiences' },
+    { name: t('nav.ayurveda'), href: '#ayurveda' },
+    { name: t('nav.dining'), href: '#dining' },
+    { name: t('nav.gallery'), href: '#gallery' },
   ]
 
   return (
@@ -138,7 +500,7 @@ function Navigation() {
                 <span className={`font-serif text-xl sm:text-2xl font-semibold tracking-wide transition-colors duration-300 ${
                   isScrolled ? 'text-foreground' : 'text-white'
                 }`}>
-                  Munroe Morris
+                  {t('hero.title')}
                 </span>
                 <p className={`text-xs tracking-widest uppercase ${
                   isScrolled ? 'text-muted-foreground' : 'text-white/70'
@@ -165,14 +527,16 @@ function Navigation() {
 
             {/* Right side */}
             <div className="hidden lg:flex items-center gap-4">
+              <LanguageToggle />
               <ThemeToggle />
               <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
-                Book Your Stay
+                {t('nav.book')}
               </Button>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex items-center gap-4 lg:hidden">
+            <div className="flex items-center gap-3 lg:hidden">
+              <LanguageToggle />
               <ThemeToggle />
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -217,7 +581,7 @@ function Navigation() {
                 className="mt-4"
               >
                 <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">
-                  Book Your Stay
+                  {t('nav.book')}
                 </Button>
               </motion.div>
             </div>
@@ -230,6 +594,7 @@ function Navigation() {
 
 // Hero Section
 function HeroSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -272,34 +637,30 @@ function HeroSection() {
           >
             <Palmtree className="h-6 w-6 text-primary" />
             <span className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-              Welcome to God's Own Country
+              {t('hero.welcome')}
             </span>
             <Palmtree className="h-6 w-6 text-primary" />
           </motion.div>
           
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-semibold leading-tight">
-            Munroe Morris
+            {t('hero.title')}
           </h1>
           
-          <p className="font-malayalam text-lg sm:text-xl text-primary mb-2">
-            മുൻറോ മോറിസ് റിസോർട്ട്
-          </p>
-          
           <p className="font-display text-xl sm:text-2xl md:text-3xl text-white/90 italic max-w-2xl mx-auto">
-            Where Backwaters Meet Luxury
+            {t('hero.tagline')}
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-4 text-white/70 text-sm mt-4">
             <span className="flex items-center gap-1">
-              <Ship className="h-4 w-4" /> Houseboats
+              <Ship className="h-4 w-4" /> {t('hero.houseboats')}
             </span>
             <span className="text-primary">•</span>
             <span className="flex items-center gap-1">
-              <Flower2 className="h-4 w-4" /> Ayurveda
+              <Flower2 className="h-4 w-4" /> {t('hero.ayurveda')}
             </span>
             <span className="text-primary">•</span>
             <span className="flex items-center gap-1">
-              <Mountain className="h-4 w-4" /> Western Ghats
+              <Mountain className="h-4 w-4" /> {t('hero.ghats')}
             </span>
           </div>
           
@@ -308,7 +669,7 @@ function HeroSection() {
               size="lg"
               className="skeuo-button px-8 py-6 text-lg tracking-wide"
             >
-              Explore Kerala Paradise
+              {t('hero.cta')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -317,7 +678,7 @@ function HeroSection() {
               className="bg-transparent border-2 border-primary/50 text-primary hover:bg-primary/10 px-8 py-6 rounded-xl text-lg tracking-wide"
             >
               <PlayCircle className="mr-2 h-5 w-5" />
-              Virtual Tour
+              {t('hero.tour')}
             </Button>
           </div>
         </motion.div>
@@ -334,7 +695,7 @@ function HeroSection() {
             transition={{ duration: 1.5, repeat: Infinity }}
             className="flex flex-col items-center gap-2 text-white/70"
           >
-            <span className="text-xs tracking-[0.2em] uppercase">Scroll</span>
+            <span className="text-xs tracking-[0.2em] uppercase">{t('hero.scroll')}</span>
             <ChevronDown className="h-5 w-5" />
           </motion.div>
         </motion.div>
@@ -345,6 +706,7 @@ function HeroSection() {
 
 // About Section
 function AboutSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
@@ -362,41 +724,31 @@ function AboutSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Our Heritage
+                {t('about.label')}
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                A Jewel in
-                <span className="gold-metallic"> Kerala's Crown</span>
+                {t('about.title').split(' ').slice(0, -2).join(' ')}
+                <span className="gold-metallic"> {t('about.title').split(' ').slice(-2).join(' ')}</span>
               </h2>
             </div>
             <div className="divider-gold w-24" />
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-              <p>
-                Nestled amidst the serene backwaters of Kerala, Munroe Morris 
-                represents the perfect harmony of traditional Kerala architecture 
-                and contemporary luxury. Our resort is named after Colonel John Munro, 
-                whose legacy is intertwined with this beautiful land.
-              </p>
-              <p>
-                Experience the warmth of Kerala hospitality, where every guest is 
-                treated as family. From the moment you arrive, you'll be embraced 
-                by the tranquil beauty of swaying coconut palms, pristine waters, 
-                and the gentle rhythm of village life.
-              </p>
+              <p>{t('about.p1')}</p>
+              <p>{t('about.p2')}</p>
             </div>
             
             <div className="grid grid-cols-3 gap-6 pt-6">
               <div className="skeuo-card p-4 text-center">
                 <p className="font-serif text-3xl gold-metallic">25</p>
-                <p className="text-xs text-muted-foreground mt-1">Luxury Villas</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('about.villas')}</p>
               </div>
               <div className="skeuo-card p-4 text-center">
                 <p className="font-serif text-3xl gold-metallic">500+</p>
-                <p className="text-xs text-muted-foreground mt-1">Happy Guests</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('about.guests')}</p>
               </div>
               <div className="skeuo-card p-4 text-center">
                 <p className="font-serif text-3xl gold-metallic">4.9</p>
-                <p className="text-xs text-muted-foreground mt-1">Rating ★</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('about.rating')} ★</p>
               </div>
             </div>
           </motion.div>
@@ -418,8 +770,8 @@ function AboutSection() {
               </div>
             </div>
             <div className="absolute -bottom-4 -left-4 skeuo-button p-6 animate-float">
-              <p className="font-serif text-xl">Est. 2009</p>
-              <p className="text-xs opacity-80 mt-1">Kerala, India</p>
+              <p className="font-serif text-xl">{t('about.established')}</p>
+              <p className="text-xs opacity-80 mt-1">{t('about.location')}</p>
             </div>
           </motion.div>
         </div>
@@ -430,39 +782,37 @@ function AboutSection() {
 
 // Accommodations Section
 function AccommodationsSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   const accommodations = [
     {
-      name: "Backwater Villa",
-      malayalamName: "ബാക്ക്‌വാട്ടർ വില്ല",
-      description: "Traditional Kerala architecture with modern amenities overlooking the serene backwaters",
+      nameKey: 'villa.backwater.name',
+      descKey: 'villa.backwater.desc',
       image: "/images/villa-1.png",
       price: "₹15,000",
       size: "120 m²",
       guests: 2,
-      features: ["Private Deck", "Canoe Ride", "Sunset View"]
+      featureKeys: ['feature.deck', 'feature.canoe', 'feature.sunset']
     },
     {
-      name: "Coconut Grove Suite",
-      malayalamName: "തെങ്ങ് തോപ്പ് സ്യൂട്ട്",
-      description: "Nestled among swaying coconut palms with authentic Kerala decor",
+      nameKey: 'villa.coconut.name',
+      descKey: 'villa.coconut.desc',
       image: "/images/villa-2.png",
       price: "₹12,000",
       size: "95 m²",
       guests: 2,
-      features: ["Garden View", "Outdoor Bath", "Bird Watching"]
+      featureKeys: ['feature.garden', 'feature.bath', 'feature.birds']
     },
     {
-      name: "Heritage Nalukettu",
-      malayalamName: "ഹെറിറ്റേജ് നാലുകെട്ട്",
-      description: "Traditional Kerala courtyard house with wooden architecture",
+      nameKey: 'villa.heritage.name',
+      descKey: 'villa.heritage.desc',
       image: "/images/villa-3.png",
       price: "₹18,000",
       size: "150 m²",
       guests: 4,
-      features: ["Courtyard", "Wood Carvings", "Heritage Style"]
+      featureKeys: ['feature.courtyard', 'feature.wood', 'feature.heritage']
     }
   ]
 
@@ -478,15 +828,14 @@ function AccommodationsSection() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-            Accommodations
+            {t('accommodations.label')}
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Your Home in
-            <span className="gold-metallic"> Paradise</span>
+            {t('accommodations.title').split(' ').slice(0, -1).join(' ')}
+            <span className="gold-metallic"> {t('accommodations.title').split(' ').slice(-1)}</span>
           </h2>
           <p className="text-muted-foreground text-lg mt-6">
-            Each villa is designed to reflect Kerala's rich heritage while providing 
-            modern comforts for an unforgettable stay.
+            {t('accommodations.subtitle')}
           </p>
         </motion.div>
 
@@ -494,7 +843,7 @@ function AccommodationsSection() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {accommodations.map((room, index) => (
             <motion.div
-              key={room.name}
+              key={room.nameKey}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -504,34 +853,31 @@ function AccommodationsSection() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
                   src={room.image}
-                  alt={room.name}
+                  alt={t(room.nameKey)}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white/80 text-sm">Starting from</p>
-                  <p className="font-serif text-2xl text-white">{room.price}<span className="text-sm">/night</span></p>
+                  <p className="text-white/80 text-sm">{t('accommodations.from')}</p>
+                  <p className="font-serif text-2xl text-white">{room.price}<span className="text-sm">{t('accommodations.night')}</span></p>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6 space-y-4">
-                <div>
-                  <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
-                    {room.name}
-                  </h3>
-                  <p className="font-malayalam text-sm text-primary">{room.malayalamName}</p>
-                </div>
-                <p className="text-muted-foreground text-sm">{room.description}</p>
+                <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
+                  {t(room.nameKey)}
+                </h3>
+                <p className="text-muted-foreground text-sm">{t(room.descKey)}</p>
 
                 {/* Features */}
                 <div className="flex flex-wrap gap-2">
-                  {room.features.map((feature) => (
+                  {room.featureKeys.map((featureKey) => (
                     <span
-                      key={feature}
+                      key={featureKey}
                       className="text-xs px-3 py-1 skeuo-inset text-muted-foreground rounded-full"
                     >
-                      {feature}
+                      {t(featureKey)}
                     </span>
                   ))}
                 </div>
@@ -544,7 +890,7 @@ function AccommodationsSection() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4" />
-                    <span>{room.guests} Guests</span>
+                    <span>{room.guests} {t('accommodations.guests')}</span>
                   </div>
                 </div>
 
@@ -553,7 +899,7 @@ function AccommodationsSection() {
                   variant="ghost"
                   className="w-full justify-between text-primary hover:text-primary hover:bg-primary/5 mt-2"
                 >
-                  View Details
+                  {t('accommodations.details')}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -567,29 +913,27 @@ function AccommodationsSection() {
 
 // Experiences Section
 function ExperiencesSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   const experiences = [
     {
       icon: <Ship className="h-8 w-8" />,
-      title: "Houseboat Cruise",
-      malayalamTitle: "ഹൗസ്ബോട്ട് ക്രൂസ്",
-      description: "Drift through the enchanting backwaters on a traditional Kettuvallam houseboat",
+      titleKey: 'exp.houseboat.name',
+      descKey: 'exp.houseboat.desc',
       image: "/images/experience-1.png"
     },
     {
       icon: <Sparkles className="h-8 w-8" />,
-      title: "Ayurveda Wellness",
-      malayalamTitle: "ആയുർവേദ വെൽനസ്",
-      description: "Rejuvenate with authentic Ayurvedic treatments and therapies",
+      titleKey: 'exp.ayurveda.name',
+      descKey: 'exp.ayurveda.desc',
       image: "/images/spa.png"
     },
     {
       icon: <Mountain className="h-8 w-8" />,
-      title: "Village Life Experience",
-      malayalamTitle: "ഗ്രാമീണ ജീവിതം",
-      description: "Immerse yourself in Kerala's rich culture and traditions",
+      titleKey: 'exp.village.name',
+      descKey: 'exp.village.desc',
       image: "/images/experience-3.png"
     }
   ]
@@ -606,15 +950,13 @@ function ExperiencesSection() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-            Kerala Experiences
+            {t('experiences.label')}
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Discover
-            <span className="gold-metallic"> God's Own Country</span>
+            {t('experiences.title')}
           </h2>
           <p className="text-muted-foreground text-lg mt-6">
-            From serene backwaters to ancient healing traditions, 
-            experience the authentic soul of Kerala.
+            {t('experiences.subtitle')}
           </p>
         </motion.div>
 
@@ -622,7 +964,7 @@ function ExperiencesSection() {
         <div className="grid md:grid-cols-3 gap-8">
           {experiences.map((exp, index) => (
             <motion.div
-              key={exp.title}
+              key={exp.titleKey}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -631,7 +973,7 @@ function ExperiencesSection() {
               <div className="relative aspect-[3/4]">
                 <img
                   src={exp.image}
-                  alt={exp.title}
+                  alt={t(exp.titleKey)}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -639,9 +981,8 @@ function ExperiencesSection() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <div className="text-primary mb-3">{exp.icon}</div>
-                  <h3 className="font-serif text-2xl">{exp.title}</h3>
-                  <p className="font-malayalam text-xs text-primary/80">{exp.malayalamTitle}</p>
-                  <p className="text-white/70 text-sm mt-2">{exp.description}</p>
+                  <h3 className="font-serif text-2xl">{t(exp.titleKey)}</h3>
+                  <p className="text-white/70 text-sm mt-2">{t(exp.descKey)}</p>
                 </div>
               </div>
             </motion.div>
@@ -654,6 +995,7 @@ function ExperiencesSection() {
 
 // Ayurveda Section
 function AyurvedaSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
@@ -672,64 +1014,51 @@ function AyurvedaSection() {
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium flex items-center gap-2">
                 <Flower2 className="h-4 w-4" />
-                Ayurveda & Wellness
+                {t('ayurveda.label')}
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                Ancient Healing,
-                <span className="gold-metallic"> Modern Comfort</span>
+                {t('ayurveda.title').split(',')[0]},
+                <span className="gold-metallic"> {t('ayurveda.title').split(',')[1]}</span>
               </h2>
-              <p className="font-malayalam text-lg text-primary">ആയുർവേദം</p>
             </div>
             <div className="divider-gold w-24" />
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Kerala is the birthplace of Ayurveda, the 5000-year-old science of life. 
-              Our wellness center offers authentic treatments passed down through generations, 
-              using traditional herbs and oils sourced from Kerala's pristine forests.
+              {t('ayurveda.p1')}
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div className="skeuo-card p-4">
                 <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
                   <Flower2 className="h-5 w-5 text-primary" />
-                  Panchakarma
+                  {t('ayurveda.panchakarma')}
                 </h4>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Complete detoxification program
-                </p>
+                <p className="text-muted-foreground text-sm mt-1">{t('ayurveda.panchakarmaDesc')}</p>
               </div>
               <div className="skeuo-card p-4">
                 <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Shirodhara
+                  {t('ayurveda.shirodhara')}
                 </h4>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Meditative oil therapy
-                </p>
+                <p className="text-muted-foreground text-sm mt-1">{t('ayurveda.shirodharaDesc')}</p>
               </div>
               <div className="skeuo-card p-4">
                 <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
                   <Heart className="h-5 w-5 text-primary" />
-                  Abhyanga
+                  {t('ayurveda.abhyanga')}
                 </h4>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Full body massage
-                </p>
+                <p className="text-muted-foreground text-sm mt-1">{t('ayurveda.abhyangaDesc')}</p>
               </div>
               <div className="skeuo-card p-4">
                 <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
                   <Waves className="h-5 w-5 text-primary" />
-                  Nasyam
+                  {t('ayurveda.nasyam')}
                 </h4>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Nasal treatment therapy
-                </p>
+                <p className="text-muted-foreground text-sm mt-1">{t('ayurveda.nasyamDesc')}</p>
               </div>
             </div>
 
-            <Button
-              className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4"
-            >
-              Book Wellness Package
+            <Button className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4">
+              {t('ayurveda.book')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
@@ -752,8 +1081,8 @@ function AyurvedaSection() {
               </div>
             </div>
             <div className="absolute -bottom-4 -right-4 skeuo-button p-6 animate-pulse-glow">
-              <p className="font-serif text-xl">Certified</p>
-              <p className="text-xs opacity-80">Ayurveda Center</p>
+              <p className="font-serif text-xl">{t('ayurveda.certified')}</p>
+              <p className="text-xs opacity-80">{t('ayurveda.center')}</p>
             </div>
           </motion.div>
         </div>
@@ -764,6 +1093,7 @@ function AyurvedaSection() {
 
 // Dining Section
 function DiningSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
@@ -801,19 +1131,16 @@ function DiningSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Kerala Cuisine
+                {t('dining.label')}
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                Flavors of
-                <span className="gold-metallic"> Kerala</span>
+                {t('dining.title').split(' ').slice(0, -1).join(' ')}
+                <span className="gold-metallic"> {t('dining.title').split(' ').slice(-1)}</span>
               </h2>
-              <p className="font-malayalam text-lg text-primary">കേരള പാചകം</p>
             </div>
             <div className="divider-gold w-24" />
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Savor the authentic tastes of Kerala, from traditional Sadya served 
-              on banana leaves to fresh Karimeen (Pearl Spot) caught from the backwaters. 
-              Our chefs use recipes passed down through generations.
+              {t('dining.p1')}
             </p>
 
             <div className="space-y-4 pt-4">
@@ -822,10 +1149,8 @@ function DiningSection() {
                   <UtensilsCrossed className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">The Backwater Restaurant</h4>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Traditional Kerala Sadya & Seafood specialties
-                  </p>
+                  <h4 className="font-serif text-xl text-foreground">{t('dining.restaurant')}</h4>
+                  <p className="text-muted-foreground text-sm mt-1">{t('dining.restaurantDesc')}</p>
                 </div>
               </div>
               <div className="skeuo-card flex items-start gap-4 p-4">
@@ -833,10 +1158,8 @@ function DiningSection() {
                   <Star className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">Sunset Chai Lounge</h4>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Fresh chai & local snacks with backwater views
-                  </p>
+                  <h4 className="font-serif text-xl text-foreground">{t('dining.lounge')}</h4>
+                  <p className="text-muted-foreground text-sm mt-1">{t('dining.loungeDesc')}</p>
                 </div>
               </div>
               <div className="skeuo-card flex items-start gap-4 p-4">
@@ -844,18 +1167,14 @@ function DiningSection() {
                   <Heart className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">Cooking Classes</h4>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Learn to make authentic Kerala dishes
-                  </p>
+                  <h4 className="font-serif text-xl text-foreground">{t('dining.cooking')}</h4>
+                  <p className="text-muted-foreground text-sm mt-1">{t('dining.cookingDesc')}</p>
                 </div>
               </div>
             </div>
 
-            <Button
-              className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4"
-            >
-              View Our Menu
+            <Button className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4">
+              {t('dining.menu')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
@@ -867,6 +1186,7 @@ function DiningSection() {
 
 // Gallery Section
 function GallerySection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -898,11 +1218,10 @@ function GallerySection() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-            Gallery
+            {t('gallery.label')}
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Moments in
-            <span className="gold-metallic"> Kerala</span>
+            {t('gallery.title')}
           </h2>
         </motion.div>
 
@@ -981,6 +1300,7 @@ function GallerySection() {
 
 // Contact Section
 function ContactSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
@@ -998,71 +1318,46 @@ function ContactSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Get in Touch
+                {t('contact.label')}
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl text-foreground leading-tight">
-                Plan Your
-                <span className="gold-metallic"> Kerala Escape</span>
+                {t('contact.title').split(' ').slice(0, -1).join(' ')}
+                <span className="gold-metallic"> {t('contact.title').split(' ').slice(-1)}</span>
               </h2>
             </div>
-            <p className="text-muted-foreground text-lg">
-              Our team is ready to help you plan an unforgettable Kerala experience. 
-              We speak English, Malayalam, Hindi, and more.
-            </p>
+            <p className="text-muted-foreground text-lg">{t('contact.subtitle')}</p>
 
             <form className="space-y-4 pt-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">First Name</label>
-                  <Input 
-                    placeholder="Your name" 
-                    className="skeuo-input mt-1.5"
-                  />
+                  <label className="text-sm font-medium text-foreground">{t('contact.firstname')}</label>
+                  <Input placeholder="..." className="skeuo-input mt-1.5" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">Phone</label>
-                  <Input 
-                    placeholder="+91 XXXXX XXXXX" 
-                    className="skeuo-input mt-1.5"
-                  />
+                  <label className="text-sm font-medium text-foreground">{t('contact.phone')}</label>
+                  <Input placeholder="+91 XXXXX XXXXX" className="skeuo-input mt-1.5" />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Email</label>
-                <Input 
-                  type="email" 
-                  placeholder="your@email.com" 
-                  className="skeuo-input mt-1.5"
-                />
+                <label className="text-sm font-medium text-foreground">{t('contact.email')}</label>
+                <Input type="email" placeholder="your@email.com" className="skeuo-input mt-1.5" />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">Check-in</label>
-                  <Input 
-                    type="date" 
-                    className="skeuo-input mt-1.5"
-                  />
+                  <label className="text-sm font-medium text-foreground">{t('contact.checkin')}</label>
+                  <Input type="date" className="skeuo-input mt-1.5" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">Check-out</label>
-                  <Input 
-                    type="date" 
-                    className="skeuo-input mt-1.5"
-                  />
+                  <label className="text-sm font-medium text-foreground">{t('contact.checkout')}</label>
+                  <Input type="date" className="skeuo-input mt-1.5" />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Message</label>
-                <Textarea 
-                  placeholder="Tell us about your dream Kerala vacation..." 
-                  className="skeuo-input mt-1.5 min-h-[120px]"
-                />
+                <label className="text-sm font-medium text-foreground">{t('contact.message')}</label>
+                <Textarea placeholder={t('contact.messagePlaceholder')} className="skeuo-input mt-1.5 min-h-[120px]" />
               </div>
-              <Button
-                type="submit"
-                className="skeuo-button w-full py-6 text-lg tracking-wide"
-              >
-                Send Inquiry
+              <Button type="submit" className="skeuo-button w-full py-6 text-lg tracking-wide">
+                {t('contact.send')}
                 <Send className="ml-2 h-5 w-5" />
               </Button>
             </form>
@@ -1076,45 +1371,35 @@ function ContactSection() {
             className="space-y-6"
           >
             <div className="skeuo-card p-8 space-y-6">
-              <h3 className="font-serif text-2xl text-foreground">Contact Information</h3>
+              <h3 className="font-serif text-2xl text-foreground">{t('contact.info')}</h3>
               
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <MapPin className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Location</p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      Munroe Island, Kollam District<br />
-                      Kerala 691502, India
-                    </p>
+                    <p className="font-medium text-foreground">{t('contact.location')}</p>
+                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">{t('contact.locationValue')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Phone className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Phone</p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      +91 474 XXXXXXX<br />
-                      +91 XXXXX XXXXX (WhatsApp)
-                    </p>
+                    <p className="font-medium text-foreground">{t('contact.phone')}</p>
+                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">{t('contact.phoneValue')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Mail className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Email</p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      reservations@munroemorris.com
-                    </p>
+                    <p className="font-medium text-foreground">{t('contact.email')}</p>
+                    <p className="text-muted-foreground text-sm mt-1">{t('contact.emailValue')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Clock className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Reception</p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      24 Hours, 7 Days a Week
-                    </p>
+                    <p className="font-medium text-foreground">{t('contact.reception')}</p>
+                    <p className="text-muted-foreground text-sm mt-1">{t('contact.receptionValue')}</p>
                   </div>
                 </div>
               </div>
@@ -1122,15 +1407,10 @@ function ContactSection() {
 
             {/* Newsletter */}
             <div className="skeuo-card p-8 space-y-4">
-              <h3 className="font-serif text-2xl text-foreground">Stay Connected</h3>
-              <p className="text-muted-foreground text-sm">
-                Subscribe for Kerala travel tips and exclusive offers.
-              </p>
+              <h3 className="font-serif text-2xl text-foreground">{t('contact.newsletter')}</h3>
+              <p className="text-muted-foreground text-sm">{t('contact.newsletterDesc')}</p>
               <div className="flex gap-2">
-                <Input 
-                  placeholder="Your email" 
-                  className="skeuo-input flex-1"
-                />
+                <Input placeholder="email" className="skeuo-input flex-1" />
                 <Button className="skeuo-button px-4">
                   <Send className="h-4 w-4" />
                 </Button>
@@ -1139,16 +1419,16 @@ function ContactSection() {
 
             {/* How to Reach */}
             <div className="skeuo-card p-8">
-              <h3 className="font-serif text-xl text-foreground mb-4">How to Reach</h3>
+              <h3 className="font-serif text-xl text-foreground mb-4">{t('contact.reach')}</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">✈</span> Trivandrum Airport: 90 km (2 hours)
+                  <span className="text-primary">✈</span> {t('contact.airport1')}
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">🚂</span> Kollam Railway Station: 25 km (45 min)
+                  <span className="text-primary">🚂</span> {t('contact.railway')}
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">🚗</span> Kochi Airport: 160 km (4 hours)
+                  <span className="text-primary">🚗</span> {t('contact.airport2')}
                 </li>
               </ul>
             </div>
@@ -1161,6 +1441,8 @@ function ContactSection() {
 
 // Footer
 function Footer() {
+  const { t } = useLang()
+  
   return (
     <footer className="skeuo-panel py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1172,13 +1454,12 @@ function Footer() {
                 <Flower2 className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="font-serif text-2xl text-foreground">Munroe Morris</h3>
+                <h3 className="font-serif text-2xl text-foreground">{t('hero.title')}</h3>
                 <p className="text-xs text-muted-foreground">Kerala, India</p>
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Experience the magic of Kerala's backwaters in luxury. 
-              Your journey to God's Own Country begins here.
+              {t('footer.tagline')}
             </p>
             <div className="flex gap-4 pt-2">
               <a href="#" className="skeuo-inset p-2 rounded-lg hover:bg-primary/20 transition-colors">
@@ -1200,9 +1481,9 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-serif text-lg text-foreground mb-4">Quick Links</h4>
+            <h4 className="font-serif text-lg text-foreground mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2">
-              {['About Us', 'Accommodations', 'Ayurveda', 'Houseboats', 'Dining', 'Gallery'].map((link) => (
+              {[t('nav.about'), t('nav.accommodations'), t('nav.ayurveda'), t('hero.houseboats'), t('nav.dining'), t('nav.gallery')].map((link) => (
                 <li key={link}>
                   <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                     {link}
@@ -1214,9 +1495,9 @@ function Footer() {
 
           {/* Experiences */}
           <div>
-            <h4 className="font-serif text-lg text-foreground mb-4">Experiences</h4>
+            <h4 className="font-serif text-lg text-foreground mb-4">{t('footer.experiences')}</h4>
             <ul className="space-y-2">
-              {['Backwater Cruise', 'Ayurveda Therapy', 'Village Tour', 'Kathakali Show', 'Cooking Class', 'Bird Watching'].map((service) => (
+              {[t('footer.backwater'), t('footer.therapy'), t('footer.tour'), t('footer.kathakali'), t('footer.cooking'), t('footer.birds')].map((service) => (
                 <li key={service}>
                   <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                     {service}
@@ -1228,7 +1509,7 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-serif text-lg text-foreground mb-4">Contact</h4>
+            <h4 className="font-serif text-lg text-foreground mb-4">{t('footer.contact')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -1250,12 +1531,12 @@ function Footer() {
         <div className="divider-gold mt-12 mb-8" />
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground/50 text-sm">
-            © 2024 Munroe Morris Resort. All rights reserved.
+            {t('footer.copyright')}
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground/50">
-            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms</a>
-            <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
+            <a href="#" className="hover:text-primary transition-colors">{t('footer.privacy')}</a>
+            <a href="#" className="hover:text-primary transition-colors">{t('footer.terms')}</a>
+            <a href="#" className="hover:text-primary transition-colors">{t('footer.cookies')}</a>
           </div>
         </div>
       </div>
@@ -1308,17 +1589,19 @@ function PlayCircle({ className }: { className?: string }) {
 // Main Page Component
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col leather-texture">
-      <Navigation />
-      <HeroSection />
-      <AboutSection />
-      <AccommodationsSection />
-      <ExperiencesSection />
-      <AyurvedaSection />
-      <DiningSection />
-      <GallerySection />
-      <ContactSection />
-      <Footer />
-    </main>
+    <LanguageProvider>
+      <main className="min-h-screen flex flex-col leather-texture">
+        <Navigation />
+        <HeroSection />
+        <AboutSection />
+        <AccommodationsSection />
+        <ExperiencesSection />
+        <AyurvedaSection />
+        <DiningSection />
+        <GallerySection />
+        <ContactSection />
+        <Footer />
+      </main>
+    </LanguageProvider>
   )
 }
