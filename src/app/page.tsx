@@ -27,8 +27,72 @@ import {
   BedDouble,
   ChevronLeft,
   ChevronRight,
-  Send
+  Send,
+  Sun,
+  Moon,
+  Palmtree,
+  Ship,
+  Lotus,
+  Mountain
 } from 'lucide-react'
+
+// Theme Toggle Component
+function ThemeToggle() {
+  const [mounted, setMounted] = useState(false)
+  // Initialize theme - dark is default
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  // Handle mount and localStorage initialization
+  useEffect(() => {
+    // Initialize from localStorage - this is a valid pattern for SSR hydration
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+    const storedTheme = localStorage.getItem('theme')
+    if (storedTheme === 'light') {
+      document.documentElement.classList.add('light')
+      setTheme('light')
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('light')
+      localStorage.setItem('theme', 'light')
+      setTheme('light')
+    } else {
+      document.documentElement.classList.remove('light')
+      localStorage.setItem('theme', 'dark')
+      setTheme('dark')
+    }
+  }
+
+  // Avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <button className="theme-toggle" aria-label="Toggle theme">
+        <div className="theme-toggle-knob">
+          <Moon className="h-4 w-4 text-primary-foreground" />
+        </div>
+      </button>
+    )
+  }
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="theme-toggle"
+      aria-label="Toggle theme"
+    >
+      <div className="theme-toggle-knob">
+        {theme === 'dark' ? (
+          <Moon className="h-4 w-4 text-primary-foreground" />
+        ) : (
+          <Sun className="h-4 w-4 text-primary-foreground" />
+        )}
+      </div>
+    </button>
+  )
+}
 
 // Navigation Component
 function Navigation() {
@@ -47,8 +111,8 @@ function Navigation() {
     { name: 'About', href: '#about' },
     { name: 'Accommodations', href: '#accommodations' },
     { name: 'Experiences', href: '#experiences' },
+    { name: 'Ayurveda', href: '#ayurveda' },
     { name: 'Dining', href: '#dining' },
-    { name: 'Spa', href: '#spa' },
     { name: 'Gallery', href: '#gallery' },
   ]
 
@@ -59,19 +123,29 @@ function Navigation() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? 'bg-background/95 backdrop-blur-md shadow-lg'
+            ? 'skeuo-panel py-2'
             : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2">
-              <span className={`font-serif text-2xl sm:text-3xl font-semibold tracking-wide transition-colors duration-300 ${
-                isScrolled ? 'text-foreground' : 'text-white'
-              }`}>
-                Munroe Morris
-              </span>
+            <a href="#" className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
+                <Lotus className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <span className={`font-serif text-xl sm:text-2xl font-semibold tracking-wide transition-colors duration-300 ${
+                  isScrolled ? 'text-foreground' : 'text-white'
+                }`}>
+                  Munroe Morris
+                </span>
+                <p className={`text-xs tracking-widest uppercase ${
+                  isScrolled ? 'text-muted-foreground' : 'text-white/70'
+                }`}>
+                  Kerala · India
+                </p>
+              </div>
             </a>
 
             {/* Desktop Navigation */}
@@ -89,24 +163,26 @@ function Navigation() {
               ))}
             </nav>
 
-            {/* Book Now Button */}
+            {/* Right side */}
             <div className="hidden lg:flex items-center gap-4">
-              <Button
-                className="btn-luxury bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-none font-medium tracking-wide transition-all duration-300"
-              >
+              <ThemeToggle />
+              <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
                 Book Your Stay
               </Button>
             </div>
 
             {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 transition-colors duration-300 ${
-                isScrolled ? 'text-foreground' : 'text-white'
-              }`}
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="flex items-center gap-4 lg:hidden">
+              <ThemeToggle />
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={`p-2 transition-colors duration-300 ${
+                  isScrolled ? 'text-foreground' : 'text-white'
+                }`}
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
       </motion.header>
@@ -118,9 +194,9 @@ function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-background lg:hidden"
+            className="fixed inset-0 z-40 skeuo-panel lg:hidden pt-24"
           >
-            <div className="flex flex-col items-center justify-center h-full gap-8">
+            <div className="flex flex-col items-center justify-center h-full gap-6">
               {navLinks.map((link, index) => (
                 <motion.a
                   key={link.name}
@@ -138,8 +214,9 @@ function Navigation() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
+                className="mt-4"
               >
-                <Button className="btn-luxury bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-none font-medium tracking-wide">
+                <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">
                   Book Your Stay
                 </Button>
               </motion.div>
@@ -170,10 +247,10 @@ function HeroSection() {
       >
         <img
           src="/images/hero.png"
-          alt="Munroe Morris Resort"
+          alt="Munroe Morris Resort Kerala"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
       </motion.div>
 
       {/* Content */}
@@ -187,30 +264,60 @@ function HeroSection() {
           transition={{ duration: 1, delay: 0.3 }}
           className="space-y-6"
         >
-          <p className="text-white/80 text-sm sm:text-base tracking-[0.3em] uppercase font-medium">
-            Welcome to Paradise
-          </p>
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.5, type: "spring" }}
+            className="flex items-center justify-center gap-2"
+          >
+            <Palmtree className="h-6 w-6 text-primary" />
+            <span className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
+              Welcome to God's Own Country
+            </span>
+            <Palmtree className="h-6 w-6 text-primary" />
+          </motion.div>
+          
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-semibold leading-tight">
             Munroe Morris
           </h1>
-          <p className="font-display text-xl sm:text-2xl md:text-3xl text-white/90 italic max-w-2xl mx-auto">
-            Where Luxury Meets Nature
+          
+          <p className="font-malayalam text-lg sm:text-xl text-primary mb-2">
+            മുൻറോ മോറിസ് റിസോർട്ട്
           </p>
+          
+          <p className="font-display text-xl sm:text-2xl md:text-3xl text-white/90 italic max-w-2xl mx-auto">
+            Where Backwaters Meet Luxury
+          </p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 text-white/70 text-sm mt-4">
+            <span className="flex items-center gap-1">
+              <Ship className="h-4 w-4" /> Houseboats
+            </span>
+            <span className="text-primary">•</span>
+            <span className="flex items-center gap-1">
+              <Lotus className="h-4 w-4" /> Ayurveda
+            </span>
+            <span className="text-primary">•</span>
+            <span className="flex items-center gap-1">
+              <Mountain className="h-4 w-4" /> Western Ghats
+            </span>
+          </div>
+          
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Button
               size="lg"
-              className="btn-luxury bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-none text-lg tracking-wide"
+              className="skeuo-button px-8 py-6 text-lg tracking-wide"
             >
-              Discover Our Resort
+              Explore Kerala Paradise
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="bg-transparent border-white/50 text-white hover:bg-white/10 px-8 py-6 rounded-none text-lg tracking-wide"
+              className="bg-transparent border-2 border-primary/50 text-primary hover:bg-primary/10 px-8 py-6 rounded-xl text-lg tracking-wide"
             >
               <PlayCircle className="mr-2 h-5 w-5" />
-              Watch Video
+              Virtual Tour
             </Button>
           </div>
         </motion.div>
@@ -255,38 +362,41 @@ function AboutSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Our Story
+                Our Heritage
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                A Sanctuary of
-                <span className="text-gold-gradient"> Elegance</span>
+                A Jewel in
+                <span className="gold-metallic"> Kerala's Crown</span>
               </h2>
             </div>
             <div className="divider-gold w-24" />
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
               <p>
-                Nestled in the heart of a pristine tropical paradise, Munroe Morris 
-                represents the pinnacle of luxury hospitality. Our resort is a harmonious 
-                blend of traditional craftsmanship and contemporary elegance.
+                Nestled amidst the serene backwaters of Kerala, Munroe Morris 
+                represents the perfect harmony of traditional Kerala architecture 
+                and contemporary luxury. Our resort is named after Colonel John Munro, 
+                whose legacy is intertwined with this beautiful land.
               </p>
               <p>
-                Every detail has been thoughtfully curated to create an atmosphere of 
-                refined sophistication. From the moment you arrive, you will be enveloped 
-                in an ambiance of warmth, exclusivity, and unparalleled service.
+                Experience the warmth of Kerala hospitality, where every guest is 
+                treated as family. From the moment you arrive, you'll be embraced 
+                by the tranquil beauty of swaying coconut palms, pristine waters, 
+                and the gentle rhythm of village life.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-8 pt-6">
-              <div className="text-center">
-                <p className="font-serif text-4xl text-primary">25</p>
-                <p className="text-sm text-muted-foreground mt-1">Luxury Villas</p>
+            
+            <div className="grid grid-cols-3 gap-6 pt-6">
+              <div className="skeuo-card p-4 text-center">
+                <p className="font-serif text-3xl gold-metallic">25</p>
+                <p className="text-xs text-muted-foreground mt-1">Luxury Villas</p>
               </div>
-              <div className="text-center">
-                <p className="font-serif text-4xl text-primary">15</p>
-                <p className="text-sm text-muted-foreground mt-1">Years of Excellence</p>
+              <div className="skeuo-card p-4 text-center">
+                <p className="font-serif text-3xl gold-metallic">500+</p>
+                <p className="text-xs text-muted-foreground mt-1">Happy Guests</p>
               </div>
-              <div className="text-center">
-                <p className="font-serif text-4xl text-primary">5</p>
-                <p className="text-sm text-muted-foreground mt-1">Star Rating</p>
+              <div className="skeuo-card p-4 text-center">
+                <p className="font-serif text-3xl gold-metallic">4.9</p>
+                <p className="text-xs text-muted-foreground mt-1">Rating ★</p>
               </div>
             </div>
           </motion.div>
@@ -298,16 +408,18 @@ function AboutSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative aspect-[4/5] overflow-hidden">
-              <img
-                src="/images/gallery-1.png"
-                alt="Munroe Morris Resort"
-                className="w-full h-full object-cover"
-              />
+            <div className="skeuo-card p-2">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
+                <img
+                  src="/images/gallery-1.png"
+                  alt="Munroe Morris Resort Kerala"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
-            <div className="absolute -bottom-8 -left-8 bg-primary p-8 text-primary-foreground">
-              <p className="font-serif text-2xl">Since 2009</p>
-              <p className="text-sm opacity-80 mt-1">Creating Memories</p>
+            <div className="absolute -bottom-4 -left-4 skeuo-button p-6 animate-float">
+              <p className="font-serif text-xl">Est. 2009</p>
+              <p className="text-xs opacity-80 mt-1">Kerala, India</p>
             </div>
           </motion.div>
         </div>
@@ -323,36 +435,39 @@ function AccommodationsSection() {
 
   const accommodations = [
     {
-      name: "Overwater Villa",
-      description: "Perched above crystal-clear waters with glass floor panels",
+      name: "Backwater Villa",
+      malayalamName: "ബാക്ക്‌വാട്ടർ വില്ല",
+      description: "Traditional Kerala architecture with modern amenities overlooking the serene backwaters",
       image: "/images/villa-1.png",
-      price: "$1,200",
+      price: "₹15,000",
       size: "120 m²",
       guests: 2,
-      features: ["Private Pool", "Glass Floor", "Butler Service"]
+      features: ["Private Deck", "Canoe Ride", "Sunset View"]
     },
     {
-      name: "Beachfront Bungalow",
-      description: "Steps away from pristine white sand beaches",
+      name: "Coconut Grove Suite",
+      malayalamName: "തെങ്ങ് തോപ്പ് സ്യൂട്ട്",
+      description: "Nestled among swaying coconut palms with authentic Kerala decor",
       image: "/images/villa-2.png",
-      price: "$890",
+      price: "₹12,000",
       size: "95 m²",
       guests: 2,
-      features: ["Ocean View", "Outdoor Shower", "Garden"]
+      features: ["Garden View", "Outdoor Bath", "Bird Watching"]
     },
     {
-      name: "Garden Suite",
-      description: "Surrounded by lush tropical vegetation",
+      name: "Heritage Nalukettu",
+      malayalamName: "ഹെറിറ്റേജ് നാലുകെട്ട്",
+      description: "Traditional Kerala courtyard house with wooden architecture",
       image: "/images/villa-3.png",
-      price: "$650",
-      size: "75 m²",
-      guests: 2,
-      features: ["Private Terrace", "Garden View", "Spa Bath"]
+      price: "₹18,000",
+      size: "150 m²",
+      guests: 4,
+      features: ["Courtyard", "Wood Carvings", "Heritage Style"]
     }
   ]
 
   return (
-    <section id="accommodations" className="py-24 lg:py-32 bg-muted/30">
+    <section id="accommodations" className="py-24 lg:py-32 skeuo-inset mx-4 lg:mx-8 rounded-3xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -366,12 +481,12 @@ function AccommodationsSection() {
             Accommodations
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Your Private
-            <span className="text-gold-gradient"> Paradise</span>
+            Your Home in
+            <span className="gold-metallic"> Paradise</span>
           </h2>
           <p className="text-muted-foreground text-lg mt-6">
-            Each of our villas and suites offers a unique blend of luxury and natural beauty,
-            designed to provide an unforgettable experience.
+            Each villa is designed to reflect Kerala's rich heritage while providing 
+            modern comforts for an unforgettable stay.
           </p>
         </motion.div>
 
@@ -383,10 +498,10 @@ function AccommodationsSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group bg-card border border-border overflow-hidden hover:shadow-xl transition-all duration-500"
+              className="skeuo-card group overflow-hidden"
             >
               {/* Image */}
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
                   src={room.image}
                   alt={room.name}
@@ -401,17 +516,20 @@ function AccommodationsSection() {
 
               {/* Content */}
               <div className="p-6 space-y-4">
-                <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
-                  {room.name}
-                </h3>
-                <p className="text-muted-foreground">{room.description}</p>
+                <div>
+                  <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
+                    {room.name}
+                  </h3>
+                  <p className="font-malayalam text-sm text-primary">{room.malayalamName}</p>
+                </div>
+                <p className="text-muted-foreground text-sm">{room.description}</p>
 
                 {/* Features */}
                 <div className="flex flex-wrap gap-2">
                   {room.features.map((feature) => (
                     <span
                       key={feature}
-                      className="text-xs px-3 py-1 bg-muted text-muted-foreground"
+                      className="text-xs px-3 py-1 skeuo-inset text-muted-foreground rounded-full"
                     >
                       {feature}
                     </span>
@@ -454,21 +572,24 @@ function ExperiencesSection() {
 
   const experiences = [
     {
-      icon: <Waves className="h-8 w-8" />,
-      title: "Sunset Sailing",
-      description: "Cruise the turquoise waters as the sun paints the sky in golden hues",
+      icon: <Ship className="h-8 w-8" />,
+      title: "Houseboat Cruise",
+      malayalamTitle: "ഹൗസ്ബോട്ട് ക്രൂസ്",
+      description: "Drift through the enchanting backwaters on a traditional Kettuvallam houseboat",
       image: "/images/experience-1.png"
     },
     {
       icon: <Sparkles className="h-8 w-8" />,
-      title: "Snorkeling Adventure",
-      description: "Discover vibrant coral reefs and exotic marine life",
-      image: "/images/experience-2.png"
+      title: "Ayurveda Wellness",
+      malayalamTitle: "ആയുർവേദ വെൽനസ്",
+      description: "Rejuvenate with authentic Ayurvedic treatments and therapies",
+      image: "/images/spa.png"
     },
     {
-      icon: <Heart className="h-8 w-8" />,
-      title: "Wellness Retreat",
-      description: "Find inner peace with beachside yoga and meditation",
+      icon: <Mountain className="h-8 w-8" />,
+      title: "Village Life Experience",
+      malayalamTitle: "ഗ്രാമീണ ജീവിതം",
+      description: "Immerse yourself in Kerala's rich culture and traditions",
       image: "/images/experience-3.png"
     }
   ]
@@ -485,15 +606,15 @@ function ExperiencesSection() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-            Experiences
+            Kerala Experiences
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Curated
-            <span className="text-gold-gradient"> Moments</span>
+            Discover
+            <span className="gold-metallic"> God's Own Country</span>
           </h2>
           <p className="text-muted-foreground text-lg mt-6">
-            Immerse yourself in a world of unforgettable experiences, 
-            each crafted to create lasting memories.
+            From serene backwaters to ancient healing traditions, 
+            experience the authentic soul of Kerala.
           </p>
         </motion.div>
 
@@ -505,7 +626,7 @@ function ExperiencesSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group relative overflow-hidden"
+              className="skeuo-card group relative overflow-hidden"
             >
               <div className="relative aspect-[3/4]">
                 <img
@@ -518,12 +639,123 @@ function ExperiencesSection() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <div className="text-primary mb-3">{exp.icon}</div>
-                  <h3 className="font-serif text-2xl mb-2">{exp.title}</h3>
-                  <p className="text-white/70 text-sm">{exp.description}</p>
+                  <h3 className="font-serif text-2xl">{exp.title}</h3>
+                  <p className="font-malayalam text-xs text-primary/80">{exp.malayalamTitle}</p>
+                  <p className="text-white/70 text-sm mt-2">{exp.description}</p>
                 </div>
               </div>
             </motion.div>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Ayurveda Section
+function AyurvedaSection() {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+  return (
+    <section id="ayurveda" className="py-24 lg:py-32 skeuo-inset mx-4 lg:mx-8 rounded-3xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Content */}
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, x: -50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8 }}
+            className="space-y-6"
+          >
+            <div className="space-y-4">
+              <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium flex items-center gap-2">
+                <Lotus className="h-4 w-4" />
+                Ayurveda & Wellness
+              </p>
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
+                Ancient Healing,
+                <span className="gold-metallic"> Modern Comfort</span>
+              </h2>
+              <p className="font-malayalam text-lg text-primary">ആയുർവേദം</p>
+            </div>
+            <div className="divider-gold w-24" />
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Kerala is the birthplace of Ayurveda, the 5000-year-old science of life. 
+              Our wellness center offers authentic treatments passed down through generations, 
+              using traditional herbs and oils sourced from Kerala's pristine forests.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 pt-4">
+              <div className="skeuo-card p-4">
+                <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
+                  <Lotus className="h-5 w-5 text-primary" />
+                  Panchakarma
+                </h4>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Complete detoxification program
+                </p>
+              </div>
+              <div className="skeuo-card p-4">
+                <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Shirodhara
+                </h4>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Meditative oil therapy
+                </p>
+              </div>
+              <div className="skeuo-card p-4">
+                <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-primary" />
+                  Abhyanga
+                </h4>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Full body massage
+                </p>
+              </div>
+              <div className="skeuo-card p-4">
+                <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
+                  <Waves className="h-5 w-5 text-primary" />
+                  Nasyam
+                </h4>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Nasal treatment therapy
+                </p>
+              </div>
+            </div>
+
+            <Button
+              className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4"
+            >
+              Book Wellness Package
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </motion.div>
+
+          {/* Image */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="skeuo-card p-2">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
+                <img
+                  src="/images/spa.png"
+                  alt="Ayurveda Spa"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              </div>
+            </div>
+            <div className="absolute -bottom-4 -right-4 skeuo-button p-6 animate-pulse-glow">
+              <p className="font-serif text-xl">Certified</p>
+              <p className="text-xs opacity-80">Ayurveda Center</p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -536,7 +768,7 @@ function DiningSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="dining" className="py-24 lg:py-32 bg-muted/30">
+    <section id="dining" className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
@@ -546,15 +778,17 @@ function DiningSection() {
             transition={{ duration: 0.8 }}
             className="relative order-2 lg:order-1"
           >
-            <div className="relative aspect-square overflow-hidden">
-              <img
-                src="/images/dining.png"
-                alt="Fine Dining"
-                className="w-full h-full object-cover"
-              />
+            <div className="skeuo-card p-2">
+              <div className="relative aspect-square overflow-hidden rounded-xl">
+                <img
+                  src="/images/dining.png"
+                  alt="Kerala Cuisine"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
-            <div className="absolute -top-4 -right-4 w-32 h-32 border border-primary" />
-            <div className="absolute -bottom-4 -left-4 w-32 h-32 border border-primary" />
+            <div className="absolute -top-4 -right-4 w-32 h-32 border-2 border-primary rounded-xl" />
+            <div className="absolute -bottom-4 -left-4 w-32 h-32 border-2 border-primary rounded-xl" />
           </motion.div>
 
           {/* Content */}
@@ -567,141 +801,63 @@ function DiningSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Culinary Excellence
+                Kerala Cuisine
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                A Journey for
-                <span className="text-gold-gradient"> Your Palate</span>
+                Flavors of
+                <span className="gold-metallic"> Kerala</span>
               </h2>
+              <p className="font-malayalam text-lg text-primary">കേരള പാചകം</p>
             </div>
             <div className="divider-gold w-24" />
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Our award-winning restaurants offer a symphony of flavors, blending local 
-              ingredients with international culinary techniques. From beachside dining 
-              to intimate private experiences, every meal is a celebration.
+              Savor the authentic tastes of Kerala, from traditional Sadya served 
+              on banana leaves to fresh Karimeen (Pearl Spot) caught from the backwaters. 
+              Our chefs use recipes passed down through generations.
             </p>
 
             <div className="space-y-4 pt-4">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/10">
-                  <UtensilsCrossed className="h-6 w-6 text-primary" />
+              <div className="skeuo-card flex items-start gap-4 p-4">
+                <div className="skeuo-button p-3 rounded-xl">
+                  <UtensilsCrossed className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">The Ocean Terrace</h4>
+                  <h4 className="font-serif text-xl text-foreground">The Backwater Restaurant</h4>
                   <p className="text-muted-foreground text-sm mt-1">
-                    International cuisine with panoramic ocean views
+                    Traditional Kerala Sadya & Seafood specialties
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/10">
-                  <Star className="h-6 w-6 text-primary" />
+              <div className="skeuo-card flex items-start gap-4 p-4">
+                <div className="skeuo-button p-3 rounded-xl">
+                  <Star className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">Sunset Bar</h4>
+                  <h4 className="font-serif text-xl text-foreground">Sunset Chai Lounge</h4>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Handcrafted cocktails and light bites by the beach
+                    Fresh chai & local snacks with backwater views
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary/10">
-                  <Heart className="h-6 w-6 text-primary" />
+              <div className="skeuo-card flex items-start gap-4 p-4">
+                <div className="skeuo-button p-3 rounded-xl">
+                  <Heart className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-xl text-foreground">Private Dining</h4>
+                  <h4 className="font-serif text-xl text-foreground">Cooking Classes</h4>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Bespoke culinary experiences in exclusive settings
+                    Learn to make authentic Kerala dishes
                   </p>
                 </div>
               </div>
             </div>
 
             <Button
-              className="btn-luxury bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 rounded-none text-lg tracking-wide mt-4"
+              className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4"
             >
-              View Our Menus
+              View Our Menu
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// Spa Section
-function SpaSection() {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
-
-  return (
-    <section id="spa" className="py-24 lg:py-32 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Content */}
-          <motion.div
-            ref={ref}
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="space-y-6"
-          >
-            <div className="space-y-4">
-              <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
-                Wellness & Spa
-              </p>
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                Restore Your
-                <span className="text-gold-gradient"> Inner Balance</span>
-              </h2>
-            </div>
-            <div className="divider-gold w-24" />
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              Our world-class spa offers a sanctuary of serenity, where ancient healing 
-              traditions meet modern wellness practices. Surrender to the expertise of 
-              our therapists and emerge renewed.
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="p-4 bg-muted/50 border border-border">
-                <h4 className="font-serif text-lg text-foreground">Signature Treatments</h4>
-                <p className="text-muted-foreground text-sm mt-1">Unique therapies inspired by local traditions</p>
-              </div>
-              <div className="p-4 bg-muted/50 border border-border">
-                <h4 className="font-serif text-lg text-foreground">Hydrotherapy</h4>
-                <p className="text-muted-foreground text-sm mt-1">Healing waters and thermal experiences</p>
-              </div>
-              <div className="p-4 bg-muted/50 border border-border">
-                <h4 className="font-serif text-lg text-foreground">Yoga & Meditation</h4>
-                <p className="text-muted-foreground text-sm mt-1">Daily sessions with expert instructors</p>
-              </div>
-              <div className="p-4 bg-muted/50 border border-border">
-                <h4 className="font-serif text-lg text-foreground">Fitness Center</h4>
-                <p className="text-muted-foreground text-sm mt-1">State-of-the-art equipment and trainers</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Image */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
-          >
-            <div className="relative aspect-[4/5] overflow-hidden">
-              <img
-                src="/images/spa.png"
-                alt="Spa & Wellness"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-            </div>
-            <div className="absolute -bottom-6 -right-6 bg-primary p-6 text-primary-foreground">
-              <p className="font-serif text-xl">Award Winning</p>
-              <p className="text-sm opacity-80">Spa of the Year 2024</p>
-            </div>
           </motion.div>
         </div>
       </div>
@@ -717,7 +873,7 @@ function GallerySection() {
 
   const images = [
     { src: "/images/gallery-1.png", alt: "Resort Entrance" },
-    { src: "/images/gallery-2.png", alt: "Beach Bar" },
+    { src: "/images/gallery-2.png", alt: "Evening Views" },
     { src: "/images/gallery-3.png", alt: "Private Dining" },
     { src: "/images/gallery-4.png", alt: "Aerial View" },
   ]
@@ -731,7 +887,7 @@ function GallerySection() {
   }
 
   return (
-    <section id="gallery" className="py-24 lg:py-32 bg-muted/30">
+    <section id="gallery" className="py-24 lg:py-32 skeuo-inset mx-4 lg:mx-8 rounded-3xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -745,8 +901,8 @@ function GallerySection() {
             Gallery
           </p>
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground mt-4 leading-tight">
-            Moments of
-            <span className="text-gold-gradient"> Beauty</span>
+            Moments in
+            <span className="gold-metallic"> Kerala</span>
           </h2>
         </motion.div>
 
@@ -756,7 +912,7 @@ function GallerySection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative aspect-[21/9] overflow-hidden"
+            className="skeuo-card p-2 relative aspect-[21/9] overflow-hidden"
           >
             <AnimatePresence mode="wait">
               <motion.img
@@ -767,7 +923,7 @@ function GallerySection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-xl"
               />
             </AnimatePresence>
           </motion.div>
@@ -775,15 +931,15 @@ function GallerySection() {
           {/* Navigation */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white transition-colors"
+            className="absolute left-6 top-1/2 -translate-y-1/2 skeuo-button p-3 rounded-full"
           >
-            <ChevronLeft className="h-6 w-6 text-foreground" />
+            <ChevronLeft className="h-6 w-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white transition-colors"
+            className="absolute right-6 top-1/2 -translate-y-1/2 skeuo-button p-3 rounded-full"
           >
-            <ChevronRight className="h-6 w-6 text-foreground" />
+            <ChevronRight className="h-6 w-6" />
           </button>
 
           {/* Dots */}
@@ -792,8 +948,8 @@ function GallerySection() {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? 'bg-primary w-8' : 'bg-muted-foreground/30'
+                className={`h-2 rounded-full transition-all ${
+                  index === currentIndex ? 'bg-primary w-8' : 'bg-muted-foreground/30 w-2'
                 }`}
               />
             ))}
@@ -806,14 +962,14 @@ function GallerySection() {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`relative aspect-video overflow-hidden transition-all ${
+              className={`skeuo-card p-1 aspect-video overflow-hidden transition-all ${
                 index === currentIndex ? 'ring-2 ring-primary' : 'opacity-60 hover:opacity-100'
               }`}
             >
               <img
                 src={img.src}
                 alt={img.alt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover rounded-lg"
               />
             </button>
           ))}
@@ -846,12 +1002,12 @@ function ContactSection() {
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl text-foreground leading-tight">
                 Plan Your
-                <span className="text-gold-gradient"> Escape</span>
+                <span className="gold-metallic"> Kerala Escape</span>
               </h2>
             </div>
             <p className="text-muted-foreground text-lg">
-              Our dedicated reservations team is available to assist you in creating 
-              your perfect getaway.
+              Our team is ready to help you plan an unforgettable Kerala experience. 
+              We speak English, Malayalam, Hindi, and more.
             </p>
 
             <form className="space-y-4 pt-4">
@@ -859,15 +1015,15 @@ function ContactSection() {
                 <div>
                   <label className="text-sm font-medium text-foreground">First Name</label>
                   <Input 
-                    placeholder="John" 
-                    className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary"
+                    placeholder="Your name" 
+                    className="skeuo-input mt-1.5"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">Last Name</label>
+                  <label className="text-sm font-medium text-foreground">Phone</label>
                   <Input 
-                    placeholder="Doe" 
-                    className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary"
+                    placeholder="+91 XXXXX XXXXX" 
+                    className="skeuo-input mt-1.5"
                   />
                 </div>
               </div>
@@ -875,36 +1031,36 @@ function ContactSection() {
                 <label className="text-sm font-medium text-foreground">Email</label>
                 <Input 
                   type="email" 
-                  placeholder="john@example.com" 
-                  className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary"
+                  placeholder="your@email.com" 
+                  className="skeuo-input mt-1.5"
                 />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">Check-in Date</label>
+                  <label className="text-sm font-medium text-foreground">Check-in</label>
                   <Input 
                     type="date" 
-                    className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary"
+                    className="skeuo-input mt-1.5"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">Check-out Date</label>
+                  <label className="text-sm font-medium text-foreground">Check-out</label>
                   <Input 
                     type="date" 
-                    className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary"
+                    className="skeuo-input mt-1.5"
                   />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">Message</label>
                 <Textarea 
-                  placeholder="Tell us about your dream vacation..." 
-                  className="mt-1.5 bg-muted/50 border-border rounded-none focus:ring-primary min-h-[120px]"
+                  placeholder="Tell us about your dream Kerala vacation..." 
+                  className="skeuo-input mt-1.5 min-h-[120px]"
                 />
               </div>
               <Button
                 type="submit"
-                className="btn-luxury w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 rounded-none text-lg tracking-wide"
+                className="skeuo-button w-full py-6 text-lg tracking-wide"
               >
                 Send Inquiry
                 <Send className="ml-2 h-5 w-5" />
@@ -917,19 +1073,19 @@ function ContactSection() {
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-8"
+            className="space-y-6"
           >
-            <div className="bg-muted/50 p-8 border border-border space-y-6">
+            <div className="skeuo-card p-8 space-y-6">
               <h3 className="font-serif text-2xl text-foreground">Contact Information</h3>
               
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <MapPin className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Address</p>
+                    <p className="font-medium text-foreground">Location</p>
                     <p className="text-muted-foreground text-sm mt-1">
-                      Paradise Island, Tropical Coast<br />
-                      Maldives 00000
+                      Munroe Island, Kollam District<br />
+                      Kerala 691502, India
                     </p>
                   </div>
                 </div>
@@ -938,7 +1094,8 @@ function ContactSection() {
                   <div>
                     <p className="font-medium text-foreground">Phone</p>
                     <p className="text-muted-foreground text-sm mt-1">
-                      +1 (555) 123-4567
+                      +91 474 XXXXXXX<br />
+                      +91 XXXXX XXXXX (WhatsApp)
                     </p>
                   </div>
                 </div>
@@ -954,9 +1111,9 @@ function ContactSection() {
                 <div className="flex items-start gap-4">
                   <Clock className="h-5 w-5 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Reservations</p>
+                    <p className="font-medium text-foreground">Reception</p>
                     <p className="text-muted-foreground text-sm mt-1">
-                      Available 24/7
+                      24 Hours, 7 Days a Week
                     </p>
                   </div>
                 </div>
@@ -964,23 +1121,36 @@ function ContactSection() {
             </div>
 
             {/* Newsletter */}
-            <div className="bg-primary p-8 text-primary-foreground space-y-4">
-              <h3 className="font-serif text-2xl">Stay Inspired</h3>
-              <p className="text-sm opacity-90">
-                Subscribe to our newsletter for exclusive offers and travel inspiration.
+            <div className="skeuo-card p-8 space-y-4">
+              <h3 className="font-serif text-2xl text-foreground">Stay Connected</h3>
+              <p className="text-muted-foreground text-sm">
+                Subscribe for Kerala travel tips and exclusive offers.
               </p>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Your email" 
-                  className="bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/50 rounded-none"
+                  className="skeuo-input flex-1"
                 />
-                <Button
-                  variant="secondary"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-none px-4"
-                >
+                <Button className="skeuo-button px-4">
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+
+            {/* How to Reach */}
+            <div className="skeuo-card p-8">
+              <h3 className="font-serif text-xl text-foreground mb-4">How to Reach</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <span className="text-primary">✈</span> Trivandrum Airport: 90 km (2 hours)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary">🚂</span> Kollam Railway Station: 25 km (45 min)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary">🚗</span> Kochi Airport: 160 km (4 hours)
+                </li>
+              </ul>
             </div>
           </motion.div>
         </div>
@@ -992,36 +1162,49 @@ function ContactSection() {
 // Footer
 function Footer() {
   return (
-    <footer className="bg-foreground text-background py-16">
+    <footer className="skeuo-panel py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="font-serif text-3xl">Munroe Morris</h3>
-            <p className="text-background/70 text-sm leading-relaxed">
-              A sanctuary of luxury and natural beauty, where every moment 
-              is crafted to create lasting memories.
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center">
+                <Lotus className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h3 className="font-serif text-2xl text-foreground">Munroe Morris</h3>
+                <p className="text-xs text-muted-foreground">Kerala, India</p>
+              </div>
+            </div>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Experience the magic of Kerala's backwaters in luxury. 
+              Your journey to God's Own Country begins here.
             </p>
             <div className="flex gap-4 pt-2">
-              <a href="#" className="p-2 bg-background/10 hover:bg-background/20 transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="skeuo-inset p-2 rounded-lg hover:bg-primary/20 transition-colors">
+                <Instagram className="h-5 w-5 text-primary" />
               </a>
-              <a href="#" className="p-2 bg-background/10 hover:bg-background/20 transition-colors">
-                <Facebook className="h-5 w-5" />
+              <a href="#" className="skeuo-inset p-2 rounded-lg hover:bg-primary/20 transition-colors">
+                <Facebook className="h-5 w-5 text-primary" />
               </a>
-              <a href="#" className="p-2 bg-background/10 hover:bg-background/20 transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a href="#" className="skeuo-inset p-2 rounded-lg hover:bg-primary/20 transition-colors">
+                <Twitter className="h-5 w-5 text-primary" />
+              </a>
+              <a href="#" className="skeuo-inset p-2 rounded-lg hover:bg-primary/20 transition-colors">
+                <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-serif text-lg mb-4">Quick Links</h4>
+            <h4 className="font-serif text-lg text-foreground mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              {['About Us', 'Accommodations', 'Dining', 'Experiences', 'Spa & Wellness', 'Gallery'].map((link) => (
+              {['About Us', 'Accommodations', 'Ayurveda', 'Houseboats', 'Dining', 'Gallery'].map((link) => (
                 <li key={link}>
-                  <a href="#" className="text-background/70 hover:text-background text-sm transition-colors">
+                  <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                     {link}
                   </a>
                 </li>
@@ -1029,13 +1212,13 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Experiences */}
           <div>
-            <h4 className="font-serif text-lg mb-4">Services</h4>
+            <h4 className="font-serif text-lg text-foreground mb-4">Experiences</h4>
             <ul className="space-y-2">
-              {['Airport Transfer', 'Concierge', 'Private Events', 'Wedding Planning', 'Business Center', 'Babysitting'].map((service) => (
+              {['Backwater Cruise', 'Ayurveda Therapy', 'Village Tour', 'Kathakali Show', 'Cooking Class', 'Bird Watching'].map((service) => (
                 <li key={service}>
-                  <a href="#" className="text-background/70 hover:text-background text-sm transition-colors">
+                  <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
                     {service}
                   </a>
                 </li>
@@ -1045,15 +1228,15 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-serif text-lg mb-4">Contact</h4>
-            <ul className="space-y-3 text-sm text-background/70">
+            <h4 className="font-serif text-lg text-foreground mb-4">Contact</h4>
+            <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                Paradise Island, Maldives
+                Munroe Island, Kollam
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
-                +1 (555) 123-4567
+                +91 474 XXXXXXX
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
@@ -1064,14 +1247,15 @@ function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-background/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-background/50 text-sm">
+        <div className="divider-gold mt-12 mb-8" />
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-muted-foreground/50 text-sm">
             © 2024 Munroe Morris Resort. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-background/50">
-            <a href="#" className="hover:text-background transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-background transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-background transition-colors">Cookie Policy</a>
+          <div className="flex gap-6 text-sm text-muted-foreground/50">
+            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-primary transition-colors">Terms</a>
+            <a href="#" className="hover:text-primary transition-colors">Cookie Policy</a>
           </div>
         </div>
       </div>
@@ -1124,14 +1308,14 @@ function PlayCircle({ className }: { className?: string }) {
 // Main Page Component
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="min-h-screen flex flex-col leather-texture">
       <Navigation />
       <HeroSection />
       <AboutSection />
       <AccommodationsSection />
       <ExperiencesSection />
+      <AyurvedaSection />
       <DiningSection />
-      <SpaSection />
       <GallerySection />
       <ContactSection />
       <Footer />
