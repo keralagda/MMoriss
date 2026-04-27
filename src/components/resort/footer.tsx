@@ -134,9 +134,9 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-muted-foreground text-sm">
-                  reservations@munroemorris.com
-                </span>
+                <Link href="/contact" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  Contact Form
+                </Link>
               </li>
             </ul>
           </motion.div>
@@ -148,14 +148,14 @@ export function Footer() {
             {t('footer.copyright')}
           </p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-              Privacy Policy
+            <Link href="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              {t('footer.privacy')}
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-              Terms
+            <Link href="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              {t('footer.terms')}
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-              Cookies
+            <Link href="/cookies" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              {t('footer.cookies')}
             </Link>
           </div>
         </div>
