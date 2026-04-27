@@ -1,0 +1,165 @@
+'use client'
+
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from 'lucide-react'
+import { useLang } from './language-context'
+
+export function Footer() {
+  const { t } = useLang()
+
+  const quickLinks = [
+    { name: t('nav.about'), href: '/about' },
+    { name: t('nav.accommodations'), href: '/accommodations' },
+    { name: t('nav.experiences'), href: '/experiences' },
+    { name: t('nav.ayurveda'), href: '/spa' },
+    { name: t('nav.dining'), href: '/dining' },
+    { name: t('nav.gallery'), href: '/gallery' },
+  ]
+
+  const experiences = [
+    { name: 'Houseboat Cruise', href: '/experiences#houseboat' },
+    { name: 'Ayurveda Therapy', href: '/spa' },
+    { name: 'Village Tour', href: '/experiences#village' },
+    { name: 'Kathakali Show', href: '/experiences#kathakali' },
+    { name: 'Cooking Class', href: '/dining#cooking' },
+    { name: 'Bird Watching', href: '/experiences#nature' },
+  ]
+
+  const socialLinks = [
+    { icon: <Instagram className="h-5 w-5" />, href: '#', label: 'Instagram' },
+    { icon: <Facebook className="h-5 w-5" />, href: '#', label: 'Facebook' },
+    { icon: <Twitter className="h-5 w-5" />, href: '#', label: 'Twitter' },
+  ]
+
+  return (
+    <footer className="bg-background border-t border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Brand */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-4"
+          >
+            <Link href="/" className="inline-block">
+              <h3 className="font-serif text-2xl gold-metallic">{t('hero.title')}</h3>
+            </Link>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t('footer.tagline')}
+            </p>
+            <div className="flex items-center gap-4 pt-4">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="w-10 h-10 skeuo-card flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="space-y-4"
+          >
+            <h4 className="font-serif text-lg text-foreground">{t('footer.quickLinks')}</h4>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Experiences */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="space-y-4"
+          >
+            <h4 className="font-serif text-lg text-foreground">{t('footer.experiences')}</h4>
+            <ul className="space-y-2">
+              {experiences.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Contact */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="space-y-4"
+          >
+            <h4 className="font-serif text-lg text-foreground">{t('footer.contact')}</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <span className="text-muted-foreground text-sm">
+                  Munroe Island, Kollam District<br />
+                  Kerala 691502, India
+                </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">
+                  +91 474 XXXXXXX
+                </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-muted-foreground text-sm">
+                  reservations@munroemorris.com
+                </span>
+              </li>
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* Bottom */}
+        <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-muted-foreground text-sm text-center md:text-left">
+            {t('footer.copyright')}
+          </p>
+          <div className="flex items-center gap-6">
+            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              Terms
+            </Link>
+            <Link href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
+              Cookies
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
