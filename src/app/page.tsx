@@ -1442,7 +1442,25 @@ function ContactSection() {
 // Footer
 function Footer() {
   const { t } = useLang()
-  
+
+  const quickLinks = [
+    { name: t('nav.about'), href: '/about' },
+    { name: t('nav.accommodations'), href: '/accommodations' },
+    { name: t('nav.ayurveda'), href: '/spa' },
+    { name: t('hero.houseboats'), href: '/experiences#houseboat' },
+    { name: t('nav.dining'), href: '/dining' },
+    { name: t('nav.gallery'), href: '/gallery' },
+  ]
+
+  const experiences = [
+    { name: t('footer.backwater'), href: '/experiences#houseboat' },
+    { name: t('footer.therapy'), href: '/spa' },
+    { name: t('footer.tour'), href: '/experiences#village' },
+    { name: t('footer.kathakali'), href: '/experiences#kathakali' },
+    { name: t('footer.cooking'), href: '/dining#cooking' },
+    { name: t('footer.birds'), href: '/experiences#nature' },
+  ]
+
   return (
     <footer className="skeuo-panel py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1483,10 +1501,10 @@ function Footer() {
           <div>
             <h4 className="font-serif text-lg text-foreground mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2">
-              {[t('nav.about'), t('nav.accommodations'), t('nav.ayurveda'), t('hero.houseboats'), t('nav.dining'), t('nav.gallery')].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                    {link}
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <a href={link.href} className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                    {link.name}
                   </a>
                 </li>
               ))}
@@ -1497,10 +1515,10 @@ function Footer() {
           <div>
             <h4 className="font-serif text-lg text-foreground mb-4">{t('footer.experiences')}</h4>
             <ul className="space-y-2">
-              {[t('footer.backwater'), t('footer.therapy'), t('footer.tour'), t('footer.kathakali'), t('footer.cooking'), t('footer.birds')].map((service) => (
-                <li key={service}>
-                  <a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                    {service}
+              {experiences.map((service) => (
+                <li key={service.name}>
+                  <a href={service.href} className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                    {service.name}
                   </a>
                 </li>
               ))}
@@ -1521,7 +1539,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
-                info@munroemorris.com
+                <a href="/contact" className="hover:text-primary transition-colors">info@munroemorris.com</a>
               </li>
             </ul>
           </div>
@@ -1534,9 +1552,9 @@ function Footer() {
             {t('footer.copyright')}
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground/50">
-            <a href="#" className="hover:text-primary transition-colors">{t('footer.privacy')}</a>
-            <a href="#" className="hover:text-primary transition-colors">{t('footer.terms')}</a>
-            <a href="#" className="hover:text-primary transition-colors">{t('footer.cookies')}</a>
+            <a href="/privacy" className="hover:text-primary transition-colors">{t('footer.privacy')}</a>
+            <a href="/terms" className="hover:text-primary transition-colors">{t('footer.terms')}</a>
+            <a href="/cookies" className="hover:text-primary transition-colors">{t('footer.cookies')}</a>
           </div>
         </div>
       </div>
