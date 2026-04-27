@@ -32,7 +32,7 @@ import {
   Moon,
   Palmtree,
   Ship,
-  Lotus,
+  Flower2,
   Mountain
 } from 'lucide-react'
 
@@ -132,7 +132,7 @@ function Navigation() {
             {/* Logo */}
             <a href="#" className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
-                <Lotus className="h-6 w-6 text-primary-foreground" />
+                <Flower2 className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
                 <span className={`font-serif text-xl sm:text-2xl font-semibold tracking-wide transition-colors duration-300 ${
@@ -295,7 +295,7 @@ function HeroSection() {
             </span>
             <span className="text-primary">•</span>
             <span className="flex items-center gap-1">
-              <Lotus className="h-4 w-4" /> Ayurveda
+              <Flower2 className="h-4 w-4" /> Ayurveda
             </span>
             <span className="text-primary">•</span>
             <span className="flex items-center gap-1">
@@ -671,7 +671,7 @@ function AyurvedaSection() {
           >
             <div className="space-y-4">
               <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium flex items-center gap-2">
-                <Lotus className="h-4 w-4" />
+                <Flower2 className="h-4 w-4" />
                 Ayurveda & Wellness
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
@@ -690,7 +690,7 @@ function AyurvedaSection() {
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div className="skeuo-card p-4">
                 <h4 className="font-serif text-lg text-foreground flex items-center gap-2">
-                  <Lotus className="h-5 w-5 text-primary" />
+                  <Flower2 className="h-5 w-5 text-primary" />
                   Panchakarma
                 </h4>
                 <p className="text-muted-foreground text-sm mt-1">
@@ -1169,7 +1169,7 @@ function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center">
-                <Lotus className="h-6 w-6 text-primary-foreground" />
+                <Flower2 className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
                 <h3 className="font-serif text-2xl text-foreground">Munroe Morris</h3>
