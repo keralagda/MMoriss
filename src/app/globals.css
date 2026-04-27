@@ -1,3 +1,6 @@
+/* Custom fonts - must be at the top */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -131,9 +134,6 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
-
-/* Custom fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
 
 /* Luxury Resort Theme */
 .font-serif {
