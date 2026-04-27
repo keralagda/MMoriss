@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +10,214 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+// Admin Users
+model AdminUser {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
+  password  String
+  name      String
+  role      String   @default("admin") // admin, manager, staff
+  avatar    String?
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Post {
+// Guests/Customers
+model Guest {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  phone       String?
+  firstName   String
+  lastName    String
+  nationality String?
+  address     String?
+  city        String?
+  country     String?
+  notes       String?
+  bookings    Booking[]
+  reviews     Review[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+// Rooms/Villas
+model Room {
+  id            String       @id @default(cuid())
+  name          String
+  slug          String       @unique
+  description   String
+  longDescription String?
+  price         Float
+  size          String?
+  maxGuests     Int          @default(2)
+  beds          String?
+  view          String?
+  features      String       // JSON array of features
+  amenities     String       // JSON array of amenities
+  images        String       // JSON array of image URLs
+  active        Boolean      @default(true)
+  sortOrder     Int          @default(0)
+  bookings      Booking[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+// Bookings/Reservations
+model Booking {
+  id            String     @id @default(cuid())
+  confirmationCode String @unique
+  guestId       String
+  guest         Guest      @relation(fields: [guestId], references: [id])
+  roomId        String
+  room          Room       @relation(fields: [roomId], references: [id])
+  checkIn       DateTime
+  checkOut      DateTime
+  adults        Int        @default(1)
+  children      Int        @default(0)
+  totalPrice    Float
+  depositPaid   Float      @default(0)
+  status        String     @default("pending") // pending, confirmed, checked_in, checked_out, cancelled
+  specialRequests String?
+  paymentStatus String     @default("pending") // pending, deposit_paid, paid, refunded
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+// Experiences/Activities
+model Experience {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String
+  longDescription String?
+  duration      String
+  price         Float
+  priceType     String   @default("per_person") // per_person, per_couple, per_group
+  highlights    String   // JSON array
+  images        String   // JSON array
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Spa Treatments
+model SpaTreatment {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  sanskrit      String?
+  description   String
+  longDescription String?
+  duration      String
+  price         Float
+  benefits      String   // JSON array
+  images        String   // JSON array
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Wellness Packages
+model WellnessPackage {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String
+  duration      String
+  treatments    String   // JSON array
+  price         Float
+  active        Boolean  @default(true)
+  featured      Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Gallery Images
+model GalleryImage {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // resort, backwaters, culture, wellness, cuisine
+  imageUrl    String
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Reviews
+model Review {
   id        String   @id @default(cuid())
+  guestId   String
+  guest     Guest    @relation(fields: [guestId], references: [id])
+  rating    Int      // 1-5
   title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  comment   String
+  approved  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Site Settings
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// Contact Inquiries
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  checkIn   DateTime?
+  checkOut  DateTime?
+  guests    Int?
+  roomType  String?
+  message   String
+  status    String   @default("new") // new, read, responded, archived
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Dining Venues
+model DiningVenue {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  cuisine     String
+  capacity    String
+  timing      String
+  images      String   // JSON array
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Signature Dishes
+model Dish {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  veg         Boolean  @default(false)
+  imageUrl    String?
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
