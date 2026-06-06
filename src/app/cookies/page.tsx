@@ -137,7 +137,7 @@ function CookiesContent() {
             className="mb-12"
           >
             <p className="text-muted-foreground text-lg leading-relaxed">
-              This Cookie Policy explains how Munroe Morris Resort uses cookies and similar technologies on our website. By using our website, you consent to the use of cookies as described in this policy.
+              This Cookie Policy explains how Munroe Morris Service Villa uses cookies and similar technologies on our website. By using our website, you consent to the use of cookies as described in this policy.
             </p>
             <div className="flex items-center gap-4 mt-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

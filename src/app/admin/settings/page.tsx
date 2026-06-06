@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
 
   // General Settings
-  const [siteName, setSiteName] = useState('Munroe Morris Resort')
+  const [siteName, setSiteName] = useState('Munroe Morris Service Villa')
   const [siteTagline, setSiteTagline] = useState('Where Backwaters Meet Luxury')
   const [siteDescription, setSiteDescription] = useState('Experience the magic of Kerala\'s backwaters in luxury. Your journey to God\'s Own Country begins here.')
   const [defaultLanguage, setDefaultLanguage] = useState('en')

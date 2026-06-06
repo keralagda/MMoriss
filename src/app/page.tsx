@@ -190,7 +190,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.kathakali': 'Kathakali Show',
     'footer.cooking': 'Cooking Class',
     'footer.birds': 'Bird Watching',
-    'footer.copyright': '© 2024 Munroe Morris Resort. All rights reserved.',
+    'footer.copyright': '© 2024 Munroe Morris Service Villa. All rights reserved.',
     'footer.privacy': 'Privacy Policy',
     'footer.terms': 'Terms',
     'footer.cookies': 'Cookie Policy',
@@ -612,7 +612,7 @@ function HeroSection() {
       >
         <img
           src="/images/hero.png"
-          alt="Munroe Morris Resort Kerala"
+          alt="Munroe Morris Service Villa Kerala"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
@@ -764,7 +764,7 @@ function AboutSection() {
               <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
                 <img
                   src="/images/gallery-1.png"
-                  alt="Munroe Morris Resort Kerala"
+                  alt="Munroe Morris Service Villa Kerala"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -1192,7 +1192,7 @@ function GallerySection() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const images = [
-    { src: "/images/gallery-1.png", alt: "Resort Entrance" },
+    { src: "/images/gallery-1.png", alt: "Service Villa Entrance" },
     { src: "/images/gallery-2.png", alt: "Evening Views" },
     { src: "/images/gallery-3.png", alt: "Private Dining" },
     { src: "/images/gallery-4.png", alt: "Aerial View" },

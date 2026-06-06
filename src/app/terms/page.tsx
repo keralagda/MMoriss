@@ -19,7 +19,7 @@ function TermsContent() {
       content: [
         {
           subtitle: 'Agreement to Terms',
-          text: 'By accessing or using the Munroe Morris Resort website and services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our website or services.'
+          text: 'By accessing or using the Munroe Morris Service Villa website and services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our website or services.'
         },
         {
           subtitle: 'Modifications',
@@ -78,7 +78,7 @@ function TermsContent() {
         },
         {
           subtitle: 'Personal Belongings',
-          text: 'Munroe Morris Resort is not responsible for lost, stolen, or damaged personal belongings. We recommend using the in-room safe for valuables and purchasing travel insurance.'
+          text: 'Munroe Morris Service Villa is not responsible for lost, stolen, or damaged personal belongings. We recommend using the in-room safe for valuables and purchasing travel insurance.'
         }
       ]
     },
@@ -108,7 +108,7 @@ function TermsContent() {
         },
         {
           subtitle: 'Third-Party Services',
-          text: 'Some services and activities are provided by third-party vendors. Munroe Morris Resort is not responsible for the quality, safety, or availability of these third-party services.'
+          text: 'Some services and activities are provided by third-party vendors. Munroe Morris Service Villa is not responsible for the quality, safety, or availability of these third-party services.'
         },
         {
           subtitle: 'Special Requests',
@@ -121,7 +121,7 @@ function TermsContent() {
       content: [
         {
           subtitle: 'Website Content',
-          text: 'All content on our website, including text, images, logos, and design, is the property of Munroe Morris Resort and is protected by copyright laws. Unauthorized use is prohibited.'
+          text: 'All content on our website, including text, images, logos, and design, is the property of Munroe Morris Service Villa and is protected by copyright laws. Unauthorized use is prohibited.'
         },
         {
           subtitle: 'User Content',
@@ -210,7 +210,7 @@ function TermsContent() {
             className="mb-12"
           >
             <p className="text-muted-foreground text-lg leading-relaxed">
-              Welcome to Munroe Morris Resort. These Terms of Service govern your use of our website, booking services, and stay at our property. Please read these terms carefully before making a reservation.
+              Welcome to Munroe Morris Service Villa. These Terms of Service govern your use of our website, booking services, and stay at our property. Please read these terms carefully before making a reservation.
             </p>
             <div className="flex items-center gap-4 mt-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

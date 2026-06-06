@@ -49,10 +49,10 @@ function AboutContent() {
   ]
 
   const awards = [
-    { title: 'Best Heritage Resort', org: 'Kerala Tourism Awards 2023' },
+    { title: 'Best Heritage Service Villa', org: 'Kerala Tourism Awards 2023' },
     { title: 'Excellence in Sustainable Tourism', org: 'Green Globe 2022' },
     { title: 'Top 10 Ayurveda Destinations', org: 'Travel + Leisure 2023' },
-    { title: 'Best Eco Resort', org: 'World Travel Awards 2022' },
+    { title: 'Best Eco Service Villa', org: 'World Travel Awards 2022' },
   ]
 
   const team = [
@@ -94,13 +94,13 @@ function AboutContent() {
               <div className="divider-gold w-24" />
               <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
                 <p>
-                  Munroe Morris Resort was born from a dream to share the authentic essence of Kerala with the world. Named after Colonel John Munro, the British administrator who played a pivotal role in the development of this region, our resort stands as a tribute to the rich history and natural beauty of Munroe Island.
+                  Munroe Morris Service Villa was born from a dream to share the authentic essence of Kerala with the world. Named after Colonel John Munro, the British administrator who played a pivotal role in the development of this region, our service villa stands as a tribute to the rich history and natural beauty of Munroe Island, Kollam.
                 </p>
                 <p>
                   Founded in 2009, we began as a small heritage property with just 5 traditional Kerala cottages. Today, we have grown into a premier luxury destination while maintaining our commitment to authentic experiences and sustainable tourism.
                 </p>
                 <p>
-                  Every corner of our resort tells a story - from the traditional Nalukettu architecture to the hand-carved wooden furniture crafted by local artisans. We take pride in preserving Kerala&apos;s cultural heritage while providing world-class amenities.
+                  Every corner of our service villa tells a story - from the traditional Nalukettu architecture to the hand-carved wooden furniture crafted by local artisans. We take pride in preserving Kerala&apos;s cultural heritage while providing world-class amenities.
                 </p>
               </div>
             </motion.div>

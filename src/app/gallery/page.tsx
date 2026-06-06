@@ -17,7 +17,7 @@ function GalleryContent() {
 
   const categories = [
     { id: 'all', name: 'All' },
-    { id: 'resort', name: 'Resort' },
+    { id: 'resort', name: 'Service Villa' },
     { id: 'backwaters', name: 'Backwaters' },
     { id: 'culture', name: 'Culture' },
     { id: 'wellness', name: 'Wellness' },

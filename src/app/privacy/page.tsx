@@ -173,7 +173,7 @@ function PrivacyContent() {
             className="mb-12"
           >
             <p className="text-muted-foreground text-lg leading-relaxed">
-              At Munroe Morris Resort, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, make reservations, or use our services.
+              At Munroe Morris Service Villa, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, make reservations, or use our services.
             </p>
             <div className="flex items-center gap-4 mt-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
