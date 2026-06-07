@@ -596,7 +596,7 @@ function CanvasPreview({
   viewport: 'desktop' | 'tablet' | 'mobile'
 }) {
   const viewportWidths = {
-    desktop: '100%',
+    desktop: '1200px', // Compact but not very squeezed
     tablet: '768px',
     mobile: '375px'
   }
@@ -828,6 +828,7 @@ export default function SiteBuilder() {
       return newSections
     })
     setSelectedId(newSection.id)
+    setRightCollapsed(false)
   }, [saveToHistory])
 
   // Update section props
@@ -1021,7 +1022,10 @@ export default function SiteBuilder() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={() => setSelectedId(section.id)}
+                    onClick={() => {
+                      setSelectedId(section.id)
+                      setRightCollapsed(false)
+                    }}
                     className={`relative group px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                       selectedId === section.id 
                         ? 'skeuo-button text-primary-foreground' 
@@ -1066,7 +1070,10 @@ export default function SiteBuilder() {
           <CanvasPreview 
             sections={sections}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(id) => {
+              setSelectedId(id)
+              setRightCollapsed(false)
+            }}
             viewport={viewport}
           />
         </div>
