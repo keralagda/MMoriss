@@ -7,11 +7,12 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Save, RefreshCw, Bell, Globe, CreditCard, Shield, Mail,
-  Phone, MapPin, Clock, Users, Flower2
+  Phone, MapPin, Clock, Users, Flower2, Palette, Upload, Trash2
 } from 'lucide-react'
 
 const tabs = [
   { id: 'general', name: 'General', icon: Globe },
+  { id: 'branding', name: 'Branding', icon: Palette },
   { id: 'contact', name: 'Contact', icon: Phone },
   { id: 'notifications', name: 'Notifications', icon: Bell },
   { id: 'payments', name: 'Payments', icon: CreditCard },
@@ -22,12 +23,19 @@ export default function SettingsPage() {
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   // General Settings
   const [siteName, setSiteName] = useState('Munroe Morris Service Villa')
   const [siteTagline, setSiteTagline] = useState('Where Backwaters Meet Luxury')
   const [siteDescription, setSiteDescription] = useState('Experience the magic of Kerala\'s backwaters in luxury. Your journey to God\'s Own Country begins here.')
   const [defaultLanguage, setDefaultLanguage] = useState('en')
+
+  // Branding Settings
+  const [brandLogo, setBrandLogo] = useState('')
+  const [brandFavicon, setBrandFavicon] = useState('')
+  const [primaryColor, setPrimaryColor] = useState('#c5a880')
+  const [secondaryColor, setSecondaryColor] = useState('#1c1c1c')
 
   // Contact Settings
   const [contactEmail, setContactEmail] = useState('reservations@munroemorris.com')
@@ -46,13 +54,99 @@ export default function SettingsPage() {
   const [depositPercentage, setDepositPercentage] = useState('25')
   const [cancellationDays, setCancellationDays] = useState('30')
 
-  useEffect(() => { Promise.resolve().then(() => setMounted(true)) }, [])
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.site_name) setSiteName(data.site_name)
+          if (data.site_tagline) setSiteTagline(data.site_tagline)
+          if (data.site_description) setSiteDescription(data.site_description)
+          if (data.default_language) setDefaultLanguage(data.default_language)
+          if (data.contact_email) setContactEmail(data.contact_email)
+          if (data.contact_phone) setContactPhone(data.contact_phone)
+          if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
+          if (data.address) setAddress(data.address)
+          if (data.currency) setCurrency(data.currency)
+          if (data.deposit_percentage) setDepositPercentage(data.deposit_percentage)
+          if (data.cancellation_days) setCancellationDays(data.cancellation_days)
+          // Branding Settings
+          if (data.brand_logo) setBrandLogo(data.brand_logo)
+          if (data.brand_favicon) setBrandFavicon(data.brand_favicon)
+          if (data.primary_color) setPrimaryColor(data.primary_color)
+          if (data.secondary_color) setSecondaryColor(data.secondary_color)
+          // Notifications
+          if (data.email_notifications) setEmailNotifications(data.email_notifications === 'true')
+          if (data.sms_notifications) setSmsNotifications(data.sms_notifications === 'true')
+          if (data.booking_alerts) setBookingAlerts(data.booking_alerts === 'true')
+          if (data.inquiry_alerts) setInquiryAlerts(data.inquiry_alerts === 'true')
+        }
+      } catch (err) {
+        console.error('Failed to load settings:', err)
+      } finally {
+        setLoading(false)
+        setMounted(true)
+      }
+    }
+    loadSettings()
+  }, [])
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'favicon') => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        if (type === 'logo') {
+          setBrandLogo(base64String)
+        } else {
+          setBrandFavicon(base64String)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
-    // Simulate save
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    setSaving(false)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_name: siteName,
+          site_tagline: siteTagline,
+          site_description: siteDescription,
+          default_language: defaultLanguage,
+          contact_email: contactEmail,
+          contact_phone: contactPhone,
+          whatsapp_number: whatsappNumber,
+          address: address,
+          currency: currency,
+          deposit_percentage: depositPercentage,
+          cancellation_days: cancellationDays,
+          brand_logo: brandLogo,
+          brand_favicon: brandFavicon,
+          primary_color: primaryColor,
+          secondary_color: secondaryColor,
+          email_notifications: String(emailNotifications),
+          sms_notifications: String(smsNotifications),
+          booking_alerts: String(bookingAlerts),
+          inquiry_alerts: String(inquiryAlerts),
+        }),
+      })
+      if (!res.ok) {
+        throw new Error('Failed to save settings')
+      }
+    } catch (err) {
+      console.error('Failed to save settings:', err)
+      alert('Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (!mounted) {
@@ -141,10 +235,207 @@ export default function SettingsPage() {
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">Logo</label>
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center">
-                        <Flower2 className="h-8 w-8 text-primary-foreground" />
+                      <div className="w-16 h-16 rounded-xl skeuo-inset flex items-center justify-center overflow-hidden bg-muted/20 relative">
+                        {brandLogo ? (
+                          <img src={brandLogo} alt="Logo" className="w-full h-full object-contain p-1.5" />
+                        ) : (
+                          <Flower2 className="h-8 w-8 text-primary" />
+                        )}
                       </div>
-                      <Button variant="outline">Upload New Logo</Button>
+                      <label className="cursor-pointer">
+                        <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium skeuo-button text-primary-foreground">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload New Logo
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleLogoUpload(e, 'logo')}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'branding' && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div className="skeuo-card p-6">
+                <h2 className="font-serif text-xl text-foreground mb-6">Branding Management</h2>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Left Column: Color & Logo Forms */}
+                  <div className="space-y-6">
+                    {/* Logo Upload */}
+                    <div className="skeuo-inset p-4 rounded-xl space-y-4">
+                      <h3 className="text-sm font-medium text-foreground">Brand Logo</h3>
+                      <div className="flex items-center gap-6">
+                        <div className="w-24 h-24 skeuo-inset rounded-xl flex items-center justify-center overflow-hidden bg-muted/20 relative">
+                          {brandLogo ? (
+                            <img src={brandLogo} alt="Brand Logo" className="w-full h-full object-contain p-2" />
+                          ) : (
+                            <Flower2 className="h-12 w-12 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <label className="cursor-pointer">
+                            <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium skeuo-button text-primary-foreground">
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Logo
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleLogoUpload(e, 'logo')}
+                            />
+                          </label>
+                          {brandLogo && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:bg-red-500/10 block"
+                              onClick={() => setBrandLogo('')}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1 inline" />
+                              Remove
+                            </Button>
+                          )}
+                          <p className="text-xs text-muted-foreground">Supported: PNG, JPEG, SVG. Max size 2MB.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Favicon Upload */}
+                    <div className="skeuo-inset p-4 rounded-xl space-y-4">
+                      <h3 className="text-sm font-medium text-foreground">Favicon (Browser Icon)</h3>
+                      <div className="flex items-center gap-6">
+                        <div className="w-12 h-12 skeuo-inset rounded-lg flex items-center justify-center overflow-hidden bg-muted/20 relative">
+                          {brandFavicon ? (
+                            <img src={brandFavicon} alt="Favicon" className="w-full h-full object-contain p-1" />
+                          ) : (
+                            <Globe className="h-6 w-6 text-muted-foreground" />
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <label className="cursor-pointer">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium skeuo-button text-primary-foreground">
+                              <Upload className="h-3.5 w-3.5 mr-1.5" />
+                              Upload Favicon
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/x-icon,image/png"
+                              className="hidden"
+                              onChange={(e) => handleLogoUpload(e, 'favicon')}
+                            />
+                          </label>
+                          {brandFavicon && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:bg-red-500/10 block text-xs"
+                              onClick={() => setBrandFavicon('')}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                          <p className="text-xs text-muted-foreground">Supported: ICO, PNG. Preferred size 32x32px.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Brand Colors */}
+                    <div className="skeuo-inset p-4 rounded-xl space-y-4">
+                      <h3 className="text-sm font-medium text-foreground">Color Palette</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1.5 block">Primary Accent</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={primaryColor}
+                              onChange={(e) => setPrimaryColor(e.target.value)}
+                              className="w-10 h-10 border-0 rounded-lg cursor-pointer skeuo-card p-0.5"
+                            />
+                            <Input
+                              value={primaryColor}
+                              onChange={(e) => setPrimaryColor(e.target.value)}
+                              className="skeuo-input text-xs font-mono uppercase"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1.5 block">Secondary Dark</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="color"
+                              value={secondaryColor}
+                              onChange={(e) => setSecondaryColor(e.target.value)}
+                              className="w-10 h-10 border-0 rounded-lg cursor-pointer skeuo-card p-0.5"
+                            />
+                            <Input
+                              value={secondaryColor}
+                              onChange={(e) => setSecondaryColor(e.target.value)}
+                              className="skeuo-input text-xs font-mono uppercase"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Live Branding Preview Card */}
+                  <div className="space-y-6">
+                    <div className="skeuo-inset p-4 rounded-xl space-y-4">
+                      <h3 className="text-sm font-medium text-foreground">Live Branding Preview</h3>
+                      
+                      {/* Mini Mock Dashboard Widget Card */}
+                      <div className="rounded-xl border border-border overflow-hidden bg-background shadow-lg relative aspect-[4/3] flex flex-col justify-between p-4">
+                        {/* Header bar */}
+                        <div className="flex items-center justify-between pb-2 border-b border-border">
+                          <div className="flex items-center gap-1.5">
+                            {brandLogo ? (
+                              <img src={brandLogo} alt="Preview Logo" className="h-5 w-auto object-contain" />
+                            ) : (
+                              <Flower2 className="h-5 w-5" style={{ color: primaryColor }} />
+                            )}
+                            <span className="text-xs font-serif font-bold text-foreground">Munroe Morris</span>
+                          </div>
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                        </div>
+
+                        {/* Banner preview */}
+                        <div className="flex-1 my-3 rounded-lg relative overflow-hidden flex flex-col justify-end p-3" style={{ background: `linear-gradient(135deg, ${primaryColor}20, ${secondaryColor}90)` }}>
+                          <div className="absolute top-2 right-2 flex items-center gap-1 text-[10px] bg-white/10 px-2 py-0.5 rounded backdrop-blur-sm text-white">
+                            <Globe className="h-2.5 w-2.5" />
+                            <span>Verified</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-sm text-white leading-tight">Welcome to Luxury</h4>
+                            <p className="text-[9px] text-white/70 line-clamp-1">Experience backwaters like never before.</p>
+                          </div>
+                        </div>
+
+                        {/* Interactive items */}
+                        <div className="flex gap-2">
+                          <button className="flex-1 py-1.5 rounded-lg text-[10px] font-medium text-white transition-all text-center" style={{ backgroundColor: primaryColor }}>
+                            Primary Button
+                          </button>
+                          <button className="flex-1 py-1.5 rounded-lg text-[10px] font-medium transition-all text-center border border-border text-foreground hover:bg-muted/10">
+                            Secondary
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          The preview reflects how your logo and primary color palette will dynamically customize the header, banners, and primary CTA buttons of the booking system.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
