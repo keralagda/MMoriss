@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { 
@@ -11,98 +11,130 @@ import {
   Coffee, Shield, Tv, Bath, Eye, Heart
 } from 'lucide-react'
 
+const fallbackVillas = [
+  {
+    id: 'backwater',
+    name: 'Backwater Villa',
+    description: 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
+    longDescription: 'Wake up to the gentle sound of water and the sight of fishing boats gliding past your window. Our Backwater Villas offer an immersive experience of Kerala\'s famous waterways, featuring traditional wooden architecture with modern comforts. Each villa has a private deck where you can watch the sunset paint the waters in golden hues.',
+    image: '/images/villa-1.png',
+    price: '₹15,000',
+    size: '120 m²',
+    guests: 2,
+    beds: '1 King Bed',
+    view: 'Backwater View',
+    features: ['Private Deck', 'Canoe Ride', 'Sunset View', 'Outdoor Bath'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
+  },
+  {
+    id: 'coconut',
+    name: 'Coconut Grove Suite',
+    description: 'Nestled among swaying coconut palms with authentic Kerala decor',
+    longDescription: 'Surrounded by towering coconut palms that sway in the gentle breeze, these suites offer a true tropical retreat. The interiors feature bamboo furniture and coconut wood accents, celebrating the versatile tree that Kerala is famous for. Enjoy your morning chai on the private balcony as birds sing in the grove.',
+    image: '/images/villa-2.png',
+    price: '₹12,000',
+    size: '95 m²',
+    guests: 2,
+    beds: '1 King Bed',
+    view: 'Garden View',
+    features: ['Garden View', 'Outdoor Bath', 'Bird Watching', 'Private Balcony'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
+  },
+  {
+    id: 'heritage',
+    name: 'Heritage Nalukettu',
+    description: 'Traditional Kerala courtyard house with wooden architecture',
+    longDescription: 'Experience authentic Kerala living in our Heritage Nalukettu villas. These traditional courtyard houses feature intricate wood carvings, a central open courtyard (nadumuttam), and architecture that has been perfected over centuries. The natural ventilation and earthy tones create a cool, serene atmosphere.',
+    image: '/images/villa-3.png',
+    price: '₹18,000',
+    size: '150 m²',
+    guests: 4,
+    beds: '2 Queen Beds',
+    view: 'Courtyard View',
+    features: ['Courtyard', 'Wood Carvings', 'Heritage Style', 'Rain Shower'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
+  },
+  {
+    id: 'houseboat',
+    name: 'Luxury Houseboat',
+    description: 'Floating villa on the backwaters with complete privacy',
+    longDescription: 'For the ultimate Kerala experience, stay on our luxury houseboat. These converted traditional Kettuvallams feature air-conditioned bedrooms, a private chef, and 360-degree views of the backwaters. Drift through the waterways and experience life on the water.',
+    image: '/images/experience-1.png',
+    price: '₹35,000',
+    size: '200 m²',
+    guests: 2,
+    beds: '1 King Bed',
+    view: '360° Backwater View',
+    features: ['Private Chef', 'Butler Service', '360° View', 'Sun Deck'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Dining']
+  },
+  {
+    id: 'pool',
+    name: 'Pool Villa',
+    description: 'Private plunge pool with garden views',
+    longDescription: 'Our Pool Villas offer the perfect blend of luxury and privacy. Each villa features a private plunge pool surrounded by tropical gardens, an outdoor shower, and a spacious deck for sunbathing. The interiors blend modern luxury with traditional Kerala aesthetics.',
+    image: '/images/gallery-3.png',
+    price: '₹25,000',
+    size: '180 m²',
+    guests: 2,
+    beds: '1 King Bed',
+    view: 'Pool & Garden View',
+    features: ['Private Pool', 'Garden View', 'Outdoor Shower', 'Sun Deck'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
+  },
+  {
+    id: 'royal',
+    name: 'Royal Suite',
+    description: 'Ultimate luxury with panoramic backwater views',
+    longDescription: 'Our most exclusive accommodation, the Royal Suite offers unparalleled luxury with panoramic views of the backwaters. Features include a private infinity pool, personal butler service, spa treatment room, and a dining pavilion. Inspired by the royal palaces of Kerala, every detail speaks of opulence.',
+    image: '/images/gallery-4.png',
+    price: '₹50,000',
+    size: '250 m²',
+    guests: 4,
+    beds: '1 King Bed + Living Area',
+    view: 'Panoramic Backwater View',
+    features: ['Private Pool', 'Butler Service', 'Spa Room', 'Dining Pavilion'],
+    amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Chef']
+  }
+]
+
 function AccommodationsContent() {
   const { t } = useLang()
   const cardsRef = useRef<HTMLDivElement>(null)
   const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" })
-  const [selectedVilla, setSelectedVilla] = useState<typeof villas[0] | null>(null)
+  const [villas, setVillas] = useState<any[]>([])
+  const [selectedVilla, setSelectedVilla] = useState<any | null>(null)
 
-  const villas = [
-    {
-      id: 'backwater',
-      name: 'Backwater Villa',
-      description: 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
-      longDescription: 'Wake up to the gentle sound of water and the sight of fishing boats gliding past your window. Our Backwater Villas offer an immersive experience of Kerala\'s famous waterways, featuring traditional wooden architecture with modern comforts. Each villa has a private deck where you can watch the sunset paint the waters in golden hues.',
-      image: '/images/villa-1.png',
-      price: '₹15,000',
-      size: '120 m²',
-      guests: 2,
-      beds: '1 King Bed',
-      view: 'Backwater View',
-      features: ['Private Deck', 'Canoe Ride', 'Sunset View', 'Outdoor Bath'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
-    },
-    {
-      id: 'coconut',
-      name: 'Coconut Grove Suite',
-      description: 'Nestled among swaying coconut palms with authentic Kerala decor',
-      longDescription: 'Surrounded by towering coconut palms that sway in the gentle breeze, these suites offer a true tropical retreat. The interiors feature bamboo furniture and coconut wood accents, celebrating the versatile tree that Kerala is famous for. Enjoy your morning chai on the private balcony as birds sing in the grove.',
-      image: '/images/villa-2.png',
-      price: '₹12,000',
-      size: '95 m²',
-      guests: 2,
-      beds: '1 King Bed',
-      view: 'Garden View',
-      features: ['Garden View', 'Outdoor Bath', 'Bird Watching', 'Private Balcony'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
-    },
-    {
-      id: 'heritage',
-      name: 'Heritage Nalukettu',
-      description: 'Traditional Kerala courtyard house with wooden architecture',
-      longDescription: 'Experience authentic Kerala living in our Heritage Nalukettu villas. These traditional courtyard houses feature intricate wood carvings, a central open courtyard (nadumuttam), and architecture that has been perfected over centuries. The natural ventilation and earthy tones create a cool, serene atmosphere.',
-      image: '/images/villa-3.png',
-      price: '₹18,000',
-      size: '150 m²',
-      guests: 4,
-      beds: '2 Queen Beds',
-      view: 'Courtyard View',
-      features: ['Courtyard', 'Wood Carvings', 'Heritage Style', 'Rain Shower'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
-    },
-    {
-      id: 'houseboat',
-      name: 'Luxury Houseboat',
-      description: 'Floating villa on the backwaters with complete privacy',
-      longDescription: 'For the ultimate Kerala experience, stay on our luxury houseboat. These converted traditional Kettuvallams feature air-conditioned bedrooms, a private chef, and 360-degree views of the backwaters. Drift through the waterways and experience life on the water.',
-      image: '/images/experience-1.png',
-      price: '₹35,000',
-      size: '200 m²',
-      guests: 2,
-      beds: '1 King Bed',
-      view: '360° Backwater View',
-      features: ['Private Chef', 'Butler Service', '360° View', 'Sun Deck'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Dining']
-    },
-    {
-      id: 'pool',
-      name: 'Pool Villa',
-      description: 'Private plunge pool with garden views',
-      longDescription: 'Our Pool Villas offer the perfect blend of luxury and privacy. Each villa features a private plunge pool surrounded by tropical gardens, an outdoor shower, and a spacious deck for sunbathing. The interiors blend modern luxury with traditional Kerala aesthetics.',
-      image: '/images/gallery-3.png',
-      price: '₹25,000',
-      size: '180 m²',
-      guests: 2,
-      beds: '1 King Bed',
-      view: 'Pool & Garden View',
-      features: ['Private Pool', 'Garden View', 'Outdoor Shower', 'Sun Deck'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']
-    },
-    {
-      id: 'royal',
-      name: 'Royal Suite',
-      description: 'Ultimate luxury with panoramic backwater views',
-      longDescription: 'Our most exclusive accommodation, the Royal Suite offers unparalleled luxury with panoramic views of the backwaters. Features include a private infinity pool, personal butler service, spa treatment room, and a dining pavilion. Inspired by the royal palaces of Kerala, every detail speaks of opulence.',
-      image: '/images/gallery-4.png',
-      price: '₹50,000',
-      size: '250 m²',
-      guests: 4,
-      beds: '1 King Bed + Living Area',
-      view: 'Panoramic Backwater View',
-      features: ['Private Pool', 'Butler Service', 'Spa Room', 'Dining Pavilion'],
-      amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Chef']
-    }
-  ]
+  useEffect(() => {
+    // Fetch dynamic rooms from the database
+    fetch('/api/rooms')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.length > 0) {
+          const activeRooms = data.filter((r: any) => r.active).map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            description: r.description,
+            longDescription: r.longDescription || r.description,
+            image: r.images[0] || '/images/placeholder.png',
+            price: `₹${r.price.toLocaleString()}`,
+            size: r.size,
+            guests: r.maxGuests,
+            beds: r.beds,
+            view: r.view,
+            features: r.features,
+            amenities: r.amenities
+          }))
+          setVillas(activeRooms)
+        } else {
+          setVillas(fallbackVillas)
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load database rooms, using static fallback:', err)
+        setVillas(fallbackVillas)
+      })
+  }, [])
 
   const amenityIcons: Record<string, React.ReactNode> = {
     'WiFi': <Wifi className="h-4 w-4" />,

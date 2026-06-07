@@ -160,11 +160,51 @@ function RoomFormModal({
       view: '',
       features: [],
       amenities: [],
+      images: [],
       active: true
     }
   )
   const [featureInput, setFeatureInput] = useState('')
   const [amenityInput, setAmenityInput] = useState('')
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files) {
+      Array.from(files).forEach(file => {
+        if (file.size > 2 * 1024 * 1024) {
+          alert(`File ${file.name} is too large. Max size is 2MB.`)
+          return
+        }
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          const base64String = reader.result as string
+          setFormData(prev => ({
+            ...prev,
+            images: [...(prev.images || []), base64String]
+          }))
+        }
+        reader.readAsDataURL(file)
+      })
+    }
+  }
+
+  const deleteImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images?.filter((_, i) => i !== index)
+    }))
+  }
+
+  const setAsPrimary = (index: number) => {
+    setFormData(prev => {
+      const images = [...(prev.images || [])]
+      if (index > 0 && index < images.length) {
+        const [target] = images.splice(index, 1)
+        images.unshift(target)
+      }
+      return { ...prev, images }
+    })
+  }
 
   const addFeature = () => {
     if (featureInput.trim()) {
@@ -295,14 +335,86 @@ function RoomFormModal({
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">View</label>
-            <Input
-              value={formData.view || ''}
-              onChange={(e) => setFormData({ ...formData, view: e.target.value })}
-              placeholder="e.g., Backwater View"
-              className="skeuo-input"
-            />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">View</label>
+              <Input
+                value={formData.view || ''}
+                onChange={(e) => setFormData({ ...formData, view: e.target.value })}
+                placeholder="e.g., Backwater View"
+                className="skeuo-input"
+              />
+            </div>
+            <div className="flex flex-col justify-end">
+              {/* Image Upload Button */}
+              <label className="text-sm font-medium text-foreground mb-2 block">Add Images</label>
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-sm font-medium skeuo-button text-primary-foreground">
+                  <Image className="h-4 w-4 mr-2" />
+                  Upload Images
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Gallery / Image Manager */}
+          <div className="skeuo-inset p-4 rounded-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">Room Gallery</span>
+              <span className="text-xs text-muted-foreground">{(formData.images?.length || 0)} image(s)</span>
+            </div>
+
+            {formData.images && formData.images.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {formData.images.map((img, idx) => (
+                  <div key={idx} className="relative aspect-[4/3] rounded-lg overflow-hidden border border-border group bg-muted/20">
+                    <img src={img} alt={`Room image ${idx + 1}`} className="w-full h-full object-cover" />
+                    
+                    {/* Floating Controls */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 z-10">
+                      {idx !== 0 && (
+                        <Button
+                          size="icon"
+                          variant="secondary"
+                          className="h-8 w-8 rounded-full bg-white/95 text-foreground hover:bg-white"
+                          title="Set as Primary"
+                          onClick={() => setAsPrimary(idx)}
+                        >
+                          <Check className="h-4 w-4 text-green-600" />
+                        </Button>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="h-8 w-8 rounded-full"
+                        title="Delete Image"
+                        onClick={() => deleteImage(idx)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* Badges */}
+                    {idx === 0 ? (
+                      <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-[9px] px-2 py-0.5 rounded-full font-medium shadow-md">
+                        Primary
+                      </span>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-8 text-center border-2 border-dashed border-border rounded-xl">
+                <p className="text-sm text-muted-foreground">No images uploaded yet. Click upload to add images.</p>
+              </div>
+            )}
           </div>
 
           {/* Features */}
@@ -314,7 +426,7 @@ function RoomFormModal({
                 onChange={(e) => setFeatureInput(e.target.value)}
                 placeholder="Add a feature..."
                 className="skeuo-input flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && addFeature()}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
               />
               <Button onClick={addFeature} variant="outline">Add</Button>
             </div>
@@ -325,7 +437,7 @@ function RoomFormModal({
                   className="inline-flex items-center gap-1 px-3 py-1 skeuo-inset rounded-full text-sm text-muted-foreground"
                 >
                   {feature}
-                  <button onClick={() => removeFeature(index)} className="hover:text-red-500">
+                  <button type="button" onClick={() => removeFeature(index)} className="hover:text-red-500">
                     <X className="h-3 w-3" />
                   </button>
                 </span>
@@ -342,7 +454,7 @@ function RoomFormModal({
                 onChange={(e) => setAmenityInput(e.target.value)}
                 placeholder="Add an amenity..."
                 className="skeuo-input flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && addAmenity()}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addAmenity())}
               />
               <Button onClick={addAmenity} variant="outline">Add</Button>
             </div>
@@ -353,7 +465,7 @@ function RoomFormModal({
                   className="inline-flex items-center gap-1 px-3 py-1 skeuo-inset rounded-full text-sm text-muted-foreground"
                 >
                   {amenity}
-                  <button onClick={() => removeAmenity(index)} className="hover:text-red-500">
+                  <button type="button" onClick={() => removeAmenity(index)} className="hover:text-red-500">
                     <X className="h-3 w-3" />
                   </button>
                 </span>
@@ -364,6 +476,7 @@ function RoomFormModal({
           {/* Status */}
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => setFormData({ ...formData, active: !formData.active })}
               className={`w-12 h-6 rounded-full transition-colors ${
                 formData.active ? 'bg-primary' : 'bg-muted'
@@ -393,13 +506,29 @@ function RoomFormModal({
 
 export default function RoomsPage() {
   const [mounted, setMounted] = useState(false)
-  const [rooms, setRooms] = useState<Room[]>(mockRooms)
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [showForm, setShowForm] = useState(false)
 
+  const loadRooms = async () => {
+    try {
+      const res = await fetch('/api/rooms')
+      if (res.ok) {
+        const data = await res.json()
+        setRooms(data)
+      }
+    } catch (err) {
+      console.error('Failed to load rooms:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    Promise.resolve().then(() => setMounted(true))
+    loadRooms()
+    setMounted(true)
   }, [])
 
   const filteredRooms = rooms.filter(room =>
@@ -407,41 +536,66 @@ export default function RoomsPage() {
     room.description.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const toggleRoomStatus = (roomId: string) => {
-    setRooms(rooms.map(room =>
-      room.id === roomId ? { ...room, active: !room.active } : room
-    ))
-  }
-
-  const handleSaveRoom = (roomData: Partial<Room>) => {
-    if (selectedRoom) {
-      setRooms(rooms.map(r =>
-        r.id === selectedRoom.id ? { ...r, ...roomData } : r
-      ))
-    } else {
-      const newRoom: Room = {
-        id: String(Date.now()),
-        name: roomData.name || '',
-        slug: roomData.name?.toLowerCase().replace(/\s+/g, '-') || '',
-        description: roomData.description || '',
-        price: roomData.price || 0,
-        size: roomData.size || '',
-        maxGuests: roomData.maxGuests || 2,
-        beds: roomData.beds || '',
-        view: roomData.view || '',
-        features: roomData.features || [],
-        amenities: roomData.amenities || [],
-        images: [],
-        active: roomData.active ?? true,
-        sortOrder: rooms.length + 1
+  const toggleRoomStatus = async (room: Room) => {
+    try {
+      const res = await fetch('/api/rooms', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...room, active: !room.active })
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setRooms(rooms.map(r => r.id === room.id ? updated : r))
       }
-      setRooms([...rooms, newRoom])
+    } catch (err) {
+      console.error('Failed to toggle room status:', err)
     }
-    setShowForm(false)
-    setSelectedRoom(null)
   }
 
-  if (!mounted) {
+  const handleSaveRoom = async (roomData: Partial<Room>) => {
+    try {
+      const method = selectedRoom ? 'PUT' : 'POST'
+      const payload = selectedRoom ? { ...selectedRoom, ...roomData } : roomData
+      const res = await fetch('/api/rooms', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (res.ok) {
+        const saved = await res.json()
+        if (selectedRoom) {
+          setRooms(rooms.map(r => r.id === selectedRoom.id ? saved : r))
+        } else {
+          setRooms([...rooms, saved])
+        }
+        setShowForm(false)
+        setSelectedRoom(null)
+      } else {
+        alert('Failed to save room details.')
+      }
+    } catch (err) {
+      console.error('Failed to save room:', err)
+      alert('Error saving room.')
+    }
+  }
+
+  const handleDeleteRoom = async (roomId: string) => {
+    if (!confirm('Are you sure you want to delete this room?')) return
+    try {
+      const res = await fetch(`/api/rooms?id=${roomId}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        setRooms(rooms.filter(r => r.id !== roomId))
+      } else {
+        alert('Failed to delete room.')
+      }
+    } catch (err) {
+      console.error('Failed to delete room:', err)
+    }
+  }
+
+  if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-pulse text-muted-foreground">Loading rooms...</div>
@@ -489,73 +643,77 @@ export default function RoomsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`skeuo-card overflow-hidden ${!room.active ? 'opacity-60' : ''}`}
+            className={`skeuo-card overflow-hidden flex flex-col justify-between ${!room.active ? 'opacity-60' : ''}`}
           >
-            {/* Image */}
-            <div className="relative aspect-video overflow-hidden">
-              <img
-                src={room.images[0] || '/images/placeholder.png'}
-                alt={room.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                <div>
-                  <h3 className="font-serif text-xl text-white">{room.name}</h3>
-                  <p className="text-white/80 text-sm">{room.size}</p>
+            <div>
+              {/* Image */}
+              <div className="relative aspect-video overflow-hidden">
+                <img
+                  src={room.images[0] || '/images/placeholder.png'}
+                  alt={room.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                  <div>
+                    <h3 className="font-serif text-xl text-white">{room.name}</h3>
+                    <p className="text-white/80 text-sm">{room.size}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleRoomStatus(room)}
+                    className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
+                  >
+                    {room.active ? (
+                      <ToggleRight className="h-5 w-5 text-primary" />
+                    ) : (
+                      <ToggleLeft className="h-5 w-5 text-white/70" />
+                    )}
+                  </button>
                 </div>
-                <button
-                  onClick={() => toggleRoomStatus(room.id)}
-                  className="p-2 rounded-lg bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
-                >
-                  {room.active ? (
-                    <ToggleRight className="h-5 w-5 text-primary" />
-                  ) : (
-                    <ToggleLeft className="h-5 w-5 text-white/70" />
+              </div>
+
+              {/* Content */}
+              <div className="p-4 space-y-4">
+                <p className="text-sm text-muted-foreground line-clamp-2">{room.description}</p>
+
+                {/* Stats */}
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    <span>{room.maxGuests}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <BedDouble className="h-4 w-4" />
+                    <span>{room.beds}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-primary font-medium ml-auto">
+                    <IndianRupee className="h-4 w-4" />
+                    <span>{room.price.toLocaleString()}/night</span>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="flex flex-wrap gap-1">
+                  {room.features.slice(0, 3).map((feature) => (
+                    <span
+                      key={feature}
+                      className="text-xs px-2 py-1 skeuo-inset text-muted-foreground rounded-full"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                  {room.features.length > 3 && (
+                    <span className="text-xs px-2 py-1 text-muted-foreground">
+                      +{room.features.length - 3} more
+                    </span>
                   )}
-                </button>
+                </div>
               </div>
             </div>
 
-            {/* Content */}
-            <div className="p-4 space-y-4">
-              <p className="text-sm text-muted-foreground line-clamp-2">{room.description}</p>
-
-              {/* Stats */}
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>{room.maxGuests}</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <BedDouble className="h-4 w-4" />
-                  <span>{room.beds}</span>
-                </div>
-                <div className="flex items-center gap-1 text-primary font-medium ml-auto">
-                  <IndianRupee className="h-4 w-4" />
-                  <span>{room.price.toLocaleString()}/night</span>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="flex flex-wrap gap-1">
-                {room.features.slice(0, 3).map((feature) => (
-                  <span
-                    key={feature}
-                    className="text-xs px-2 py-1 skeuo-inset text-muted-foreground rounded-full"
-                  >
-                    {feature}
-                  </span>
-                ))}
-                {room.features.length > 3 && (
-                  <span className="text-xs px-2 py-1 text-muted-foreground">
-                    +{room.features.length - 3} more
-                  </span>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-2 border-t border-border">
+            {/* Actions */}
+            <div className="p-4 pt-0">
+              <div className="flex items-center gap-2 pt-4 border-t border-border">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -580,6 +738,7 @@ export default function RoomsPage() {
                   variant="ghost"
                   size="sm"
                   className="text-red-500 hover:bg-red-500/10"
+                  onClick={() => handleDeleteRoom(room.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -605,3 +764,4 @@ export default function RoomsPage() {
     </div>
   )
 }
+
