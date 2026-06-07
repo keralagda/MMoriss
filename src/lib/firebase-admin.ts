@@ -2,9 +2,17 @@ import * as admin from 'firebase-admin'
 
 if (!admin.apps.length) {
   try {
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY
-      ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-      : undefined
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY
+    if (privateKey) {
+      // Strip surrounding quotes if they exist
+      if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+        privateKey = privateKey.slice(1, -1)
+      }
+      if (privateKey.startsWith("'") && privateKey.endsWith("'")) {
+        privateKey = privateKey.slice(1, -1)
+      }
+      privateKey = privateKey.replace(/\\n/g, '\n')
+    }
 
     admin.initializeApp({
       credential: admin.credential.cert({

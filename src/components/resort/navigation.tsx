@@ -95,12 +95,26 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
   const { t } = useLang()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [logo, setLogo] = useState('')
+  const [siteName, setSiteName] = useState('')
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
     }
     window.addEventListener('scroll', handleScroll)
+    
+    // Fetch dynamic branding settings
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.brand_logo) setLogo(data.brand_logo)
+          if (data.site_name) setSiteName(data.site_name)
+        }
+      })
+      .catch(err => console.error('Failed to load branding settings:', err))
+
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -131,14 +145,20 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
-                <Flower2 className="h-6 w-6 text-primary-foreground" />
-              </div>
+              {logo ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shadow-lg bg-background/30 backdrop-blur-sm border border-primary/20">
+                  <img src={logo} alt="Logo" className="w-full h-full object-contain p-1.5" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
+                  <Flower2 className="h-6 w-6 text-primary-foreground" />
+                </div>
+              )}
               <div>
                 <span className={`font-serif text-xl sm:text-2xl font-semibold tracking-wide transition-colors duration-300 ${
                   shouldHaveBackground ? 'text-foreground' : 'text-white'
                 }`}>
-                  {t('hero.title')}
+                  {siteName || t('hero.title')}
                 </span>
                 <p className={`text-xs tracking-widest uppercase ${
                   shouldHaveBackground ? 'text-muted-foreground' : 'text-white/70'

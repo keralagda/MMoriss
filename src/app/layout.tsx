@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { db } from "@/lib/db";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,13 +36,50 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let primaryColor = "";
+  let secondaryColor = "";
+  let favicon = "";
+  
+  try {
+    const settings = await db.setting.findMany({
+      where: {
+        key: {
+          in: ["primary_color", "secondary_color", "brand_favicon"]
+        }
+      }
+    });
+    
+    settings.forEach(setting => {
+      if (setting.key === "primary_color") primaryColor = setting.value;
+      if (setting.key === "secondary_color") secondaryColor = setting.value;
+      if (setting.key === "brand_favicon") favicon = setting.value;
+    });
+  } catch (error) {
+    console.error("Failed to load layout branding settings:", error);
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {favicon && <link rel="icon" href={favicon} />}
+        {(primaryColor || secondaryColor) && (
+          <style dangerouslySetInnerHTML={{ __html: `
+            :root {
+              ${primaryColor ? `--primary: ${primaryColor} !important; --ring: ${primaryColor} !important;` : ""}
+              ${secondaryColor ? `--secondary: ${secondaryColor} !important;` : ""}
+            }
+            .light {
+              ${primaryColor ? `--primary: ${primaryColor} !important; --ring: ${primaryColor} !important;` : ""}
+              ${secondaryColor ? `--secondary: ${secondaryColor} !important;` : ""}
+            }
+          `}} />
+        )}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
