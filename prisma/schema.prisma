@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
@@ -48,7 +48,7 @@ model Room {
   slug          String       @unique
   description   String
   longDescription String?
-  price         Float
+  price         Decimal
   size          String?
   maxGuests     Int          @default(2)
   beds          String?
@@ -75,8 +75,8 @@ model Booking {
   checkOut      DateTime
   adults        Int        @default(1)
   children      Int        @default(0)
-  totalPrice    Float
-  depositPaid   Float      @default(0)
+  totalPrice    Decimal
+  depositPaid   Decimal    @default(0)
   status        String     @default("pending") // pending, confirmed, checked_in, checked_out, cancelled
   specialRequests String?
   paymentStatus String     @default("pending") // pending, deposit_paid, paid, refunded
@@ -93,7 +93,7 @@ model Experience {
   description   String
   longDescription String?
   duration      String
-  price         Float
+  price         Decimal
   priceType     String   @default("per_person") // per_person, per_couple, per_group
   highlights    String   // JSON array
   images        String   // JSON array
@@ -113,7 +113,7 @@ model SpaTreatment {
   description   String
   longDescription String?
   duration      String
-  price         Float
+  price         Decimal
   benefits      String   // JSON array
   images        String   // JSON array
   active        Boolean  @default(true)
@@ -131,7 +131,7 @@ model WellnessPackage {
   description   String
   duration      String
   treatments    String   // JSON array
-  price         Float
+  price         Decimal
   active        Boolean  @default(true)
   featured      Boolean  @default(false)
   sortOrder     Int      @default(0)
@@ -212,7 +212,7 @@ model Dish {
   id          String   @id @default(cuid())
   name        String
   description String
-  price       Float
+  price       Decimal
   veg         Boolean  @default(false)
   imageUrl    String?
   active      Boolean  @default(true)
