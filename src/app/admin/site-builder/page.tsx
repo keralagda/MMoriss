@@ -240,9 +240,7 @@ function WidgetPanel({
       )}
     </motion.div>
   )
-}
-
-// Section Preview Component
+}// Section Preview Component
 function SectionPreview({ section }: { section: Section }) {
   switch (section.type) {
     case 'hero-section':
@@ -320,22 +318,39 @@ function SectionPreview({ section }: { section: Section }) {
         </div>
       )
       
-    case 'accommodations-section':
+    case 'accommodations-section': {
+      const title = (section.props.title as string) || 'Your Home in Paradise'
+      const subtitle = (section.props.subtitle as string) || 'Accommodations'
+      const villas = [
+        {
+          name: (section.props.villa1Name as string) || 'Backwater Villa',
+          price: (section.props.villa1Price as string) || '₹15,000',
+          image: (section.props.villa1Image as string) || '/images/villa-1.png'
+        },
+        {
+          name: (section.props.villa2Name as string) || 'Coconut Grove Suite',
+          price: (section.props.villa2Price as string) || '₹12,000',
+          image: (section.props.villa2Image as string) || '/images/villa-2.png'
+        },
+        {
+          name: (section.props.villa3Name as string) || 'Heritage Nalukettu',
+          price: (section.props.villa3Price as string) || '₹18,000',
+          image: (section.props.villa3Image as string) || '/images/villa-3.png'
+        }
+      ]
       return (
         <div className="py-16 px-4 skeuo-inset mx-4 rounded-3xl">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Accommodations</p>
+              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium font-serif">
+                {subtitle}
+              </p>
               <h2 className="font-serif text-3xl lg:text-4xl text-foreground mt-3">
-                Your Home in <span className="gold-metallic">Paradise</span>
+                {title}
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { name: 'Backwater Villa', price: '₹15,000', image: '/images/villa-1.png' },
-                { name: 'Coconut Grove Suite', price: '₹12,000', image: '/images/villa-2.png' },
-                { name: 'Heritage Nalukettu', price: '₹18,000', image: '/images/villa-3.png' }
-              ].map((villa, i) => (
+              {villas.map((villa, i) => (
                 <div key={i} className="skeuo-card overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <img src={villa.image} alt={villa.name} className="w-full h-full object-cover" />
@@ -355,23 +370,44 @@ function SectionPreview({ section }: { section: Section }) {
           </div>
         </div>
       )
+    }
       
-    case 'experiences-section':
+    case 'experiences-section': {
+      const title = (section.props.title as string) || "Discover God's Own Country"
+      const subtitle = (section.props.subtitle as string) || 'Kerala Experiences'
+      const experiences = [
+        {
+          icon: Ship,
+          name: (section.props.exp1Name as string) || 'Houseboat Cruise',
+          desc: (section.props.exp1Desc as string) || 'Drift through enchanting backwaters',
+          image: (section.props.exp1Image as string) || '/images/experience-1.png'
+        },
+        {
+          icon: Sparkles,
+          name: (section.props.exp2Name as string) || 'Ayurveda Wellness',
+          desc: (section.props.exp2Desc as string) || 'Authentic healing traditions',
+          image: (section.props.exp2Image as string) || '/images/spa.png'
+        },
+        {
+          icon: Mountain,
+          name: (section.props.exp3Name as string) || 'Village Experience',
+          desc: (section.props.exp3Desc as string) || 'Immerse in Kerala culture',
+          image: (section.props.exp3Image as string) || '/images/experience-3.png'
+        }
+      ]
       return (
         <div className="py-16 px-4 bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Kerala Experiences</p>
+              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
+                {subtitle}
+              </p>
               <h2 className="font-serif text-3xl lg:text-4xl text-foreground mt-3">
-                Discover <span className="gold-metallic">God&apos;s Own Country</span>
+                {title}
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { icon: Ship, name: 'Houseboat Cruise', desc: 'Drift through enchanting backwaters', image: '/images/experience-1.png' },
-                { icon: Sparkles, name: 'Ayurveda Wellness', desc: 'Authentic healing traditions', image: '/images/spa.png' },
-                { icon: Mountain, name: 'Village Experience', desc: 'Immerse in Kerala culture', image: '/images/experience-3.png' }
-              ].map((exp, i) => (
+              {experiences.map((exp, i) => (
                 <div key={i} className="group skeuo-card overflow-hidden">
                   <div className="relative aspect-[3/4]">
                     <img src={exp.image} alt={exp.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -390,25 +426,38 @@ function SectionPreview({ section }: { section: Section }) {
           </div>
         </div>
       )
+    }
       
-    case 'ayurveda-section':
+    case 'ayurveda-section': {
+      const title = (section.props.title as string) || 'Ancient Healing, Modern Comfort'
+      const subtitle = (section.props.subtitle as string) || 'Ayurveda & Wellness'
+      const description = (section.props.description as string) || 'Kerala is the birthplace of Ayurveda. Our wellness center offers authentic treatments using traditional herbs and oils sourced from Kerala.'
+      const image = (section.props.image as string) || '/images/spa.png'
+      const treatments = [
+        (section.props.treatment1 as string) || 'Panchakarma',
+        (section.props.treatment2 as string) || 'Shirodhara',
+        (section.props.treatment3 as string) || 'Abhyanga',
+        (section.props.treatment4 as string) || 'Nasyam'
+      ]
       return (
         <div className="py-16 px-4 skeuo-inset mx-4 rounded-3xl">
           <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative">
-                <img src="/images/spa.png" alt="Ayurveda" className="rounded-2xl w-full aspect-square object-cover" />
+                <img src={image} alt="Ayurveda" className="rounded-2xl w-full aspect-square object-cover" />
               </div>
               <div className="space-y-4">
-                <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Ayurveda & Wellness</p>
+                <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
+                  {subtitle}
+                </p>
                 <h2 className="font-serif text-3xl lg:text-4xl text-foreground leading-tight">
-                  Ancient Healing, <span className="gold-metallic">Modern Comfort</span>
+                  {title}
                 </h2>
                 <p className="text-muted-foreground text-base">
-                  Kerala is the birthplace of Ayurveda. Our wellness center offers authentic treatments using traditional herbs and oils sourced from Kerala.
+                  {description}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
-                  {['Panchakarma', 'Shirodhara', 'Abhyanga', 'Nasyam'].map((treatment, i) => (
+                  {treatments.map((treatment, i) => (
                     <div key={i} className="skeuo-card p-3">
                       <p className="font-medium text-foreground text-sm">{treatment}</p>
                     </div>
@@ -419,23 +468,41 @@ function SectionPreview({ section }: { section: Section }) {
           </div>
         </div>
       )
+    }
       
-    case 'dining-section':
+    case 'dining-section': {
+      const title = (section.props.title as string) || 'Flavors of Kerala'
+      const subtitle = (section.props.subtitle as string) || 'Kerala Cuisine'
+      const diningItems = [
+        {
+          name: (section.props.dining1Name as string) || 'Backwater Restaurant',
+          desc: (section.props.dining1Desc as string) || 'Traditional Kerala Sadya & Seafood',
+          image: (section.props.dining1Image as string) || '/images/dining-1.png'
+        },
+        {
+          name: (section.props.dining2Name as string) || 'Sunset Chai Lounge',
+          desc: (section.props.dining2Desc as string) || 'Fresh chai & local snacks',
+          image: (section.props.dining2Image as string) || '/images/dining-2.png'
+        },
+        {
+          name: (section.props.dining3Name as string) || 'Cooking Classes',
+          desc: (section.props.dining3Desc as string) || 'Learn authentic Kerala dishes',
+          image: (section.props.dining3Image as string) || '/images/dining-3.png'
+        }
+      ]
       return (
         <div className="py-16 px-4 bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Kerala Cuisine</p>
+              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
+                {subtitle}
+              </p>
               <h2 className="font-serif text-3xl lg:text-4xl text-foreground mt-3">
-                Flavors of <span className="gold-metallic">Kerala</span>
+                {title}
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { name: 'Backwater Restaurant', desc: 'Traditional Kerala Sadya & Seafood', image: '/images/dining-1.png' },
-                { name: 'Sunset Chai Lounge', desc: 'Fresh chai & local snacks', image: '/images/dining-2.png' },
-                { name: 'Cooking Classes', desc: 'Learn authentic Kerala dishes', image: '/images/dining-3.png' }
-              ].map((item, i) => (
+              {diningItems.map((item, i) => (
                 <div key={i} className="skeuo-card overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -450,61 +517,81 @@ function SectionPreview({ section }: { section: Section }) {
           </div>
         </div>
       )
+    }
       
-    case 'gallery-section':
+    case 'gallery-section': {
+      const title = (section.props.title as string) || 'Moments in Kerala'
+      const subtitle = (section.props.subtitle as string) || 'Gallery'
+      const images = [
+        (section.props.image1 as string) || '/images/gallery-1.png',
+        (section.props.image2 as string) || '/images/gallery-2.png',
+        (section.props.image3 as string) || '/images/gallery-3.png',
+        (section.props.image4 as string) || '/images/gallery-4.png'
+      ]
       return (
         <div className="py-16 px-4 skeuo-inset mx-4 rounded-3xl">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Gallery</p>
+              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
+                {subtitle}
+              </p>
               <h2 className="font-serif text-3xl lg:text-4xl text-foreground mt-3">
-                Moments in <span className="gold-metallic">Kerala</span>
+                {title}
               </h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {['/images/gallery-1.png', '/images/gallery-2.png', '/images/gallery-3.png', '/images/gallery-4.png'].map((img, i) => (
+              {images.map((img, i) => (
                 <div key={i} className={`skeuo-card overflow-hidden ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}>
-                  <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover aspect-square" />
+                  <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover aspect-square animate-pulse-slow" />
                 </div>
               ))}
             </div>
           </div>
         </div>
       )
+    }
       
-    case 'contact-section':
+    case 'contact-section': {
+      const title = (section.props.title as string) || 'Plan Your Kerala Escape'
+      const subtitle = (section.props.subtitle as string) || 'Get in Touch'
+      const description = (section.props.description as string) || 'Our team is ready to help you plan an unforgettable experience in Munroe Island, Kollam.'
+      const location = (section.props.location as string) || 'Munroe Island, Kollam, Kerala 691502'
+      const phone = (section.props.phone as string) || '+91 474 XXXXXXX'
+      const email = (section.props.email as string) || 'reservations@munroemorris.com'
       return (
         <div className="py-16 px-4 bg-background">
           <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12">
               <div className="space-y-4">
-                <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Get in Touch</p>
+                <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">
+                  {subtitle}
+                </p>
                 <h2 className="font-serif text-3xl lg:text-4xl text-foreground">
-                  Plan Your <span className="gold-metallic">Kerala Escape</span>
+                  {title}
                 </h2>
                 <p className="text-muted-foreground text-base">
-                  Our team is ready to help you plan an unforgettable experience in Munroe Island, Kollam.
+                  {description}
                 </p>
                 <div className="space-y-3">
                   <div className="skeuo-card p-3 flex items-center gap-3">
                     <MapPin className="h-4 w-4 text-primary" />
                     <div>
                       <p className="font-medium text-foreground text-sm">Location</p>
-                      <p className="text-muted-foreground text-xs">Munroe Island, Kollam, Kerala 691502</p>
+                      <p className="text-muted-foreground text-xs">{location}</p>
                     </div>
                   </div>
                   <div className="skeuo-card p-3 flex items-center gap-3">
                     <Phone className="h-4 w-4 text-primary" />
                     <div>
                       <p className="font-medium text-foreground text-sm">Phone</p>
-                      <p className="text-muted-foreground text-xs">+91 474 XXXXXXX</p>
+                      <p className="text-muted-foreground text-xs">{phone}</p>
                     </div>
                   </div>
                   <div className="skeuo-card p-3 flex items-center gap-3">
                     <Mail className="h-4 w-4 text-primary" />
                     <div>
                       <p className="font-medium text-foreground text-sm">Email</p>
-                      <p className="text-muted-foreground text-xs">reservations@munroemorris.com</p>
+                      <p className="text-muted-foreground text-xs">{email}</p>
                     </div>
                   </div>
                 </div>
@@ -512,40 +599,58 @@ function SectionPreview({ section }: { section: Section }) {
               <div className="skeuo-card p-5">
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="First Name" className="skeuo-input w-full text-sm" />
-                    <input type="text" placeholder="Last Name" className="skeuo-input w-full text-sm" />
+                    <input type="text" placeholder="First Name" className="skeuo-input w-full text-sm" disabled />
+                    <input type="text" placeholder="Last Name" className="skeuo-input w-full text-sm" disabled />
                   </div>
-                  <input type="email" placeholder="Email" className="skeuo-input w-full text-sm" />
-                  <input type="tel" placeholder="Phone" className="skeuo-input w-full text-sm" />
-                  <textarea placeholder="Your message..." className="skeuo-input w-full h-24 text-sm" />
-                  <button className="w-full skeuo-button py-2 font-medium text-sm">Send Inquiry</button>
+                  <input type="email" placeholder="Email" className="skeuo-input w-full text-sm" disabled />
+                  <input type="tel" placeholder="Phone" className="skeuo-input w-full text-sm" disabled />
+                  <textarea placeholder="Your message..." className="skeuo-input w-full h-24 text-sm" disabled />
+                  <button className="w-full skeuo-button py-2 font-medium text-sm" disabled>Send Inquiry</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )
+    }
       
-    case 'testimonials-section':
+    case 'testimonials-section': {
+      const title = (section.props.title as string) || 'What Our Guests Say'
+      const subtitle = (section.props.subtitle as string) || 'Testimonials'
+      const reviews = [
+        {
+          name: (section.props.testimonial1Name as string) || 'Sarah J.',
+          rating: Number(section.props.testimonial1Rating) || 5,
+          comment: (section.props.testimonial1Comment as string) || 'Absolutely magical! The backwater views are stunning.'
+        },
+        {
+          name: (section.props.testimonial2Name as string) || 'Rajesh K.',
+          rating: Number(section.props.testimonial2Rating) || 5,
+          comment: (section.props.testimonial2Comment as string) || 'Great Ayurveda treatments. Will definitely come back.'
+        },
+        {
+          name: (section.props.testimonial3Name as string) || 'Emily C.',
+          rating: Number(section.props.testimonial3Rating) || 5,
+          comment: (section.props.testimonial3Comment as string) || 'The staff was incredibly helpful and the food amazing!'
+        }
+      ]
       return (
         <div className="py-16 px-4 skeuo-inset mx-4 rounded-3xl">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium">Testimonials</p>
+              <p className="text-primary text-sm tracking-[0.2em] uppercase font-medium font-serif">
+                {subtitle}
+              </p>
               <h2 className="font-serif text-3xl lg:text-4xl text-foreground mt-3">
-                What Our <span className="gold-metallic">Guests Say</span>
+                {title}
               </h2>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { name: 'Sarah J.', rating: 5, comment: 'Absolutely magical! The backwater views are stunning.' },
-                { name: 'Rajesh K.', rating: 5, comment: 'Great Ayurveda treatments. Will definitely come back.' },
-                { name: 'Emily C.', rating: 5, comment: 'The staff was incredibly helpful and the food amazing!' }
-              ].map((review, i) => (
+              {reviews.map((review, i) => (
                 <div key={i} className="skeuo-card p-4">
                   <div className="flex items-center gap-1 mb-2">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className={`h-3 w-3 ${j < review.rating ? 'text-primary fill-primary' : 'text-muted'}`} />
+                      <Star key={j} className={`h-3 w-3 ${j < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground/30'}`} />
                     ))}
                   </div>
                   <p className="text-muted-foreground text-xs mb-2">&quot;{review.comment}&quot;</p>
@@ -556,23 +661,131 @@ function SectionPreview({ section }: { section: Section }) {
           </div>
         </div>
       )
+    }
       
     case 'cta-section':
       return (
         <div className="py-16 px-4 bg-gradient-to-r from-primary/20 to-gold-dark/20">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-serif text-3xl lg:text-4xl text-foreground">
-              Ready to Experience <span className="gold-metallic">Kerala</span>?
+              {(section.props.title as string) || 'Ready to Experience Kerala?'}
             </h2>
             <p className="text-muted-foreground text-base mt-3">
-              Book your stay at Munroe Morris Service Villa and create unforgettable memories.
+              {(section.props.description as string) || 'Book your stay at Munroe Morris Service Villa and create unforgettable memories.'}
             </p>
             <button className="mt-6 skeuo-button px-6 py-3 text-base">
-              Book Your Stay
+              {(section.props.ctaText as string) || 'Book Your Stay'}
             </button>
           </div>
         </div>
       )
+
+    case 'section': {
+      const padding = (section.props.padding as string) || 'py-24'
+      const bg = (section.props.bg as string) || 'bg-background'
+      return (
+        <div className={`${padding} ${bg} border border-dashed border-primary/20 m-2 rounded-xl`}>
+          <div className="text-center text-xs text-primary/70 uppercase tracking-widest font-mono mb-2">Layout: Section</div>
+          <div className="px-4 text-center text-sm text-muted-foreground italic">
+            Background: {bg} | Padding: {padding}
+          </div>
+        </div>
+      )
+    }
+
+    case 'container': {
+      const maxWidth = (section.props.maxWidth as string) || 'max-w-7xl'
+      const centered = section.props.centered !== false
+      return (
+        <div className={`${centered ? 'mx-auto' : ''} ${maxWidth} border border-dotted border-foreground/35 p-4 m-2 rounded-lg`}>
+          <div className="text-center text-xs text-primary/70 uppercase tracking-widest font-mono mb-1">Layout: Container</div>
+          <div className="text-center text-sm text-muted-foreground">Max Width: {maxWidth} | Centered: {centered ? 'Yes' : 'No'}</div>
+        </div>
+      )
+    }
+
+    case 'columns': {
+      const cols = Number(section.props.columns) || 2
+      const gap = (section.props.gap as string) || 'gap-8'
+      return (
+        <div className="p-4 m-2 border border-dashed border-foreground/20 rounded-lg">
+          <div className="text-center text-xs text-primary/70 uppercase tracking-widest font-mono mb-3">Layout: Columns ({cols})</div>
+          <div className={`grid ${gap}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+            {[...Array(cols)].map((_, i) => (
+              <div key={i} className="skeuo-inset p-4 text-center text-xs text-muted-foreground rounded">
+                Column {i + 1} ({gap})
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    case 'heading': {
+      const text = (section.props.text as string) || 'Heading'
+      const level = (section.props.level as string) || 'h2'
+      const align = (section.props.align as string) || 'center'
+      const alignClass = align === 'left' ? 'text-left' : align === 'right' ? 'text-right' : 'text-center'
+      
+      const HeadingTag = (level === 'h1' || level === 'h3' || level === 'h4') ? level : 'h2'
+      
+      return (
+        <div className="p-4">
+          <HeadingTag className={`font-serif text-foreground font-semibold ${alignClass} ${
+            level === 'h1' ? 'text-4xl md:text-5xl' : 
+            level === 'h2' ? 'text-3xl md:text-4xl' :
+            level === 'h3' ? 'text-2xl md:text-3xl' : 'text-xl'
+          }`}>
+            {text}
+          </HeadingTag>
+        </div>
+      )
+    }
+
+    case 'text': {
+      const text = (section.props.text as string) || 'Your text here...'
+      const align = (section.props.align as string) || 'left'
+      const alignClass = align === 'left' ? 'text-left' : align === 'right' ? 'text-right' : align === 'justify' ? 'text-justify' : 'text-center'
+      return (
+        <div className="p-4">
+          <p className={`text-muted-foreground text-base leading-relaxed ${alignClass}`}>
+            {text}
+          </p>
+        </div>
+      )
+    }
+
+    case 'image': {
+      const src = (section.props.src as string) || '/images/placeholder.png'
+      const alt = (section.props.alt as string) || 'Image'
+      return (
+        <div className="p-4 flex justify-center">
+          <div className="skeuo-card p-2 max-w-md w-full">
+            <div className="relative aspect-[16/10] rounded-lg overflow-hidden">
+              <img src={src} alt={alt} className="w-full h-full object-cover" />
+            </div>
+            <p className="text-center text-xs text-muted-foreground mt-2">{alt}</p>
+          </div>
+        </div>
+      )
+    }
+
+    case 'button': {
+      const text = (section.props.text as string) || 'Click Here'
+      const style = (section.props.style as string) || 'primary'
+      const buttonStyle = 
+        style === 'secondary' ? 'skeuo-inset text-foreground' : 
+        style === 'outline' ? 'border border-primary text-primary bg-transparent hover:bg-primary/10 shadow-none' : 
+        style === 'link' ? 'underline text-primary bg-transparent shadow-none hover:text-primary/80' : 
+        'skeuo-button'
+      return (
+        <div className="p-4 flex justify-center">
+          <button className={`px-6 py-2 rounded-lg font-medium text-sm transition-all ${buttonStyle}`}>
+            {text}
+          </button>
+        </div>
+      )
+    }
       
     default:
       return (
@@ -783,6 +996,834 @@ function SettingsPanel({
                 </div>
               </>
             )}
+
+            {section.type === 'accommodations-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Villa 1</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.villa1Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa1Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Price</label>
+                  <Input 
+                    value={(section.props.villa1Price as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa1Price: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.villa1Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa1Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Villa 2</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.villa2Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa2Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Price</label>
+                  <Input 
+                    value={(section.props.villa2Price as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa2Price: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.villa2Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa2Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Villa 3</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.villa3Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa3Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Price</label>
+                  <Input 
+                    value={(section.props.villa3Price as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa3Price: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.villa3Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { villa3Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'experiences-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Experience 1</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.exp1Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp1Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.exp1Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp1Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.exp1Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp1Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Experience 2</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.exp2Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp2Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.exp2Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp2Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.exp2Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp2Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Experience 3</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.exp3Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp3Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.exp3Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp3Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.exp3Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { exp3Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'ayurveda-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Description</label>
+                  <Textarea 
+                    value={(section.props.description as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { description: e.target.value })}
+                    className="skeuo-input min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Image URL</label>
+                  <Input 
+                    value={(section.props.image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { image: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Treatments</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Treatment 1</label>
+                    <Input 
+                      value={(section.props.treatment1 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { treatment1: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Treatment 2</label>
+                    <Input 
+                      value={(section.props.treatment2 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { treatment2: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Treatment 3</label>
+                    <Input 
+                      value={(section.props.treatment3 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { treatment3: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Treatment 4</label>
+                    <Input 
+                      value={(section.props.treatment4 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { treatment4: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {section.type === 'dining-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Dining Item 1</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.dining1Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining1Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.dining1Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining1Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.dining1Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining1Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Dining Item 2</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.dining2Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining2Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.dining2Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining2Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.dining2Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining2Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Dining Item 3</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.dining3Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining3Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Description</label>
+                  <Input 
+                    value={(section.props.dining3Desc as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining3Desc: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Image URL</label>
+                  <Input 
+                    value={(section.props.dining3Image as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { dining3Image: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'gallery-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Images</h4>
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Image 1 URL</label>
+                    <Input 
+                      value={(section.props.image1 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { image1: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Image 2 URL</label>
+                    <Input 
+                      value={(section.props.image2 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { image2: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Image 3 URL</label>
+                    <Input 
+                      value={(section.props.image3 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { image3: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-foreground block mb-1">Image 4 URL</label>
+                    <Input 
+                      value={(section.props.image4 as string) || ''}
+                      onChange={(e) => onUpdate(section.id, { image4: e.target.value })}
+                      className="skeuo-input text-xs"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {section.type === 'contact-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Description</label>
+                  <Textarea 
+                    value={(section.props.description as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { description: e.target.value })}
+                    className="skeuo-input min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Location Address</label>
+                  <Input 
+                    value={(section.props.location as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { location: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Phone</label>
+                  <Input 
+                    value={(section.props.phone as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { phone: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Email</label>
+                  <Input 
+                    value={(section.props.email as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { email: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'testimonials-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Subtitle</label>
+                  <Input 
+                    value={(section.props.subtitle as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Testimonial 1</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.testimonial1Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial1Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Rating (1-5)</label>
+                  <input 
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={Number(section.props.testimonial1Rating) || 5}
+                    onChange={(e) => onUpdate(section.id, { testimonial1Rating: Number(e.target.value) })}
+                    className="skeuo-input bg-background w-full text-xs p-2 rounded-lg"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Comment</label>
+                  <Input 
+                    value={(section.props.testimonial1Comment as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial1Comment: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Testimonial 2</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.testimonial2Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial2Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Rating (1-5)</label>
+                  <input 
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={Number(section.props.testimonial2Rating) || 5}
+                    onChange={(e) => onUpdate(section.id, { testimonial2Rating: Number(e.target.value) })}
+                    className="skeuo-input bg-background w-full text-xs p-2 rounded-lg"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Comment</label>
+                  <Input 
+                    value={(section.props.testimonial2Comment as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial2Comment: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+
+                <div className="divider-gold my-2" />
+                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Testimonial 3</h4>
+                <div>
+                  <label className="text-xs text-foreground block mb-1">Name</label>
+                  <Input 
+                    value={(section.props.testimonial3Name as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial3Name: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Rating (1-5)</label>
+                  <input 
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={Number(section.props.testimonial3Rating) || 5}
+                    onChange={(e) => onUpdate(section.id, { testimonial3Rating: Number(e.target.value) })}
+                    className="skeuo-input bg-background w-full text-xs p-2 rounded-lg"
+                  />
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-foreground block mb-1">Comment</label>
+                  <Input 
+                    value={(section.props.testimonial3Comment as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { testimonial3Comment: e.target.value })}
+                    className="skeuo-input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'cta-section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Title</label>
+                  <Input 
+                    value={(section.props.title as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { title: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Description</label>
+                  <Textarea 
+                    value={(section.props.description as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { description: e.target.value })}
+                    className="skeuo-input min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">CTA Button Text</label>
+                  <Input 
+                    value={(section.props.ctaText as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { ctaText: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'section' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Padding</label>
+                  <select 
+                    value={(section.props.padding as string) || 'py-24'}
+                    onChange={(e) => onUpdate(section.id, { padding: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="py-8">Extra Small (py-8)</option>
+                    <option value="py-12">Small (py-12)</option>
+                    <option value="py-16">Medium (py-16)</option>
+                    <option value="py-24">Large (py-24)</option>
+                    <option value="py-32">Extra Large (py-32)</option>
+                  </select>
+                </div>
+                <div className="mt-2">
+                  <label className="text-sm font-medium text-foreground block mb-2">Background Theme</label>
+                  <select 
+                    value={(section.props.bg as string) || 'bg-background'}
+                    onChange={(e) => onUpdate(section.id, { bg: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="bg-background">Default Background</option>
+                    <option value="bg-muted/30">Muted Light Gray</option>
+                    <option value="bg-primary/5">Very Soft Green</option>
+                    <option value="bg-primary/10">Soft Green Accent</option>
+                    <option value="bg-gold-dark/5">Soft Gold Accent</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {section.type === 'container' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Max Width</label>
+                  <select 
+                    value={(section.props.maxWidth as string) || 'max-w-7xl'}
+                    onChange={(e) => onUpdate(section.id, { maxWidth: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="max-w-4xl">Narrow (max-w-4xl)</option>
+                    <option value="max-w-6xl">Medium (max-w-6xl)</option>
+                    <option value="max-w-7xl">Default Wide (max-w-7xl)</option>
+                    <option value="max-w-full">Full Width (max-w-full)</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <input 
+                    type="checkbox" 
+                    id="container-centered" 
+                    checked={section.props.centered !== false}
+                    onChange={(e) => onUpdate(section.id, { centered: e.target.checked })}
+                    className="rounded"
+                  />
+                  <label htmlFor="container-centered" className="text-sm text-foreground">Centered margin (mx-auto)</label>
+                </div>
+              </>
+            )}
+
+            {section.type === 'columns' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Columns</label>
+                  <select 
+                    value={Number(section.props.columns) || 2}
+                    onChange={(e) => onUpdate(section.id, { columns: Number(e.target.value) })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value={1}>1 Column</option>
+                    <option value={2}>2 Columns</option>
+                    <option value={3}>3 Columns</option>
+                    <option value={4}>4 Columns</option>
+                  </select>
+                </div>
+                <div className="mt-2">
+                  <label className="text-sm font-medium text-foreground block mb-2">Gap Size</label>
+                  <select 
+                    value={(section.props.gap as string) || 'gap-8'}
+                    onChange={(e) => onUpdate(section.id, { gap: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="gap-4">Small (gap-4)</option>
+                    <option value="gap-6">Medium (gap-6)</option>
+                    <option value="gap-8">Large (gap-8)</option>
+                    <option value="gap-12">Extra Large (gap-12)</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {section.type === 'heading' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Text</label>
+                  <Input 
+                    value={(section.props.text as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { text: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Level</label>
+                  <select 
+                    value={(section.props.level as string) || 'h2'}
+                    onChange={(e) => onUpdate(section.id, { level: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="h1">Heading 1 (Hero size)</option>
+                    <option value="h2">Heading 2 (Section size)</option>
+                    <option value="h3">Heading 3 (Card size)</option>
+                    <option value="h4">Heading 4 (Sub size)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Alignment</label>
+                  <select 
+                    value={(section.props.align as string) || 'center'}
+                    onChange={(e) => onUpdate(section.id, { align: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="left">Left Align</option>
+                    <option value="center">Center Align</option>
+                    <option value="right">Right Align</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {section.type === 'text' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Content</label>
+                  <Textarea 
+                    value={(section.props.text as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { text: e.target.value })}
+                    className="skeuo-input min-h-[120px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Alignment</label>
+                  <select 
+                    value={(section.props.align as string) || 'left'}
+                    onChange={(e) => onUpdate(section.id, { align: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="left">Left Align</option>
+                    <option value="center">Center Align</option>
+                    <option value="right">Right Align</option>
+                    <option value="justify">Justified</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {section.type === 'image' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Image URL</label>
+                  <Input 
+                    value={(section.props.src as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { src: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Alt Text</label>
+                  <Input 
+                    value={(section.props.alt as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { alt: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {section.type === 'button' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Text</label>
+                  <Input 
+                    value={(section.props.text as string) || ''}
+                    onChange={(e) => onUpdate(section.id, { text: e.target.value })}
+                    className="skeuo-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-2">Style Variant</label>
+                  <select 
+                    value={(section.props.style as string) || 'primary'}
+                    onChange={(e) => onUpdate(section.id, { style: e.target.value })}
+                    className="skeuo-input bg-background w-full text-sm p-2 rounded-lg"
+                  >
+                    <option value="primary">Primary (Metallic Gold)</option>
+                    <option value="secondary">Secondary (Inlaid Skeuo)</option>
+                    <option value="outline">Outline (Gold Border)</option>
+                    <option value="link">Link Style (Clean Underline)</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -803,7 +1844,22 @@ export default function SiteBuilder() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    Promise.resolve().then(() => setMounted(true))
+    Promise.resolve().then(() => {
+      setMounted(true)
+      const saved = localStorage.getItem('site-builder-sections')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSections(parsed)
+            setHistory([parsed])
+            setHistoryIndex(0)
+          }
+        } catch (e) {
+          console.error('Failed to load site-builder sections from localStorage', e)
+        }
+      }
+    })
   }, [])
 
   // Save to history for undo/redo
