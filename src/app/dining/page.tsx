@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { 
@@ -11,6 +11,78 @@ import {
   ChefHat, Wine, Users, Star
 } from 'lucide-react'
 
+const fallbackDishes = [
+  {
+    name: 'Karimeen Pollichathu',
+    description: 'Pearl spot fish marinated with spices and wrapped in banana leaf',
+    image: '/images/dining-1.png',
+    price: '₹650',
+    veg: false
+  },
+  {
+    name: 'Kerala Sadya',
+    description: 'Traditional vegetarian feast with 24+ dishes served on banana leaf',
+    image: '/images/dining-2.png',
+    price: '₹750',
+    veg: true
+  },
+  {
+    name: 'Appam & Stew',
+    description: 'Fermented rice pancakes with creamy vegetable or meat stew',
+    image: '/images/dining-3.png',
+    price: '₹350',
+    veg: true
+  },
+  {
+    name: 'Chemmeen Curry',
+    description: 'Kerala-style prawn curry with coconut milk and kokum',
+    image: '/images/dining-4.png',
+    price: '₹550',
+    veg: false
+  },
+  {
+    name: 'Puttu & Kadala',
+    description: 'Steamed rice cake with black chickpea curry - a breakfast favorite',
+    image: '/images/gallery-1.png',
+    price: '₹250',
+    veg: true
+  },
+  {
+    name: 'Palada Payasam',
+    description: 'Traditional rice flake dessert in sweetened milk',
+    image: '/images/gallery-2.png',
+    price: '₹200',
+    veg: true
+  }
+]
+
+const fallbackVenues = [
+  {
+    name: 'The Backwater Restaurant',
+    description: 'Our main restaurant offers panoramic views of the backwaters while you enjoy authentic Kerala cuisine prepared with locally sourced ingredients.',
+    image: '/images/gallery-3.png',
+    cuisine: 'Kerala & International',
+    capacity: '80 guests',
+    timing: '7:00 AM - 10:00 PM'
+  },
+  {
+    name: 'Sunset Chai Lounge',
+    description: 'Relax with fresh chai and local snacks while watching the sun set over the backwaters. The perfect spot for afternoon relaxation.',
+    image: '/images/gallery-4.png',
+    cuisine: 'Snacks & Beverages',
+    capacity: '40 guests',
+    timing: '3:00 PM - 7:00 PM'
+  },
+  {
+    name: 'Private Dining Pavilion',
+    description: 'For special occasions, reserve our private dining pavilion for an intimate dining experience with personalized menu and butler service.',
+    image: '/images/gallery-5.png',
+    cuisine: 'Custom Menu',
+    capacity: '12 guests',
+    timing: 'By Reservation'
+  }
+]
+
 function DiningContent() {
   const { t } = useLang()
   const menuRef = useRef<HTMLDivElement>(null)
@@ -18,77 +90,61 @@ function DiningContent() {
   const menuInView = useInView(menuRef, { once: true, margin: "-100px" })
   const venuesInView = useInView(venuesRef, { once: true, margin: "-100px" })
 
-  const signatureDishes = [
-    {
-      name: 'Karimeen Pollichathu',
-      description: 'Pearl spot fish marinated with spices and wrapped in banana leaf',
-      image: '/images/dining-1.png',
-      price: '₹650',
-      veg: false
-    },
-    {
-      name: 'Kerala Sadya',
-      description: 'Traditional vegetarian feast with 24+ dishes served on banana leaf',
-      image: '/images/dining-2.png',
-      price: '₹750',
-      veg: true
-    },
-    {
-      name: 'Appam & Stew',
-      description: 'Fermented rice pancakes with creamy vegetable or meat stew',
-      image: '/images/dining-3.png',
-      price: '₹350',
-      veg: true
-    },
-    {
-      name: 'Chemmeen Curry',
-      description: 'Kerala-style prawn curry with coconut milk and kokum',
-      image: '/images/dining-4.png',
-      price: '₹550',
-      veg: false
-    },
-    {
-      name: 'Puttu & Kadala',
-      description: 'Steamed rice cake with black chickpea curry - a breakfast favorite',
-      image: '/images/gallery-1.png',
-      price: '₹250',
-      veg: true
-    },
-    {
-      name: 'Palada Payasam',
-      description: 'Traditional rice flake dessert in sweetened milk',
-      image: '/images/gallery-2.png',
-      price: '₹200',
-      veg: true
-    }
-  ]
+  const [venues, setVenues] = useState<any[]>([])
+  const [signatureDishes, setSignatureDishes] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const venues = [
-    {
-      name: 'The Backwater Restaurant',
-      description: 'Our main restaurant offers panoramic views of the backwaters while you enjoy authentic Kerala cuisine prepared with locally sourced ingredients.',
-      image: '/images/gallery-3.png',
-      cuisine: 'Kerala & International',
-      capacity: '80 guests',
-      timing: '7:00 AM - 10:00 PM'
-    },
-    {
-      name: 'Sunset Chai Lounge',
-      description: 'Relax with fresh chai and local snacks while watching the sun set over the backwaters. The perfect spot for afternoon relaxation.',
-      image: '/images/gallery-4.png',
-      cuisine: 'Snacks & Beverages',
-      capacity: '40 guests',
-      timing: '3:00 PM - 7:00 PM'
-    },
-    {
-      name: 'Private Dining Pavilion',
-      description: 'For special occasions, reserve our private dining pavilion for an intimate dining experience with personalized menu and butler service.',
-      image: '/images/gallery-5.png',
-      cuisine: 'Custom Menu',
-      capacity: '12 guests',
-      timing: 'By Reservation'
-    }
-  ]
+  useEffect(() => {
+    fetch('/api/dining')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.venues && data.venues.length > 0) {
+            setVenues(data.venues.map((v: any) => {
+              let img = '/images/gallery-3.png'
+              try {
+                const parsedImgs = JSON.parse(v.images)
+                if (Array.isArray(parsedImgs) && parsedImgs.length > 0) {
+                  img = parsedImgs[0]
+                }
+              } catch (e) {}
+              return {
+                name: v.name,
+                description: v.description,
+                image: img,
+                cuisine: v.cuisine,
+                capacity: v.capacity,
+                timing: v.timing
+              }
+            }))
+          } else {
+            setVenues(fallbackVenues)
+          }
+
+          if (data.dishes && data.dishes.length > 0) {
+            setSignatureDishes(data.dishes.map((d: any) => ({
+              name: d.name,
+              description: d.description,
+              image: d.imageUrl || '/images/dining-1.png',
+              price: `₹${Number(d.price).toLocaleString()}`,
+              veg: d.veg
+            })))
+          } else {
+            setSignatureDishes(fallbackDishes)
+          }
+        } else {
+          setVenues(fallbackVenues)
+          setSignatureDishes(fallbackDishes)
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to load dining database records, falling back:', err)
+        setVenues(fallbackVenues)
+        setSignatureDishes(fallbackDishes)
+        setLoading(false)
+      })
+  }, [])
 
   const dietaryOptions = [
     { name: 'Vegetarian', icon: <Leaf className="h-5 w-5" /> },
@@ -96,6 +152,7 @@ function DiningContent() {
     { name: 'Gluten-Free', icon: <Leaf className="h-5 w-5" /> },
     { name: 'Jain Options', icon: <Leaf className="h-5 w-5" /> }
   ]
+
 
   return (
     <main className="min-h-screen bg-background">

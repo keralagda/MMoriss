@@ -56,6 +56,8 @@ function GuestDetailModal({
 }) {
   if (!guest) return null
 
+  const lastVisitStr = new Date(guest.lastVisit).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -68,7 +70,7 @@ function GuestDetailModal({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="w-full max-w-2xl skeuo-panel rounded-2xl overflow-hidden"
+        className="w-full max-w-2xl skeuo-panel rounded-2xl overflow-hidden bg-[#F0F2F5]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6 border-b border-border flex items-center justify-between">
@@ -77,7 +79,7 @@ function GuestDetailModal({
               {guest.firstName.charAt(0)}{guest.lastName.charAt(0)}
             </div>
             <div>
-              <h2 className="font-serif text-2xl text-foreground">{guest.firstName} {guest.lastName}</h2>
+              <h2 className="font-serif text-2xl text-foreground font-semibold">{guest.firstName} {guest.lastName}</h2>
               <p className="text-muted-foreground text-sm">{guest.email}</p>
             </div>
           </div>
@@ -98,14 +100,14 @@ function GuestDetailModal({
               <p className="text-xs text-muted-foreground">Total Spent</p>
             </div>
             <div className="skeuo-inset p-4 rounded-xl text-center">
-              <p className="text-2xl font-serif font-semibold text-foreground">{guest.lastVisit.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}</p>
+              <p className="text-2xl font-serif font-semibold text-foreground">{lastVisitStr}</p>
               <p className="text-xs text-muted-foreground">Last Visit</p>
             </div>
           </div>
 
           {/* Contact Info */}
           <div className="skeuo-inset p-4 rounded-xl space-y-3">
-            <h3 className="font-medium text-foreground">Contact Information</h3>
+            <h3 className="font-medium text-foreground font-serif">Contact Information</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
@@ -129,23 +131,23 @@ function GuestDetailModal({
           {/* Notes */}
           {guest.notes && (
             <div className="skeuo-inset p-4 rounded-xl">
-              <h3 className="font-medium text-foreground mb-2">Notes</h3>
+              <h3 className="font-medium text-foreground mb-2 font-serif">Notes</h3>
               <p className="text-sm text-muted-foreground">{guest.notes}</p>
             </div>
           )}
         </div>
 
-        <div className="p-6 border-t border-border flex items-center justify-between">
-          <Button variant="outline" className="border-red-500/50 text-red-500">
+        <div className="p-6 border-t border-border flex items-center justify-between bg-white/20">
+          <Button variant="outline" className="border-red-500/50 text-red-500 text-xs py-4 px-4">
             <Trash2 className="h-4 w-4 mr-2" />
             Delete Guest
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" className="text-xs py-4 px-4">
               <Mail className="h-4 w-4 mr-2" />
               Send Email
             </Button>
-            <Button className="skeuo-button">
+            <Button className="skeuo-button text-xs py-4 px-5">
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
@@ -158,12 +160,56 @@ function GuestDetailModal({
 
 export default function GuestsPage() {
   const [mounted, setMounted] = useState(false)
-  const [guests, setGuests] = useState<Guest[]>(mockGuests)
+  const [loading, setLoading] = useState(true)
+  const [guests, setGuests] = useState<Guest[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
 
   useEffect(() => {
-    Promise.resolve().then(() => setMounted(true))
+    setMounted(true)
+    fetch('/api/guests')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && !data.error) {
+          const mapped = data.map((g: any) => {
+            const totalBookings = g.bookings ? g.bookings.length : 0
+            const totalSpent = g.bookings ? g.bookings.reduce((sum: number, b: any) => {
+              if (['confirmed', 'checked_in', 'checked_out'].includes(b.status)) {
+                return sum + Number(b.totalPrice)
+              }
+              return sum
+            }, 0) : 0
+            
+            let lastVisit = g.createdAt
+            if (g.bookings && g.bookings.length > 0) {
+              const visits = g.bookings.map((b: any) => new Date(b.checkIn).getTime())
+              lastVisit = new Date(Math.max(...visits))
+            }
+
+            return {
+              id: g.id,
+              firstName: g.firstName,
+              lastName: g.lastName,
+              email: g.email,
+              phone: g.phone || 'N/A',
+              nationality: g.nationality || 'N/A',
+              city: g.city || 'N/A',
+              country: g.country || 'N/A',
+              notes: g.notes || '',
+              totalBookings,
+              totalSpent,
+              lastVisit,
+              createdAt: new Date(g.createdAt)
+            }
+          })
+          setGuests(mapped)
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to load guests:', err)
+        setLoading(false)
+      })
   }, [])
 
   const filteredGuests = guests.filter(guest =>
@@ -173,9 +219,10 @@ export default function GuestsPage() {
     guest.phone.includes(searchQuery)
   )
 
-  if (!mounted) {
-    return <div className="flex items-center justify-center min-h-[60vh]"><div className="animate-pulse text-muted-foreground">Loading...</div></div>
+  if (!mounted || loading) {
+    return <div className="flex items-center justify-center min-h-[60vh]"><div className="animate-pulse text-muted-foreground">Loading guests...</div></div>
   }
+
 
   return (
     <div className="space-y-6">

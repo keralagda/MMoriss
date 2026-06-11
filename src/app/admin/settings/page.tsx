@@ -49,6 +49,15 @@ export default function SettingsPage() {
   const [bookingAlerts, setBookingAlerts] = useState(true)
   const [inquiryAlerts, setInquiryAlerts] = useState(true)
 
+  // SMTP Settings & Templates
+  const [smtpUser, setSmtpUser] = useState('')
+  const [smtpPass, setSmtpPass] = useState('')
+  const [welcomeEmailSubject, setWelcomeEmailSubject] = useState('')
+  const [welcomeEmailBody, setWelcomeEmailBody] = useState('')
+  const [whatsappTemplate, setWhatsappTemplate] = useState('')
+  const [testingEmail, setTestingEmail] = useState(false)
+  const [testEmailStatus, setTestEmailStatus] = useState<string | null>(null)
+
   // Payment Settings
   const [currency, setCurrency] = useState('INR')
   const [depositPercentage, setDepositPercentage] = useState('25')
@@ -81,6 +90,12 @@ export default function SettingsPage() {
           if (data.sms_notifications) setSmsNotifications(data.sms_notifications === 'true')
           if (data.booking_alerts) setBookingAlerts(data.booking_alerts === 'true')
           if (data.inquiry_alerts) setInquiryAlerts(data.inquiry_alerts === 'true')
+          // SMTP Setup
+          if (data.smtp_user) setSmtpUser(data.smtp_user)
+          if (data.smtp_pass) setSmtpPass(data.smtp_pass)
+          if (data.welcome_email_subject) setWelcomeEmailSubject(data.welcome_email_subject)
+          if (data.welcome_email_body) setWelcomeEmailBody(data.welcome_email_body)
+          if (data.whatsapp_template) setWhatsappTemplate(data.whatsapp_template)
         }
       } catch (err) {
         console.error('Failed to load settings:', err)
@@ -105,6 +120,32 @@ export default function SettingsPage() {
         }
       }
       reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSendTestEmail = async () => {
+    if (!smtpUser) {
+      alert('Please enter a Gmail address in the SMTP Setup first.')
+      return
+    }
+    setTestingEmail(true)
+    setTestEmailStatus(null)
+    try {
+      const res = await fetch('/api/admin/test-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: smtpUser })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setTestEmailStatus('Test email sent successfully!')
+      } else {
+        setTestEmailStatus(`Failed: ${data.error || 'Unknown error'}`)
+      }
+    } catch (err: any) {
+      setTestEmailStatus(`Error: ${err.message}`)
+    } finally {
+      setTestingEmail(false)
     }
   }
 
@@ -136,6 +177,11 @@ export default function SettingsPage() {
           sms_notifications: String(smsNotifications),
           booking_alerts: String(bookingAlerts),
           inquiry_alerts: String(inquiryAlerts),
+          smtp_user: smtpUser,
+          smtp_pass: smtpPass,
+          welcome_email_subject: welcomeEmailSubject,
+          welcome_email_body: welcomeEmailBody,
+          whatsapp_template: whatsappTemplate,
         }),
       })
       if (!res.ok) {
@@ -148,6 +194,7 @@ export default function SettingsPage() {
       setSaving(false)
     }
   }
+
 
   if (!mounted) {
     return <div className="flex items-center justify-center min-h-[60vh]"><div className="animate-pulse text-muted-foreground">Loading...</div></div>
@@ -506,6 +553,7 @@ export default function SettingsPage() {
                         <p className="text-sm text-muted-foreground">{setting.desc}</p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => setting.onChange(!setting.value)}
                         className={`w-12 h-6 rounded-full transition-colors ${setting.value ? 'bg-primary' : 'bg-muted'}`}
                       >
@@ -513,6 +561,88 @@ export default function SettingsPage() {
                       </button>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* SMTP Setup Card */}
+              <div className="skeuo-card p-6 space-y-4">
+                <h2 className="font-serif text-xl text-foreground">Gmail SMTP Setup</h2>
+                <p className="text-xs text-muted-foreground">Configure the resort transactional sender Gmail credentials.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Gmail Address</label>
+                    <Input 
+                      type="email" 
+                      value={smtpUser} 
+                      onChange={(e) => setSmtpUser(e.target.value)} 
+                      placeholder="resort@gmail.com" 
+                      className="skeuo-input text-xs" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Gmail App Password</label>
+                    <Input 
+                      type="password" 
+                      value={smtpPass} 
+                      onChange={(e) => setSmtpPass(e.target.value)} 
+                      placeholder="xxxx xxxx xxxx xxxx" 
+                      className="skeuo-input text-xs" 
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 pt-2">
+                  <Button 
+                    type="button"
+                    onClick={handleSendTestEmail} 
+                    disabled={testingEmail}
+                    className="skeuo-button text-xs py-4 px-5"
+                  >
+                    {testingEmail ? 'Sending Test...' : 'Send Test Email'}
+                  </Button>
+                  {testEmailStatus && (
+                    <span className="text-xs font-semibold text-primary">{testEmailStatus}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Welcome Email Template Card */}
+              <div className="skeuo-card p-6 space-y-4">
+                <h2 className="font-serif text-xl text-foreground">Welcome Email Template</h2>
+                <p className="text-xs text-muted-foreground">Customize the email sent to newly registered guests (Supports {"{{name}}"}).</p>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Subject Line</label>
+                  <Input 
+                    value={welcomeEmailSubject} 
+                    onChange={(e) => setWelcomeEmailSubject(e.target.value)} 
+                    placeholder="Welcome to Munroe Morris Resort!" 
+                    className="skeuo-input text-xs" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Email Body</label>
+                  <Textarea 
+                    rows={6}
+                    value={welcomeEmailBody} 
+                    onChange={(e) => setWelcomeEmailBody(e.target.value)} 
+                    placeholder="Dear {{name}},\n\nWelcome..." 
+                    className="skeuo-input text-xs resize-none" 
+                  />
+                </div>
+              </div>
+
+              {/* WhatsApp Template Card */}
+              <div className="skeuo-card p-6 space-y-4">
+                <h2 className="font-serif text-xl text-foreground">WhatsApp Template Configuration</h2>
+                <p className="text-xs text-muted-foreground">Pre-fill the WhatsApp chat template for contacting inquiries (Supports {"{{name}}, {{roomType}}, {{checkIn}}, {{checkOut}}"}).</p>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Inquiry Response Template</label>
+                  <Textarea 
+                    rows={4}
+                    value={whatsappTemplate} 
+                    onChange={(e) => setWhatsappTemplate(e.target.value)} 
+                    placeholder="Hello *{{name}}*, thank you for inquiring for a *{{roomType}}* from *{{checkIn}}* to *{{checkOut}}*. We will get back to you shortly." 
+                    className="skeuo-input text-xs resize-none" 
+                  />
                 </div>
               </div>
             </motion.div>

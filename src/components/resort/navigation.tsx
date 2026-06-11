@@ -97,6 +97,18 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [logo, setLogo] = useState('')
   const [siteName, setSiteName] = useState('')
+  const [user, setUser] = useState<{ id: string; email: string; role: 'admin' | 'guest'; name: string } | null>(null)
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      if (res.ok) {
+        window.location.href = '/'
+      }
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -114,6 +126,16 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
         }
       })
       .catch(err => console.error('Failed to load branding settings:', err))
+
+    // Fetch session on mount
+    fetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(err => console.error('Failed to load session:', err))
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -187,6 +209,37 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
             <div className="hidden lg:flex items-center gap-4">
               <LanguageToggle />
               <ThemeToggle />
+              
+              {user ? (
+                <>
+                  <Link
+                    href={user.role === 'admin' ? '/admin' : '/dashboard'}
+                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                      shouldHaveBackground ? 'text-foreground' : 'text-white/90'
+                    }`}
+                  >
+                    {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                      shouldHaveBackground ? 'text-foreground' : 'text-white/90'
+                    }`}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                    shouldHaveBackground ? 'text-foreground' : 'text-white/90'
+                  }`}
+                >
+                  Sign In
+                </Link>
+              )}
+
               <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
                 {t('nav.book')}
               </Button>
@@ -235,10 +288,58 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                   </Link>
                 </motion.div>
               ))}
+
+              {user ? (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: navLinks.length * 0.1 }}
+                  >
+                    <Link
+                      href={user.role === 'admin' ? '/admin' : '/dashboard'}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: (navLinks.length + 1) * 0.1 }}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false)
+                        handleLogout()
+                      }}
+                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: navLinks.length * 0.1 }}
+                >
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </motion.div>
+              )}
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
+                transition={{ delay: (navLinks.length + 2) * 0.1 }}
                 className="mt-4"
               >
                 <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">

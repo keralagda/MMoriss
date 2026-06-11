@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { 
-  LanguageProvider, useLang, Navigation, Footer, PageHero 
+  LanguageProvider, useLang, Navigation, Footer, PageHero, GetQuoteModal
 } from '@/components/resort'
 import { 
   BedDouble, Users, ArrowRight, X, Check, Wifi, Wind, 
@@ -103,7 +103,8 @@ function AccommodationsContent() {
   const cardsRef = useRef<HTMLDivElement>(null)
   const cardsInView = useInView(cardsRef, { once: true, margin: "-100px" })
   const [villas, setVillas] = useState<any[]>([])
-  const [selectedVilla, setSelectedVilla] = useState<any | null>(null)
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false)
+  const [quoteRoomType, setQuoteRoomType] = useState('')
 
   useEffect(() => {
     // Fetch dynamic rooms from the database
@@ -114,10 +115,10 @@ function AccommodationsContent() {
           const activeRooms = data.filter((r: any) => r.active).map((r: any) => ({
             id: r.id,
             name: r.name,
+            slug: r.slug,
             description: r.description,
             longDescription: r.longDescription || r.description,
             image: r.images[0] || '/images/placeholder.png',
-            price: `₹${r.price.toLocaleString()}`,
             size: r.size,
             guests: r.maxGuests,
             beds: r.beds,
@@ -127,25 +128,15 @@ function AccommodationsContent() {
           }))
           setVillas(activeRooms)
         } else {
-          setVillas(fallbackVillas)
+          // Standard mapping of fallback
+          setVillas(fallbackVillas.map(fv => ({ ...fv, slug: fv.id + '-villa' })))
         }
       })
       .catch(err => {
         console.error('Failed to load database rooms, using static fallback:', err)
-        setVillas(fallbackVillas)
+        setVillas(fallbackVillas.map(fv => ({ ...fv, slug: fv.id + '-villa' })))
       })
   }, [])
-
-  const amenityIcons: Record<string, React.ReactNode> = {
-    'WiFi': <Wifi className="h-4 w-4" />,
-    'Air Conditioning': <Wind className="h-4 w-4" />,
-    'Mini Bar': <Coffee className="h-4 w-4" />,
-    'In-room Safe': <Shield className="h-4 w-4" />,
-    'Smart TV': <Tv className="h-4 w-4" />,
-    'Tea Maker': <Coffee className="h-4 w-4" />,
-    'Private Chef': <Coffee className="h-4 w-4" />,
-    'Private Dining': <Coffee className="h-4 w-4" />,
-  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -184,7 +175,7 @@ function AccommodationsContent() {
                 animate={cardsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="skeuo-card group overflow-hidden cursor-pointer"
-                onClick={() => setSelectedVilla(villa)}
+                onClick={() => window.location.href = `/accommodations/${villa.slug}`}
               >
                 {/* Image */}
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -195,10 +186,16 @@ function AccommodationsContent() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white/80 text-sm">Starting from</p>
-                    <p className="font-serif text-2xl text-white">{villa.price}<span className="text-sm">/night</span></p>
+                    <span className="text-[10px] bg-primary/95 text-white font-semibold uppercase tracking-wider px-2.5 py-1 rounded">
+                      Concierge Booking
+                    </span>
                   </div>
-                  <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                    }}
+                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                  >
                     <Heart className="h-5 w-5" />
                   </button>
                 </div>
@@ -208,7 +205,7 @@ function AccommodationsContent() {
                   <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
                     {villa.name}
                   </h3>
-                  <p className="text-muted-foreground text-sm">{villa.description}</p>
+                  <p className="text-muted-foreground text-sm line-clamp-2">{villa.description}</p>
 
                   {/* Features */}
                   <div className="flex flex-wrap gap-2">
@@ -223,7 +220,7 @@ function AccommodationsContent() {
                   </div>
 
                   {/* Details */}
-                  <div className="flex items-center gap-6 pt-4 border-t border-border">
+                  <div className="flex items-center gap-6 pt-3 border-t border-border">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Eye className="h-4 w-4" />
                       <span>{villa.size}</span>
@@ -234,14 +231,26 @@ function AccommodationsContent() {
                     </div>
                   </div>
 
-                  {/* Button */}
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between text-primary hover:text-primary hover:bg-primary/5 mt-2"
-                  >
-                    View Details
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  {/* Buttons */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setQuoteRoomType(villa.name)
+                        setIsQuoteOpen(true)
+                      }}
+                      className="skeuo-button text-xs font-semibold py-4"
+                    >
+                      Get Quote
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="text-primary hover:text-primary hover:bg-primary/5 text-xs font-semibold py-4 flex items-center justify-center gap-1"
+                    >
+                      View Details
+                      <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -249,108 +258,11 @@ function AccommodationsContent() {
         </div>
       </section>
 
-      {/* Villa Detail Modal */}
-      <AnimatePresence>
-        {selectedVilla && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedVilla(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto skeuo-panel rounded-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setSelectedVilla(null)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              <div className="grid md:grid-cols-2">
-                <div className="relative aspect-square md:aspect-auto">
-                  <img
-                    src={selectedVilla.image}
-                    alt={selectedVilla.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="p-8 space-y-6">
-                  <div>
-                    <h2 className="font-serif text-3xl text-foreground">{selectedVilla.name}</h2>
-                    <p className="text-2xl gold-metallic font-serif mt-2">
-                      {selectedVilla.price}<span className="text-base text-muted-foreground">/night</span>
-                    </p>
-                  </div>
-
-                  <p className="text-muted-foreground">{selectedVilla.longDescription}</p>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="skeuo-inset p-4 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Size</p>
-                      <p className="font-medium text-foreground">{selectedVilla.size}</p>
-                    </div>
-                    <div className="skeuo-inset p-4 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Guests</p>
-                      <p className="font-medium text-foreground">{selectedVilla.guests} People</p>
-                    </div>
-                    <div className="skeuo-inset p-4 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Bedding</p>
-                      <p className="font-medium text-foreground">{selectedVilla.beds}</p>
-                    </div>
-                    <div className="skeuo-inset p-4 rounded-lg">
-                      <p className="text-xs text-muted-foreground">View</p>
-                      <p className="font-medium text-foreground">{selectedVilla.view}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-foreground mb-3">Features</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedVilla.features.map((feature) => (
-                        <span
-                          key={feature}
-                          className="text-xs px-3 py-1.5 skeuo-card text-foreground rounded-full flex items-center gap-1"
-                        >
-                          <Check className="h-3 w-3 text-primary" />
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-foreground mb-3">Amenities</h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {selectedVilla.amenities.map((amenity) => (
-                        <div
-                          key={amenity}
-                          className="flex items-center gap-2 text-sm text-muted-foreground"
-                        >
-                          {amenityIcons[amenity]}
-                          <span>{amenity}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button className="w-full skeuo-button py-6 text-lg">
-                    Book This Villa
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <GetQuoteModal 
+        isOpen={isQuoteOpen} 
+        onClose={() => setIsQuoteOpen(false)} 
+        roomType={quoteRoomType}
+      />
 
       {/* CTA Section */}
       <section className="py-16 bg-primary/5">

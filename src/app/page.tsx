@@ -5,6 +5,8 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { GetQuoteModal } from '@/components/resort'
+import Link from 'next/link'
 import {
   Menu,
   X,
@@ -460,12 +462,48 @@ function Navigation() {
   const { t } = useLang()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [logo, setLogo] = useState('')
+  const [siteName, setSiteName] = useState('')
+  const [user, setUser] = useState<{ id: string; email: string; role: 'admin' | 'guest'; name: string } | null>(null)
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      if (res.ok) {
+        window.location.href = '/'
+      }
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
     }
     window.addEventListener('scroll', handleScroll)
+
+    // Fetch dynamic branding settings
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.brand_logo) setLogo(data.brand_logo)
+          if (data.site_name) setSiteName(data.site_name)
+        }
+      })
+      .catch(err => console.error('Failed to load branding settings:', err))
+
+    // Fetch session on mount
+    fetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(err => console.error('Failed to load session:', err))
+
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -493,14 +531,20 @@ function Navigation() {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <a href="#" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
-                <Flower2 className="h-6 w-6 text-primary-foreground" />
-              </div>
+              {logo ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shadow-lg bg-background/30 backdrop-blur-sm border border-primary/20">
+                  <img src={logo} alt="Logo" className="w-full h-full object-contain p-1.5" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center shadow-lg">
+                  <Flower2 className="h-6 w-6 text-primary-foreground" />
+                </div>
+              )}
               <div>
                 <span className={`font-serif text-xl sm:text-2xl font-semibold tracking-wide transition-colors duration-300 ${
                   isScrolled ? 'text-foreground' : 'text-white'
                 }`}>
-                  {t('hero.title')}
+                  {siteName || t('hero.title')}
                 </span>
                 <p className={`text-xs tracking-widest uppercase ${
                   isScrolled ? 'text-muted-foreground' : 'text-white/70'
@@ -529,6 +573,37 @@ function Navigation() {
             <div className="hidden lg:flex items-center gap-4">
               <LanguageToggle />
               <ThemeToggle />
+
+              {user ? (
+                <>
+                  <Link
+                    href={user.role === 'admin' ? '/admin' : '/dashboard'}
+                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                      isScrolled ? 'text-foreground' : 'text-white/90'
+                    }`}
+                  >
+                    {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                      isScrolled ? 'text-foreground' : 'text-white/90'
+                    }`}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                    isScrolled ? 'text-foreground' : 'text-white/90'
+                  }`}
+                >
+                  Sign In
+                </Link>
+              )}
+
               <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
                 {t('nav.book')}
               </Button>
@@ -574,10 +649,58 @@ function Navigation() {
                   {link.name}
                 </motion.a>
               ))}
+
+              {user ? (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: navLinks.length * 0.1 }}
+                  >
+                    <Link
+                      href={user.role === 'admin' ? '/admin' : '/dashboard'}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: (navLinks.length + 1) * 0.1 }}
+                  >
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false)
+                        handleLogout()
+                      }}
+                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: navLinks.length * 0.1 }}
+                >
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </motion.div>
+              )}
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: (navLinks.length + 2) * 0.1 }}
                 className="mt-4"
               >
                 <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">
@@ -785,36 +908,74 @@ function AccommodationsSection() {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [villas, setVillas] = useState<any[]>([])
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false)
+  const [quoteRoomType, setQuoteRoomType] = useState('')
 
-  const accommodations = [
+  const fallbackVillas = [
     {
-      nameKey: 'villa.backwater.name',
-      descKey: 'villa.backwater.desc',
+      id: 'backwater',
+      name: 'Backwater Villa',
+      slug: 'backwater-villa',
+      description: 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
       image: "/images/villa-1.png",
-      price: "₹15,000",
       size: "120 m²",
       guests: 2,
-      featureKeys: ['feature.deck', 'feature.canoe', 'feature.sunset']
+      features: ['Private Deck', 'Canoe Ride', 'Sunset View']
     },
     {
-      nameKey: 'villa.coconut.name',
-      descKey: 'villa.coconut.desc',
+      id: 'coconut',
+      name: 'Coconut Grove Suite',
+      slug: 'coconut-grove-suite',
+      description: "Nestled among swaying coconut palms with authentic Kerala decor",
       image: "/images/villa-2.png",
-      price: "₹12,000",
       size: "95 m²",
       guests: 2,
-      featureKeys: ['feature.garden', 'feature.bath', 'feature.birds']
+      features: ['Garden View', 'Outdoor Bath', 'Bird Watching']
     },
     {
-      nameKey: 'villa.heritage.name',
-      descKey: 'villa.heritage.desc',
+      id: 'heritage',
+      name: 'Heritage Nalukettu',
+      slug: 'heritage-nalukettu',
+      description: 'Traditional Kerala courtyard house with wooden architecture',
       image: "/images/villa-3.png",
-      price: "₹18,000",
       size: "150 m²",
       guests: 4,
-      featureKeys: ['feature.courtyard', 'feature.wood', 'feature.heritage']
+      features: ['Courtyard', 'Wood Carvings', 'Heritage Style']
     }
   ]
+
+  useEffect(() => {
+    fetch('/api/rooms')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.length > 0) {
+          const activeRooms = data.filter((r: any) => r.active).map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            slug: r.slug,
+            description: r.description,
+            image: r.images[0] || '/images/placeholder.png',
+            size: r.size,
+            guests: r.maxGuests,
+            features: r.features
+          }))
+          setVillas(activeRooms)
+        } else {
+          setVillas(fallbackVillas)
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load database rooms, using static fallback:', err)
+        setVillas(fallbackVillas)
+      })
+  }, [])
+
+  const handleGetQuote = (roomName: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setQuoteRoomType(roomName)
+    setIsQuoteOpen(true)
+  }
 
   return (
     <section id="accommodations" className="py-24 lg:py-32 skeuo-inset mx-4 lg:mx-8 rounded-3xl">
@@ -841,43 +1002,45 @@ function AccommodationsSection() {
 
         {/* Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {accommodations.map((room, index) => (
+          {villas.map((room, index) => (
             <motion.div
-              key={room.nameKey}
+              key={room.id || room.slug}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="skeuo-card group overflow-hidden"
+              className="skeuo-card group overflow-hidden cursor-pointer"
+              onClick={() => window.location.href = `/accommodations/${room.slug}`}
             >
               {/* Image */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
                   src={room.image}
-                  alt={t(room.nameKey)}
+                  alt={room.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-white/80 text-sm">{t('accommodations.from')}</p>
-                  <p className="font-serif text-2xl text-white">{room.price}<span className="text-sm">{t('accommodations.night')}</span></p>
+                  <span className="text-[10px] bg-primary/95 text-white font-semibold uppercase tracking-wider px-2.5 py-1 rounded">
+                    Concierge Booking
+                  </span>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6 space-y-4">
                 <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">
-                  {t(room.nameKey)}
+                  {room.name}
                 </h3>
-                <p className="text-muted-foreground text-sm">{t(room.descKey)}</p>
+                <p className="text-muted-foreground text-sm line-clamp-2">{room.description}</p>
 
                 {/* Features */}
                 <div className="flex flex-wrap gap-2">
-                  {room.featureKeys.map((featureKey) => (
+                  {Array.isArray(room.features) && room.features.map((feature: string) => (
                     <span
-                      key={featureKey}
+                      key={feature}
                       className="text-xs px-3 py-1 skeuo-inset text-muted-foreground rounded-full"
                     >
-                      {t(featureKey)}
+                      {feature}
                     </span>
                   ))}
                 </div>
@@ -894,19 +1057,32 @@ function AccommodationsSection() {
                   </div>
                 </div>
 
-                {/* Button */}
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between text-primary hover:text-primary hover:bg-primary/5 mt-2"
-                >
-                  {t('accommodations.details')}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col gap-2 pt-2">
+                  <Button
+                    onClick={(e) => handleGetQuote(room.name, e)}
+                    className="w-full skeuo-button py-2.5 font-medium tracking-wide text-sm"
+                  >
+                    Get Quote
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-between text-primary hover:text-primary hover:bg-primary/5"
+                  >
+                    {t('accommodations.details')}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
+
+      <GetQuoteModal
+        isOpen={isQuoteOpen}
+        onClose={() => setIsQuoteOpen(false)}
+        roomType={quoteRoomType}
+      />
     </section>
   )
 }
@@ -1304,6 +1480,65 @@ function ContactSection() {
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
+  const [settings, setSettings] = useState<Record<string, string>>({})
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [checkIn, setCheckIn] = useState('')
+  const [checkOut, setCheckOut] = useState('')
+  const [message, setMessage] = useState('')
+
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setSettings(data)
+      })
+      .catch(err => console.error('Failed to load settings in ContactSection:', err))
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setSuccess(false)
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          checkIn: checkIn || null,
+          checkOut: checkOut || null,
+          guests: 1,
+          roomType: 'General Inquiry',
+          message
+        })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry')
+
+      setSuccess(true)
+      setName('')
+      setEmail('')
+      setPhone('')
+      setCheckIn('')
+      setCheckOut('')
+      setMessage('')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <section className="py-24 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1327,40 +1562,91 @@ function ContactSection() {
             </div>
             <p className="text-muted-foreground text-lg">{t('contact.subtitle')}</p>
 
-            <form className="space-y-4 pt-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground">{t('contact.firstname')}</label>
-                  <Input placeholder="..." className="skeuo-input mt-1.5" />
+            {success ? (
+              <div className="skeuo-card p-6 text-center space-y-4">
+                <p className="text-green-500 font-medium">Your inquiry has been submitted successfully!</p>
+                <p className="text-sm text-muted-foreground">Our reservations team will reach out to you shortly.</p>
+                <Button onClick={() => setSuccess(false)} className="skeuo-button py-2 px-4 text-xs font-medium">
+                  Send Another Message
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground">{t('contact.firstname')}</label>
+                    <Input
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="..."
+                      className="skeuo-input mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground">{t('contact.phone')}</label>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 XXXXX XXXXX"
+                      className="skeuo-input mt-1.5"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">{t('contact.phone')}</label>
-                  <Input placeholder="+91 XXXXX XXXXX" className="skeuo-input mt-1.5" />
+                  <label className="text-sm font-medium text-foreground">{t('contact.email')}</label>
+                  <Input
+                    required
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="skeuo-input mt-1.5"
+                  />
                 </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground">{t('contact.email')}</label>
-                <Input type="email" placeholder="your@email.com" className="skeuo-input mt-1.5" />
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-foreground">{t('contact.checkin')}</label>
+                    <Input
+                      type="date"
+                      value={checkIn}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                      className="skeuo-input mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground">{t('contact.checkout')}</label>
+                    <Input
+                      type="date"
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      className="skeuo-input mt-1.5"
+                    />
+                  </div>
+                </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground">{t('contact.checkin')}</label>
-                  <Input type="date" className="skeuo-input mt-1.5" />
+                  <label className="text-sm font-medium text-foreground">{t('contact.message')}</label>
+                  <Textarea
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={t('contact.messagePlaceholder')}
+                    className="skeuo-input mt-1.5 min-h-[120px]"
+                  />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground">{t('contact.checkout')}</label>
-                  <Input type="date" className="skeuo-input mt-1.5" />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground">{t('contact.message')}</label>
-                <Textarea placeholder={t('contact.messagePlaceholder')} className="skeuo-input mt-1.5 min-h-[120px]" />
-              </div>
-              <Button type="submit" className="skeuo-button w-full py-6 text-lg tracking-wide">
-                {t('contact.send')}
-                <Send className="ml-2 h-5 w-5" />
-              </Button>
-            </form>
+
+                {error && (
+                  <div className="text-xs text-red-500 bg-red-500/5 p-3 rounded-lg border border-red-500/10">
+                    {error}
+                  </div>
+                )}
+
+                <Button type="submit" disabled={loading} className="skeuo-button w-full py-6 text-lg tracking-wide">
+                  {loading ? 'Sending Inquiry...' : t('contact.send')}
+                  <Send className="ml-2 h-5 w-5" />
+                </Button>
+              </form>
+            )}
           </motion.div>
 
           {/* Contact Info */}
@@ -1378,21 +1664,27 @@ function ContactSection() {
                   <MapPin className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <p className="font-medium text-foreground">{t('contact.location')}</p>
-                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">{t('contact.locationValue')}</p>
+                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">
+                      {settings.resort_address || t('contact.locationValue')}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Phone className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <p className="font-medium text-foreground">{t('contact.phone')}</p>
-                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">{t('contact.phoneValue')}</p>
+                    <p className="text-muted-foreground text-sm mt-1 whitespace-pre-line">
+                      {settings.resort_phone || t('contact.phoneValue')}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Mail className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <p className="font-medium text-foreground">{t('contact.email')}</p>
-                    <p className="text-muted-foreground text-sm mt-1">{t('contact.emailValue')}</p>
+                    <p className="text-muted-foreground text-sm mt-1">
+                      {settings.resort_email || t('contact.emailValue')}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -1439,9 +1731,97 @@ function ContactSection() {
   )
 }
 
+// Testimonials Section
+function TestimonialsSection() {
+  const { t } = useLang()
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [testimonials, setTestimonials] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('/api/reviews')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTestimonials(data)
+        }
+      })
+      .catch(err => console.error('Failed to load testimonials:', err))
+  }, [])
+
+  if (testimonials.length === 0) return null
+
+  return (
+    <section id="testimonials" ref={ref} className="py-24 lg:py-32 bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
+          <p className="text-primary text-sm tracking-[0.3em] uppercase font-medium">
+            Guest Testimonials
+          </p>
+          <h2 className="font-serif text-4xl sm:text-5xl text-foreground mt-4 leading-tight">
+            What Our <span className="gold-metallic">Guests Say</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {testimonials.map((review, index) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="skeuo-card p-6 flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-2">
+                <div className="flex gap-1 text-primary">
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+                  ))}
+                  {Array.from({ length: 5 - review.rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-muted-foreground/30" />
+                  ))}
+                </div>
+                <h4 className="font-serif text-lg text-foreground italic">
+                  "{review.title}"
+                </h4>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {review.comment}
+                </p>
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t border-border">
+                <span className="font-medium text-foreground text-sm">
+                  {review.guest?.firstName} {review.guest?.lastName}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(review.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // Footer
 function Footer() {
   const { t } = useLang()
+  const [settings, setSettings] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setSettings(data)
+      })
+      .catch(err => console.error('Failed to load settings in Footer:', err))
+  }, [])
 
   const quickLinks = [
     { name: t('nav.about'), href: '/about' },
@@ -1468,11 +1848,17 @@ function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center">
-                <Flower2 className="h-6 w-6 text-primary-foreground" />
-              </div>
+              {settings.brand_logo ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shadow-lg bg-background/30 backdrop-blur-sm border border-primary/20">
+                  <img src={settings.brand_logo} alt="Logo" className="w-full h-full object-contain p-1.5" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center">
+                  <Flower2 className="h-6 w-6 text-primary-foreground" />
+                </div>
+              )}
               <div>
-                <h3 className="font-serif text-2xl text-foreground">{t('hero.title')}</h3>
+                <h3 className="font-serif text-2xl text-foreground">{settings.site_name || t('hero.title')}</h3>
                 <p className="text-xs text-muted-foreground">Kerala, India</p>
               </div>
             </div>
@@ -1531,15 +1917,17 @@ function Footer() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                Munroe Island, Kollam
+                {settings.resort_address || 'Munroe Island, Kollam'}
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
-                +91 474 XXXXXXX
+                {settings.resort_phone || '+91 474 XXXXXXX'}
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
-                <a href="/contact" className="hover:text-primary transition-colors">info@munroemorris.com</a>
+                <a href={`mailto:${settings.resort_email || 'info@munroemorris.com'}`} className="hover:text-primary transition-colors">
+                  {settings.resort_email || 'info@munroemorris.com'}
+                </a>
               </li>
             </ul>
           </div>
@@ -1617,6 +2005,7 @@ export default function Home() {
         <AyurvedaSection />
         <DiningSection />
         <GallerySection />
+        <TestimonialsSection />
         <ContactSection />
         <Footer />
       </main>

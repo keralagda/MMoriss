@@ -140,6 +140,9 @@ function BookingDetailModal({
   if (!booking) return null
 
   const StatusIcon = statusColors[booking.status]?.icon || Clock
+  const checkInStr = new Date(booking.checkIn).toLocaleDateString()
+  const checkOutStr = new Date(booking.checkOut).toLocaleDateString()
+  const createdStr = new Date(booking.createdAt).toLocaleDateString()
 
   return (
     <motion.div
@@ -153,7 +156,7 @@ function BookingDetailModal({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="w-full max-w-2xl skeuo-panel rounded-2xl overflow-hidden"
+        className="w-full max-w-2xl skeuo-panel rounded-2xl overflow-hidden bg-[#F0F2F5]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -161,7 +164,7 @@ function BookingDetailModal({
           <div>
             <h2 className="font-serif text-2xl text-foreground">Booking {booking.confirmationCode}</h2>
             <p className="text-muted-foreground text-sm mt-1">
-              Created on {booking.createdAt.toLocaleDateString()}
+              Created on {createdStr}
             </p>
           </div>
           <button
@@ -187,19 +190,19 @@ function BookingDetailModal({
 
           {/* Guest Info */}
           <div className="skeuo-inset p-4 rounded-xl">
-            <h3 className="font-medium text-foreground mb-3">Guest Information</h3>
+            <h3 className="font-medium text-foreground mb-3 font-serif">Guest Information</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-muted-foreground">Name</p>
-                <p className="text-foreground">{booking.guest.firstName} {booking.guest.lastName}</p>
+                <p className="text-foreground">{booking.guest?.firstName} {booking.guest?.lastName}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Email</p>
-                <p className="text-foreground">{booking.guest.email}</p>
+                <p className="text-foreground">{booking.guest?.email}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Phone</p>
-                <p className="text-foreground">{booking.guest.phone}</p>
+                <p className="text-foreground">{booking.guest?.phone || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Guests</p>
@@ -210,42 +213,42 @@ function BookingDetailModal({
 
           {/* Booking Details */}
           <div className="skeuo-inset p-4 rounded-xl">
-            <h3 className="font-medium text-foreground mb-3">Booking Details</h3>
+            <h3 className="font-medium text-foreground mb-3 font-serif">Booking Details</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-muted-foreground">Room</p>
-                <p className="text-foreground">{booking.room.name}</p>
+                <p className="text-foreground">{booking.room?.name || 'Unknown Room'}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Check-in</p>
-                <p className="text-foreground">{booking.checkIn.toLocaleDateString()}</p>
+                <p className="text-foreground">{checkInStr}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Check-out</p>
-                <p className="text-foreground">{booking.checkOut.toLocaleDateString()}</p>
+                <p className="text-foreground">{checkOutStr}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Price</p>
-                <p className="text-foreground font-semibold">₹{booking.totalPrice.toLocaleString()}</p>
+                <p className="text-foreground font-semibold">₹{Number(booking.totalPrice).toLocaleString()}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t border-border flex items-center justify-between gap-4">
+        <div className="p-6 border-t border-border flex items-center justify-between gap-4 bg-white/20">
           <div className="flex gap-2">
-            <Button variant="outline" className="border-red-500/50 text-red-500 hover:bg-red-500/10">
+            <Button variant="outline" className="border-red-500/50 text-red-500 hover:bg-red-500/10 text-xs py-4 px-4">
               <Trash2 className="h-4 w-4 mr-2" />
               Cancel Booking
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" className="text-xs py-4 px-4">
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
-            <Button className="skeuo-button">
+            <Button className="skeuo-button text-xs py-4 px-5">
               <CheckCircle className="h-4 w-4 mr-2" />
               Check In
             </Button>
@@ -258,26 +261,41 @@ function BookingDetailModal({
 
 export default function BookingsPage() {
   const [mounted, setMounted] = useState(false)
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings)
+  const [loading, setLoading] = useState(true)
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
-    Promise.resolve().then(() => setMounted(true))
+    setMounted(true)
+    fetch('/api/bookings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && !data.error) {
+          setBookings(data)
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to fetch bookings:', err)
+        setLoading(false)
+      })
   }, [])
 
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = 
       booking.confirmationCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.guest.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.guest.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.guest.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (booking.guest && (
+        booking.guest.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.guest.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.guest.email.toLowerCase().includes(searchQuery.toLowerCase())
+      ))
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
-  if (!mounted) {
+  if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-pulse text-muted-foreground">Loading bookings...</div>
@@ -381,25 +399,31 @@ export default function BookingsPage() {
             <tbody className="divide-y divide-border">
               {filteredBookings.map((booking) => {
                 const StatusIcon = statusColors[booking.status]?.icon || Clock
+                const guestName = booking.guest ? `${booking.guest.firstName} ${booking.guest.lastName}` : 'Guest'
+                const guestEmail = booking.guest ? booking.guest.email : ''
+                const roomName = booking.room ? booking.room.name : 'Unknown Room'
+                const checkInDate = new Date(booking.checkIn).toLocaleDateString()
+                const checkOutDate = new Date(booking.checkOut).toLocaleDateString()
+                const createdDate = new Date(booking.createdAt).toLocaleDateString()
                 return (
                   <tr key={booking.id} className="hover:bg-primary/5 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-medium text-foreground">{booking.confirmationCode}</p>
                       <p className="text-xs text-muted-foreground">
-                        {booking.createdAt.toLocaleDateString()}
+                        {createdDate}
                       </p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-foreground">{booking.guest.firstName} {booking.guest.lastName}</p>
-                      <p className="text-xs text-muted-foreground">{booking.guest.email}</p>
+                      <p className="text-foreground">{guestName}</p>
+                      <p className="text-xs text-muted-foreground">{guestEmail}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-foreground">{booking.room.name}</p>
+                      <p className="text-foreground">{roomName}</p>
                       <p className="text-xs text-muted-foreground">{booking.adults + booking.children} guests</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-foreground">{booking.checkIn.toLocaleDateString()}</p>
-                      <p className="text-xs text-muted-foreground">to {booking.checkOut.toLocaleDateString()}</p>
+                      <p className="text-foreground">{checkInDate}</p>
+                      <p className="text-xs text-muted-foreground">to {checkOutDate}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${statusColors[booking.status].bg} ${statusColors[booking.status].text}`}>
@@ -408,7 +432,7 @@ export default function BookingsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-medium text-foreground">₹{booking.totalPrice.toLocaleString()}</p>
+                      <p className="font-medium text-foreground">₹{Number(booking.totalPrice).toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">{booking.paymentStatus}</p>
                     </td>
                     <td className="px-6 py-4">
