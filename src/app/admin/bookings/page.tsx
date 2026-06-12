@@ -236,23 +236,10 @@ function BookingDetailModal({
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t border-border flex items-center justify-between gap-4 bg-white/20">
-          <div className="flex gap-2">
-            <Button variant="outline" className="border-red-500/50 text-red-500 hover:bg-red-500/10 text-xs py-4 px-4">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Cancel Booking
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="text-xs py-4 px-4">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-            <Button className="skeuo-button text-xs py-4 px-5">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Check In
-            </Button>
-          </div>
+        <div className="p-6 border-t border-border flex justify-end gap-4 bg-white/20">
+          <Button onClick={onClose} variant="outline" className="text-xs py-4 px-6">
+            Close
+          </Button>
         </div>
       </motion.div>
     </motion.div>
@@ -315,10 +302,6 @@ export default function BookingsPage() {
           <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export
-          </Button>
-          <Button className="skeuo-button">
-            <Plus className="h-4 w-4 mr-2" />
-            New Booking
           </Button>
         </div>
       </div>
@@ -440,14 +423,9 @@ export default function BookingsPage() {
                         <button
                           onClick={() => setSelectedBooking(booking)}
                           className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                          title="View Details"
                         >
                           <Eye className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                        <button className="p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                          <Edit className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                        <button className="p-2 rounded-lg hover:bg-red-500/10 transition-colors">
-                          <Trash2 className="h-4 w-4 text-red-500" />
                         </button>
                       </div>
                     </td>
