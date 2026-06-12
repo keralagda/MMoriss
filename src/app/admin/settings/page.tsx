@@ -17,6 +17,7 @@ const tabs = [
   { id: 'notifications', name: 'Notifications', icon: Bell },
   { id: 'payments', name: 'Payments', icon: CreditCard },
   { id: 'security', name: 'Security', icon: Shield },
+  { id: 'database', name: 'Database', icon: RefreshCw },
 ]
 
 export default function SettingsPage() {
@@ -62,6 +63,57 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState('INR')
   const [depositPercentage, setDepositPercentage] = useState('25')
   const [cancellationDays, setCancellationDays] = useState('30')
+
+  // Database Reset Settings
+  const [resetMode, setResetMode] = useState<'full' | 'partial'>('partial')
+  const [resetSelections, setResetSelections] = useState({
+    bookings: true,
+    guests: false,
+    rooms: false,
+    experiences: false,
+    spa: false,
+    dining: false,
+    gallery: false,
+    inquiries: true,
+    reviews: true,
+    settings: false,
+  })
+  const [resettingDb, setResettingDb] = useState(false)
+  const [resetDbStatus, setResetDbStatus] = useState<string | null>(null)
+
+  const handleResetDb = async () => {
+    const confirmMsg = resetMode === 'full' 
+      ? 'WARNING: This will delete ALL records in the database (Rooms, Guests, Bookings, Spa, Settings, Experiences, Dining, etc.) and restore the default seeded dataset. Are you absolutely sure?'
+      : 'Are you sure you want to reset the selected tables? Note: Resetting Rooms or Guests will also clear related Bookings.'
+    
+    if (!confirm(confirmMsg)) return
+
+    setResettingDb(true)
+    setResetDbStatus(null)
+    try {
+      const res = await fetch('/api/admin/reset-db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: resetMode,
+          selections: resetSelections
+        })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setResetDbStatus('Database successfully reset and re-seeded!')
+        alert('Database successfully reset!')
+      } else {
+        setResetDbStatus(`Failed: ${data.error || 'Unknown error'}`)
+        alert(`Failed to reset database: ${data.error || 'Unknown error'}`)
+      }
+    } catch (err: any) {
+      setResetDbStatus(`Error: ${err.message}`)
+      alert(`Error resetting database: ${err.message}`)
+    } finally {
+      setResettingDb(false)
+    }
+  }
 
   useEffect(() => {
     async function loadSettings() {
@@ -743,6 +795,114 @@ export default function SettingsPage() {
                         <span className="text-xs text-green-500">Active</span>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'database' && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div className="skeuo-card p-6">
+                <h2 className="font-serif text-xl text-foreground mb-4">Database Operations</h2>
+                <p className="text-xs text-muted-foreground mb-6">
+                  Reset the database back to default seeded values or partially clear specific tables.
+                </p>
+
+                <div className="space-y-6">
+                  {/* Mode Selector */}
+                  <div className="flex gap-4 p-1 skeuo-inset rounded-xl max-w-sm">
+                    <button
+                      type="button"
+                      onClick={() => setResetMode('partial')}
+                      className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        resetMode === 'partial'
+                          ? 'skeuo-button text-primary-foreground'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Partial Reset
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setResetMode('full')}
+                      className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        resetMode === 'full'
+                          ? 'skeuo-button bg-red-600 hover:bg-red-700 text-white'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Full Reset
+                    </button>
+                  </div>
+
+                  {resetMode === 'full' ? (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-700 rounded-xl space-y-2 text-xs">
+                      <p className="font-bold">⚠️ CRITICAL WARNING</p>
+                      <p>
+                        A Full Reset will purge ALL tables in the database. This includes: Rooms, Guests, Bookings, Experiences, Spa Treatments, Dining, Gallery Images, Reviews, and Contact Inquiries.
+                      </p>
+                      <p>
+                        All records will be restored to the initial default system demo seeds. This action is irreversible.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 text-yellow-700 rounded-xl text-xs">
+                        Select tables to clear and restore to initial seeded datasets. Clearing <strong>Rooms</strong> or <strong>Guests</strong> will automatically drop related <strong>Bookings</strong> due to relational database integrity requirements.
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        {[
+                          { id: 'bookings', label: 'Bookings & Reservations' },
+                          { id: 'guests', label: 'Guests & Profiles' },
+                          { id: 'rooms', label: 'Rooms & Villas' },
+                          { id: 'experiences', label: 'Experiences / Activities' },
+                          { id: 'spa', label: 'Spa Treatments & Packages' },
+                          { id: 'dining', label: 'Dining Venues & Dishes' },
+                          { id: 'gallery', label: 'Gallery Images' },
+                          { id: 'inquiries', label: 'Contact Inquiries' },
+                          { id: 'reviews', label: 'Reviews & Testimonials' },
+                          { id: 'settings', label: 'System Settings' },
+                        ].map((item) => (
+                          <label
+                            key={item.id}
+                            className="flex items-center gap-3 p-3 skeuo-inset rounded-xl cursor-pointer hover:bg-primary/5 transition-all text-xs"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={(resetSelections as any)[item.id]}
+                              onChange={(e) =>
+                                setResetSelections((prev) => ({
+                                  ...prev,
+                                  [item.id]: e.target.checked,
+                                }))
+                              }
+                              className="rounded border-border text-primary focus:ring-primary/20 h-4 w-4"
+                            />
+                            <div>
+                              <p className="font-semibold text-foreground">{item.label}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-4 pt-4 border-t border-border">
+                    <Button
+                      type="button"
+                      onClick={handleResetDb}
+                      disabled={resettingDb}
+                      className={`skeuo-button text-xs py-4 px-6 ${
+                        resetMode === 'full' ? 'bg-red-600 hover:bg-red-700 text-white' : ''
+                      }`}
+                    >
+                      {resettingDb ? 'Resetting Database...' : 'Execute Database Reset'}
+                    </Button>
+                    {resetDbStatus && (
+                      <span className="text-xs font-semibold text-primary">{resetDbStatus}</span>
+                    )}
                   </div>
                 </div>
               </div>
