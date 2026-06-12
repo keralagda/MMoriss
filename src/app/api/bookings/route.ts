@@ -64,10 +64,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Please login to make a booking' }, { status: 401 })
     }
 
-    const { roomId, checkIn, checkOut, adults, children, specialRequests } = await request.json()
+    const body = await request.json()
+    const { 
+      roomId, 
+      checkIn, 
+      checkOut, 
+      adults, 
+      children, 
+      specialRequests, 
+      guestId, 
+      status, 
+      paymentStatus, 
+      totalPrice: customPrice, 
+      depositPaid, 
+      notes 
+    } = body
 
     if (!roomId || !checkIn || !checkOut) {
       return NextResponse.json({ error: 'Room, Check-In, and Check-Out dates are required' }, { status: 400 })
+    }
+
+    const isAdmin = session.role === 'admin'
+    const targetGuestId = isAdmin && guestId ? guestId : session.id
+
+    if (!targetGuestId) {
+      return NextResponse.json({ error: 'Guest ID is required' }, { status: 400 })
     }
 
     // Fetch the room details
@@ -81,7 +102,10 @@ export async function POST(request: Request) {
     const checkOutDate = new Date(checkOut)
     const diffTime = checkOutDate.getTime() - checkInDate.getTime()
     const nights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
-    const totalPrice = Number(room.price) * nights
+    
+    const finalTotalPrice = customPrice !== undefined && isAdmin
+      ? parseFloat(customPrice)
+      : Number(room.price) * nights
 
     // Generate confirmation code
     const confirmationCode = 'BK' + Math.floor(10000 + Math.random() * 90000)
@@ -89,20 +113,22 @@ export async function POST(request: Request) {
     const booking = await db.booking.create({
       data: {
         confirmationCode,
-        guestId: session.id,
+        guestId: targetGuestId,
         roomId,
         checkIn: checkInDate,
         checkOut: checkOutDate,
         adults: parseInt(adults) || 1,
         children: parseInt(children) || 0,
-        totalPrice,
-        depositPaid: 0,
-        status: 'pending',
-        paymentStatus: 'pending',
+        totalPrice: finalTotalPrice,
+        depositPaid: depositPaid !== undefined && isAdmin ? parseFloat(depositPaid) : 0,
+        status: isAdmin && status ? status : 'pending',
+        paymentStatus: isAdmin && paymentStatus ? paymentStatus : 'pending',
         specialRequests: specialRequests || '',
+        notes: isAdmin && notes ? notes : '',
       },
       include: {
-        room: true
+        room: true,
+        guest: true
       }
     })
 
