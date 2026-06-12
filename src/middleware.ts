@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get('mm_session')?.value
-  const session = token ? decrypt(token) : null
+  const session = token ? await decrypt(token) : null
 
   if (isAdminRoute) {
     if (!session || session.role !== 'admin') {
