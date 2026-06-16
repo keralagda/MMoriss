@@ -37,7 +37,8 @@ import {
   BedDouble,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Leaf
 } from 'lucide-react'
 
 // Types
