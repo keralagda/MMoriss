@@ -716,7 +716,7 @@ function Navigation() {
 }
 
 // Hero Section
-function HeroSection() {
+function HeroSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
@@ -734,7 +734,7 @@ function HeroSection() {
         className="absolute inset-0 z-0"
       >
         <img
-          src="/images/birds-view.jpg"
+          src={props?.bgImage || "/images/birds-view.jpg"}
           alt="Munroe Morris Service Villa Kerala"
           className="w-full h-full object-cover"
         />
@@ -766,11 +766,11 @@ function HeroSection() {
           </motion.div>
           
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-semibold leading-tight">
-            {t('hero.title')}
+            {props?.title || t('hero.title')}
           </h1>
           
           <p className="font-display text-xl sm:text-2xl md:text-3xl text-white/90 italic max-w-2xl mx-auto">
-            {t('hero.tagline')}
+            {props?.tagline || t('hero.tagline')}
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-4 text-white/70 text-sm mt-4">
@@ -792,7 +792,7 @@ function HeroSection() {
               size="lg"
               className="skeuo-button px-8 py-6 text-lg tracking-wide"
             >
-              {t('hero.cta')}
+              {props?.ctaText || t('hero.cta')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -828,7 +828,7 @@ function HeroSection() {
 }
 
 // About Section
-function AboutSection() {
+function AboutSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -850,14 +850,26 @@ function AboutSection() {
                 {t('about.label')}
               </p>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-foreground leading-tight">
-                {t('about.title').split(' ').slice(0, -2).join(' ')}
-                <span className="gold-metallic"> {t('about.title').split(' ').slice(-2).join(' ')}</span>
+                {props?.title ? (
+                  props.title
+                ) : (
+                  <>
+                    {t('about.title').split(' ').slice(0, -2).join(' ')}
+                    <span className="gold-metallic"> {t('about.title').split(' ').slice(-2).join(' ')}</span>
+                  </>
+                )}
               </h2>
             </div>
             <div className="divider-gold w-24" />
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-              <p>{t('about.p1')}</p>
-              <p>{t('about.p2')}</p>
+              {props?.description ? (
+                <p>{props.description}</p>
+              ) : (
+                <>
+                  <p>{t('about.p1')}</p>
+                  <p>{t('about.p2')}</p>
+                </>
+              )}
             </div>
             
             <div className="grid grid-cols-3 gap-6 pt-6">
@@ -886,7 +898,7 @@ function AboutSection() {
             <div className="skeuo-card p-2">
               <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
                 <img
-                  src="/images/gallery-1.png"
+                  src={props?.image || "/images/gallery-1.png"}
                   alt="Munroe Morris Service Villa Kerala"
                   className="w-full h-full object-cover"
                 />
@@ -904,7 +916,7 @@ function AboutSection() {
 }
 
 // Accommodations Section
-function AccommodationsSection() {
+function AccommodationsSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1088,7 +1100,7 @@ function AccommodationsSection() {
 }
 
 // Experiences Section
-function ExperiencesSection() {
+function ExperiencesSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1170,7 +1182,7 @@ function ExperiencesSection() {
 }
 
 // Ayurveda Section
-function AyurvedaSection() {
+function AyurvedaSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1268,7 +1280,7 @@ function AyurvedaSection() {
 }
 
 // Dining Section
-function DiningSection() {
+function DiningSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1361,7 +1373,7 @@ function DiningSection() {
 }
 
 // Gallery Section
-function GallerySection() {
+function GallerySection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1478,7 +1490,7 @@ function GallerySection() {
 }
 
 // Contact Section
-function ContactSection() {
+function ContactSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1735,7 +1747,7 @@ function ContactSection() {
 }
 
 // Testimonials Section
-function TestimonialsSection() {
+function TestimonialsSection({ props }: { props?: any }) {
   const { t } = useLang()
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
@@ -1997,19 +2009,70 @@ function PlayCircle({ className }: { className?: string }) {
 
 // Main Page Component
 export default function Home() {
+  const [sections, setSections] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.site_builder_sections) {
+          try {
+            const parsed = JSON.parse(data.site_builder_sections)
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setSections(parsed)
+            }
+          } catch (e) {
+            console.error('Failed to parse site_builder_sections:', e)
+          }
+        }
+      })
+      .catch(err => console.error('Failed to load site builder sections:', err))
+  }, [])
+
+  const renderSection = (section: any) => {
+    switch (section.type) {
+      case 'hero-section':
+        return <HeroSection key={section.id || 'hero'} props={section.props} />
+      case 'about-section':
+        return <AboutSection key={section.id || 'about'} props={section.props} />
+      case 'accommodations-section':
+        return <AccommodationsSection key={section.id || 'accommodations'} props={section.props} />
+      case 'experiences-section':
+        return <ExperiencesSection key={section.id || 'experiences'} props={section.props} />
+      case 'ayurveda-section':
+        return <AyurvedaSection key={section.id || 'ayurveda'} props={section.props} />
+      case 'dining-section':
+        return <DiningSection key={section.id || 'dining'} props={section.props} />
+      case 'gallery-section':
+        return <GallerySection key={section.id || 'gallery'} props={section.props} />
+      case 'testimonials-section':
+        return <TestimonialsSection key={section.id || 'testimonials'} props={section.props} />
+      case 'contact-section':
+        return <ContactSection key={section.id || 'contact'} props={section.props} />
+      default:
+        return null
+    }
+  }
+
+  const visibleSections = sections.length > 0
+    ? sections.filter(s => s.visible)
+    : [
+        { type: 'hero-section', props: {} },
+        { type: 'about-section', props: {} },
+        { type: 'accommodations-section', props: {} },
+        { type: 'experiences-section', props: {} },
+        { type: 'ayurveda-section', props: {} },
+        { type: 'dining-section', props: {} },
+        { type: 'gallery-section', props: {} },
+        { type: 'testimonials-section', props: {} },
+        { type: 'contact-section', props: {} }
+      ]
+
   return (
     <LanguageProvider>
       <main className="min-h-screen flex flex-col leather-texture">
         <Navigation />
-        <HeroSection />
-        <AboutSection />
-        <AccommodationsSection />
-        <ExperiencesSection />
-        <AyurvedaSection />
-        <DiningSection />
-        <GallerySection />
-        <TestimonialsSection />
-        <ContactSection />
+        {visibleSections.map(section => renderSection(section))}
         <Footer />
       </main>
     </LanguageProvider>

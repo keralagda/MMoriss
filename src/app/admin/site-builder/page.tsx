@@ -1844,20 +1844,46 @@ export default function SiteBuilder() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    Promise.resolve().then(() => {
+    Promise.resolve().then(async () => {
       setMounted(true)
-      const saved = localStorage.getItem('site-builder-sections')
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setSections(parsed)
-            setHistory([parsed])
-            setHistoryIndex(0)
+      
+      let loadedSections: Section[] | null = null
+      
+      // Try loading from Database settings first
+      try {
+        const res = await fetch('/api/settings')
+        if (res.ok) {
+          const settings = await res.json()
+          if (settings.site_builder_sections) {
+            const parsed = JSON.parse(settings.site_builder_sections)
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              loadedSections = parsed
+            }
           }
-        } catch (e) {
-          console.error('Failed to load site-builder sections from localStorage', e)
         }
+      } catch (err) {
+        console.error('Failed to load site-builder sections from Database settings', err)
+      }
+      
+      // Fallback to localStorage
+      if (!loadedSections) {
+        const saved = localStorage.getItem('site-builder-sections')
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved)
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              loadedSections = parsed
+            }
+          } catch (e) {
+            console.error('Failed to load site-builder sections from localStorage', e)
+          }
+        }
+      }
+      
+      if (loadedSections) {
+        setSections(loadedSections)
+        setHistory([loadedSections])
+        setHistoryIndex(0)
       }
     })
   }, [])
@@ -1962,10 +1988,31 @@ export default function SiteBuilder() {
   // Save
   const handleSave = useCallback(async () => {
     setIsSaving(true)
-    // Simulate save
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    setIsSaving(false)
-    localStorage.setItem('site-builder-sections', JSON.stringify(sections))
+    try {
+      // Save to Database settings
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          site_builder_sections: JSON.stringify(sections)
+        })
+      })
+      
+      if (!res.ok) {
+        throw new Error('Failed to save to database settings')
+      }
+      
+      // Also save to localStorage as fallback
+      localStorage.setItem('site-builder-sections', JSON.stringify(sections))
+      alert('Site builder layout successfully saved!')
+    } catch (err: any) {
+      console.error('Save error:', err)
+      alert(`Failed to save settings: ${err.message || 'Unknown error'}`)
+    } finally {
+      setIsSaving(false)
+    }
   }, [sections])
 
   if (!mounted) {
