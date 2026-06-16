@@ -15,24 +15,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  metadataBase: new URL("https://munroemorris.com"),
+  title: "Munroe Morris Service Villa | Luxury Backwater Resort in Munroe Island, Kerala",
+  description: "Experience premium luxury at Munroe Morris Service Villa, nestled in the serene backwaters of Munroe Island, Kollam, Kerala. Enjoy authentic Ayurveda wellness, houseboat cruises, and traditional Kerala hospitality.",
+  keywords: ["Munroe Morris", "Service Villa", "Munroe Island Resort", "Kollam Backwater Resort", "Kerala Luxury Villa", "Ayurveda Wellness Kerala", "Houseboat Cruise Kerala", "Munroe Island Homestay"],
+  authors: [{ name: "Munroe Morris Team" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "Munroe Morris Service Villa - Luxury Backwater Resort in Kerala",
+    description: "Book your luxury stay at Munroe Morris Service Villa in Munroe Island, Kerala. Authentic Ayurveda, houseboat cruises, and premium accommodations.",
+    url: "https://munroemorris.com",
+    siteName: "Munroe Morris Service Villa",
     type: "website",
+    images: [
+      {
+        url: "/images/birds-view.jpg",
+        width: 1200,
+        height: 800,
+        alt: "Munroe Morris Service Villa Aerial View",
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Munroe Morris Service Villa | Luxury Backwater Resort in Kerala",
+    description: "Experience premium luxury at Munroe Morris Service Villa in Munroe Island, Kerala.",
+    images: ["/images/birds-view.jpg"],
   },
 };
 
