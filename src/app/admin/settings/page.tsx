@@ -7,17 +7,44 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Save, RefreshCw, Bell, Globe, CreditCard, Shield, Mail,
-  Phone, MapPin, Clock, Users, Flower2, Palette, Upload, Trash2
+  Phone, MapPin, Clock, Users, Flower2, Palette, Upload, Trash2,
+  Layout, Plus, ArrowUp, ArrowDown
 } from 'lucide-react'
 
 const tabs = [
   { id: 'general', name: 'General', icon: Globe },
   { id: 'branding', name: 'Branding', icon: Palette },
   { id: 'contact', name: 'Contact', icon: Phone },
+  { id: 'navigation', name: 'Header & Footer', icon: Layout },
   { id: 'notifications', name: 'Notifications', icon: Bell },
   { id: 'payments', name: 'Payments', icon: CreditCard },
   { id: 'security', name: 'Security', icon: Shield },
   { id: 'database', name: 'Database', icon: RefreshCw },
+]
+
+const defaultHeaderLinks = [
+  { name: 'nav.about', href: '/about' },
+  { name: 'nav.accommodations', href: '/accommodations' },
+  { name: 'nav.experiences', href: '/experiences' },
+  { 
+    name: 'nav.dining', 
+    href: '/dining',
+    subItems: [
+      { name: 'nav.diningOverview', href: '/dining' },
+      { name: 'nav.diningMenu', href: '/menu' }
+    ]
+  },
+  { name: 'nav.gallery', href: '/gallery' },
+  { name: 'nav.contact', href: '/contact' }
+]
+
+const defaultFooterLinks = [
+  { name: 'nav.about', href: '/about' },
+  { name: 'nav.accommodations', href: '/accommodations' },
+  { name: 'nav.experiences', href: '/experiences' },
+  { name: 'nav.ayurveda', href: '/spa' },
+  { name: 'nav.dining', href: '/dining' },
+  { name: 'nav.gallery', href: '/gallery' }
 ]
 
 export default function SettingsPage() {
@@ -58,6 +85,10 @@ export default function SettingsPage() {
   const [whatsappTemplate, setWhatsappTemplate] = useState('')
   const [testingEmail, setTestingEmail] = useState(false)
   const [testEmailStatus, setTestEmailStatus] = useState<string | null>(null)
+
+  // Navigation state
+  const [headerLinks, setHeaderLinks] = useState<{ name: string; href: string; subItems?: { name: string; href: string }[] }[]>([])
+  const [footerLinks, setFooterLinks] = useState<{ name: string; href: string }[]>([])
 
   // Payment Settings
   const [currency, setCurrency] = useState('INR')
@@ -148,6 +179,27 @@ export default function SettingsPage() {
           if (data.welcome_email_subject) setWelcomeEmailSubject(data.welcome_email_subject)
           if (data.welcome_email_body) setWelcomeEmailBody(data.welcome_email_body)
           if (data.whatsapp_template) setWhatsappTemplate(data.whatsapp_template)
+          
+          // Navigation menus
+          if (data.header_menu) {
+            try {
+              setHeaderLinks(JSON.parse(data.header_menu))
+            } catch (e) {
+              setHeaderLinks(defaultHeaderLinks)
+            }
+          } else {
+            setHeaderLinks(defaultHeaderLinks)
+          }
+
+          if (data.footer_menu) {
+            try {
+              setFooterLinks(JSON.parse(data.footer_menu))
+            } catch (e) {
+              setFooterLinks(defaultFooterLinks)
+            }
+          } else {
+            setFooterLinks(defaultFooterLinks)
+          }
         }
       } catch (err) {
         console.error('Failed to load settings:', err)
@@ -201,6 +253,96 @@ export default function SettingsPage() {
     }
   }
 
+  // Header Links Helpers
+  const addHeaderLink = () => {
+    setHeaderLinks([...headerLinks, { name: 'New Link', href: '/' }])
+  }
+
+  const removeHeaderLink = (index: number) => {
+    setHeaderLinks(headerLinks.filter((_, i) => i !== index))
+  }
+
+  const updateHeaderLink = (index: number, fields: Partial<{ name: string; href: string; subItems?: { name: string; href: string }[] }>) => {
+    const updated = [...headerLinks]
+    updated[index] = { ...updated[index], ...fields }
+    setHeaderLinks(updated)
+  }
+
+  const moveHeaderLink = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return
+    if (direction === 'down' && index === headerLinks.length - 1) return
+    
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    const updated = [...headerLinks]
+    const temp = updated[index]
+    updated[index] = updated[targetIndex]
+    updated[targetIndex] = temp
+    setHeaderLinks(updated)
+  }
+
+  const addSubItem = (parentIndex: number) => {
+    const parent = headerLinks[parentIndex]
+    const subItems = parent.subItems ? [...parent.subItems] : []
+    subItems.push({ name: 'Sub Link', href: '/' })
+    updateHeaderLink(parentIndex, { subItems })
+  }
+
+  const removeSubItem = (parentIndex: number, subIndex: number) => {
+    const parent = headerLinks[parentIndex]
+    if (!parent.subItems) return
+    const subItems = parent.subItems.filter((_, i) => i !== subIndex)
+    updateHeaderLink(parentIndex, { subItems: subItems.length > 0 ? subItems : undefined })
+  }
+
+  const updateSubItem = (parentIndex: number, subIndex: number, fields: Partial<{ name: string; href: string }>) => {
+    const parent = headerLinks[parentIndex]
+    if (!parent.subItems) return
+    const subItems = [...parent.subItems]
+    subItems[subIndex] = { ...subItems[subIndex], ...fields }
+    updateHeaderLink(parentIndex, { subItems })
+  }
+
+  const moveSubItem = (parentIndex: number, subIndex: number, direction: 'up' | 'down') => {
+    const parent = headerLinks[parentIndex]
+    if (!parent.subItems) return
+    const subItems = [...parent.subItems]
+    if (direction === 'up' && subIndex === 0) return
+    if (direction === 'down' && subIndex === subItems.length - 1) return
+
+    const targetIndex = direction === 'up' ? subIndex - 1 : subIndex + 1
+    const temp = subItems[subIndex]
+    subItems[subIndex] = subItems[targetIndex]
+    subItems[targetIndex] = temp
+    updateHeaderLink(parentIndex, { subItems })
+  }
+
+  // Footer Links Helpers
+  const addFooterLink = () => {
+    setFooterLinks([...footerLinks, { name: 'New Link', href: '/' }])
+  }
+
+  const removeFooterLink = (index: number) => {
+    setFooterLinks(footerLinks.filter((_, i) => i !== index))
+  }
+
+  const updateFooterLink = (index: number, fields: Partial<{ name: string; href: string }>) => {
+    const updated = [...footerLinks]
+    updated[index] = { ...updated[index], ...fields }
+    setFooterLinks(updated)
+  }
+
+  const moveFooterLink = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return
+    if (direction === 'down' && index === footerLinks.length - 1) return
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    const updated = [...footerLinks]
+    const temp = updated[index]
+    updated[index] = updated[targetIndex]
+    updated[targetIndex] = temp
+    setFooterLinks(updated)
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
@@ -234,6 +376,8 @@ export default function SettingsPage() {
           welcome_email_subject: welcomeEmailSubject,
           welcome_email_body: welcomeEmailBody,
           whatsapp_template: whatsappTemplate,
+          header_menu: JSON.stringify(headerLinks),
+          footer_menu: JSON.stringify(footerLinks),
         }),
       })
       if (!res.ok) {
@@ -582,6 +726,249 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'navigation' && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+              {/* Header Navigation Menu Builder */}
+              <div className="skeuo-card p-6 space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-black/5">
+                  <div>
+                    <h2 className="font-serif text-xl text-foreground font-semibold">Header Navigation Menu</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Customize the links in the main header navigation (supports translation keys like <code>nav.about</code> or custom labels).</p>
+                  </div>
+                  <Button onClick={addHeaderLink} className="skeuo-button py-2 px-4 text-xs font-semibold flex items-center gap-1.5">
+                    <Plus className="h-4 w-4" /> Add Link
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  {headerLinks.length === 0 ? (
+                    <div className="text-center py-8 text-xs text-muted-foreground skeuo-inset rounded-xl">
+                      No navigation links configured. Click "Add Link" to get started.
+                    </div>
+                  ) : (
+                    headerLinks.map((link, idx) => (
+                      <div key={idx} className="p-4 skeuo-inset rounded-xl space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                          <div className="flex-1 grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-[10px] font-semibold text-muted-foreground block mb-1">Link Label (or Translation Key)</label>
+                              <Input 
+                                value={link.name} 
+                                onChange={(e) => updateHeaderLink(idx, { name: e.target.value })}
+                                className="skeuo-input text-xs"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-semibold text-muted-foreground block mb-1">URL Path / Destination</label>
+                              <Input 
+                                value={link.href} 
+                                onChange={(e) => updateHeaderLink(idx, { href: e.target.value })}
+                                className="skeuo-input text-xs"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 self-end sm:self-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={idx === 0}
+                              onClick={() => moveHeaderLink(idx, 'up')}
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-black/5 active:scale-95"
+                            >
+                              <ArrowUp className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={idx === headerLinks.length - 1}
+                              onClick={() => moveHeaderLink(idx, 'down')}
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-black/5 active:scale-95"
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeHeaderLink(idx)}
+                              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10 active:scale-95"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Dropdown Options */}
+                        <div className="border-t border-black/5 pt-3 mt-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="checkbox"
+                                id={`has-submenu-${idx}`}
+                                checked={!!link.subItems}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    updateHeaderLink(idx, { subItems: [{ name: 'Sub Link', href: '/' }] })
+                                  } else {
+                                    updateHeaderLink(idx, { subItems: undefined })
+                                  }
+                                }}
+                                className="rounded border-gray-300 text-primary focus:ring-primary h-3.5 w-3.5"
+                              />
+                              <label htmlFor={`has-submenu-${idx}`} className="text-xs font-medium text-foreground cursor-pointer select-none">
+                                Enable Dropdown Sub-menu
+                              </label>
+                            </div>
+                            
+                            {link.subItems && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => addSubItem(idx)}
+                                className="text-[10px] font-semibold text-primary hover:text-primary-dark p-0 h-auto"
+                              >
+                                <Plus className="h-3 w-3 mr-1 inline" /> Add Sub-Link
+                              </Button>
+                            )}
+                          </div>
+
+                          {/* SubItems Render */}
+                          {link.subItems && (
+                            <div className="ml-6 pl-4 border-l-2 border-primary/20 space-y-3">
+                              {link.subItems.map((sub, sIdx) => (
+                                <div key={sIdx} className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between bg-black/5 p-3 rounded-lg">
+                                  <div className="flex-1 grid grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="text-[9px] font-semibold text-muted-foreground block mb-0.5">Sub-Link Label</label>
+                                      <Input 
+                                        value={sub.name} 
+                                        onChange={(e) => updateSubItem(idx, sIdx, { name: e.target.value })}
+                                        className="skeuo-input text-[11px] h-8 py-1"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[9px] font-semibold text-muted-foreground block mb-0.5">Sub-Link URL</label>
+                                      <Input 
+                                        value={sub.href} 
+                                        onChange={(e) => updateSubItem(idx, sIdx, { href: e.target.value })}
+                                        className="skeuo-input text-[11px] h-8 py-1"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 self-end sm:self-center">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      disabled={sIdx === 0}
+                                      onClick={() => moveSubItem(idx, sIdx, 'up')}
+                                      className="h-7 w-7 text-muted-foreground hover:bg-black/5"
+                                    >
+                                      <ArrowUp className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      disabled={sIdx === link.subItems!.length - 1}
+                                      onClick={() => moveSubItem(idx, sIdx, 'down')}
+                                      className="h-7 w-7 text-muted-foreground hover:bg-black/5"
+                                    >
+                                      <ArrowDown className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => removeSubItem(idx, sIdx)}
+                                      className="h-7 w-7 text-red-500 hover:bg-red-500/10"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Footer Navigation Menu Builder */}
+              <div className="skeuo-card p-6 space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-black/5">
+                  <div>
+                    <h2 className="font-serif text-xl text-foreground font-semibold">Footer Quick Links Menu</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Customize the links in the footer quick links section.</p>
+                  </div>
+                  <Button onClick={addFooterLink} className="skeuo-button py-2 px-4 text-xs font-semibold flex items-center gap-1.5">
+                    <Plus className="h-4 w-4" /> Add Link
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  {footerLinks.length === 0 ? (
+                    <div className="text-center py-8 text-xs text-muted-foreground skeuo-inset rounded-xl">
+                      No footer links configured. Click "Add Link" to get started.
+                    </div>
+                  ) : (
+                    footerLinks.map((link, idx) => (
+                      <div key={idx} className="p-4 skeuo-inset rounded-xl flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                        <div className="flex-1 grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-[10px] font-semibold text-muted-foreground block mb-1">Link Label (or Translation Key)</label>
+                            <Input 
+                              value={link.name} 
+                              onChange={(e) => updateFooterLink(idx, { name: e.target.value })}
+                              className="skeuo-input text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-semibold text-muted-foreground block mb-1">URL Path / Destination</label>
+                            <Input 
+                              value={link.href} 
+                              onChange={(e) => updateFooterLink(idx, { href: e.target.value })}
+                              className="skeuo-input text-xs"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 self-end sm:self-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={idx === 0}
+                            onClick={() => moveFooterLink(idx, 'up')}
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-black/5 active:scale-95"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={idx === footerLinks.length - 1}
+                            onClick={() => moveFooterLink(idx, 'down')}
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-black/5 active:scale-95"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeFooterLink(idx)}
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10 active:scale-95"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </motion.div>

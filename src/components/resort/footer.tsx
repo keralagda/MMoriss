@@ -1,21 +1,39 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from 'lucide-react'
 import { useLang } from './language-context'
 
+const defaultFooterLinks = [
+  { name: 'nav.about', href: '/about' },
+  { name: 'nav.accommodations', href: '/accommodations' },
+  { name: 'nav.experiences', href: '/experiences' },
+  { name: 'nav.ayurveda', href: '/spa' },
+  { name: 'nav.dining', href: '/dining' },
+  { name: 'nav.gallery', href: '/gallery' },
+]
+
 export function Footer() {
   const { t } = useLang()
+  const [quickLinks, setQuickLinks] = useState<{ name: string; href: string }[]>(defaultFooterLinks)
 
-  const quickLinks = [
-    { name: t('nav.about'), href: '/about' },
-    { name: t('nav.accommodations'), href: '/accommodations' },
-    { name: t('nav.experiences'), href: '/experiences' },
-    { name: t('nav.ayurveda'), href: '/spa' },
-    { name: t('nav.dining'), href: '/dining' },
-    { name: t('nav.gallery'), href: '/gallery' },
-  ]
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.footer_menu) {
+          try {
+            setQuickLinks(JSON.parse(data.footer_menu))
+          } catch (e) {
+            console.error('Failed to parse footer_menu settings:', e)
+            setQuickLinks(defaultFooterLinks)
+          }
+        }
+      })
+      .catch(() => setQuickLinks(defaultFooterLinks))
+  }, [])
 
   const experiences = [
     { name: 'Houseboat Cruise', href: '/experiences#houseboat' },
@@ -79,7 +97,7 @@ export function Footer() {
                     href={link.href}
                     className="text-muted-foreground hover:text-primary transition-colors text-sm"
                   >
-                    {link.name}
+                    {t(link.name)}
                   </Link>
                 </li>
               ))}

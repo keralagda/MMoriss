@@ -87,6 +87,23 @@ export function LanguageToggle() {
   )
 }
 
+// Default Header Navigation Links
+const defaultHeaderLinks = [
+  { name: 'nav.about', href: '/about' },
+  { name: 'nav.accommodations', href: '/accommodations' },
+  { name: 'nav.experiences', href: '/experiences' },
+  { 
+    name: 'nav.dining', 
+    href: '/dining',
+    subItems: [
+      { name: 'nav.diningOverview', href: '/dining' },
+      { name: 'nav.diningMenu', href: '/menu' }
+    ]
+  },
+  { name: 'nav.gallery', href: '/gallery' },
+  { name: 'nav.contact', href: '/contact' },
+]
+
 // Navigation Component
 interface NavigationProps {
   isTransparent?: boolean
@@ -103,6 +120,9 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
   // Dropdown states for nested menus
   const [isDiningOpen, setIsDiningOpen] = useState(false)
   const [isMobileDiningOpen, setIsMobileDiningOpen] = useState(false)
+
+  // Dynamic Navigation menu state
+  const [navLinks, setNavLinks] = useState<{ name: string; href: string; subItems?: { name: string; href: string }[] }[]>(defaultHeaderLinks)
 
   const handleLogout = async () => {
     try {
@@ -121,16 +141,24 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
     }
     window.addEventListener('scroll', handleScroll)
     
-    // Fetch dynamic branding settings
+    // Fetch dynamic branding and navigation settings
     fetch('/api/settings')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data) {
           if (data.brand_logo) setLogo(data.brand_logo)
           if (data.site_name) setSiteName(data.site_name)
+          if (data.header_menu) {
+            try {
+              setNavLinks(JSON.parse(data.header_menu))
+            } catch (e) {
+              console.error('Failed to parse header_menu settings:', e)
+              setNavLinks(defaultHeaderLinks)
+            }
+          }
         }
       })
-      .catch(err => console.error('Failed to load branding settings:', err))
+      .catch(err => console.error('Failed to load settings:', err))
 
     // Fetch session on mount
     fetch('/api/auth/me')
@@ -144,22 +172,6 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  const navLinks = [
-    { name: t('nav.about'), href: '/about' },
-    { name: t('nav.accommodations'), href: '/accommodations' },
-    { name: t('nav.experiences'), href: '/experiences' },
-    { 
-      name: t('nav.dining'), 
-      href: '/dining',
-      subItems: [
-        { name: t('nav.diningOverview'), href: '/dining' },
-        { name: t('nav.diningMenu'), href: '/menu' }
-      ]
-    },
-    { name: t('nav.gallery'), href: '/gallery' },
-    { name: t('nav.contact'), href: '/contact' },
-  ]
 
   const shouldHaveBackground = isScrolled || !isTransparent
 
@@ -217,7 +229,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                           shouldHaveBackground ? 'text-foreground' : 'text-white/90'
                         }`}
                       >
-                        {link.name}
+                        {t(link.name)}
                         <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
                       </button>
                       <AnimatePresence>
@@ -235,7 +247,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                                 href={subItem.href}
                                 className="block px-4 py-2.5 rounded-lg text-xs font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all active:scale-[0.98]"
                               >
-                                {subItem.name}
+                                {t(subItem.name)}
                               </Link>
                             ))}
                           </motion.div>
@@ -252,7 +264,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                       shouldHaveBackground ? 'text-foreground' : 'text-white/90'
                     }`}
                   >
-                    {link.name}
+                    {t(link.name)}
                   </Link>
                 )
               })}
@@ -339,7 +351,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                         onClick={() => setIsMobileDiningOpen(!isMobileDiningOpen)}
                         className="font-serif text-2xl text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
                       >
-                        {link.name}
+                        {t(link.name)}
                         <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isMobileDiningOpen ? 'rotate-180' : ''}`} />
                       </button>
                       
@@ -358,7 +370,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className="font-serif text-lg text-muted-foreground hover:text-primary transition-colors py-1"
                               >
-                                {subItem.name}
+                                {t(subItem.name)}
                               </Link>
                             ))}
                           </motion.div>
@@ -380,7 +392,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
                     >
-                      {link.name}
+                      {t(link.name)}
                     </Link>
                   </motion.div>
                 )
