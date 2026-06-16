@@ -734,7 +734,7 @@ function HeroSection() {
         className="absolute inset-0 z-0"
       >
         <img
-          src="/images/hero.png"
+          src="/images/birds-view.jpg"
           alt="Munroe Morris Service Villa Kerala"
           className="w-full h-full object-cover"
         />
@@ -918,7 +918,7 @@ function AccommodationsSection() {
       name: 'Backwater Villa',
       slug: 'backwater-villa',
       description: 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
-      image: "/images/villa-1.png",
+      image: "/images/room-collage.jpg",
       size: "120 m²",
       guests: 2,
       features: ['Private Deck', 'Canoe Ride', 'Sunset View']
@@ -928,7 +928,7 @@ function AccommodationsSection() {
       name: 'Coconut Grove Suite',
       slug: 'coconut-grove-suite',
       description: "Nestled among swaying coconut palms with authentic Kerala decor",
-      image: "/images/villa-2.png",
+      image: "/images/room-collage-2.jpg",
       size: "95 m²",
       guests: 2,
       features: ['Garden View', 'Outdoor Bath', 'Bird Watching']
@@ -938,7 +938,7 @@ function AccommodationsSection() {
       name: 'Heritage Nalukettu',
       slug: 'heritage-nalukettu',
       description: 'Traditional Kerala courtyard house with wooden architecture',
-      image: "/images/villa-3.png",
+      image: "/images/exterior-interior-collage.jpg",
       size: "150 m²",
       guests: 4,
       features: ['Courtyard', 'Wood Carvings', 'Heritage Style']
@@ -1110,7 +1110,7 @@ function ExperiencesSection() {
       icon: <Mountain className="h-8 w-8" />,
       titleKey: 'exp.village.name',
       descKey: 'exp.village.desc',
-      image: "/images/experience-3.png"
+      image: "/images/indoor-activity.jpg"
     }
   ]
 
@@ -1368,10 +1368,13 @@ function GallerySection() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const images = [
-    { src: "/images/gallery-1.png", alt: "Service Villa Entrance" },
-    { src: "/images/gallery-2.png", alt: "Evening Views" },
-    { src: "/images/gallery-3.png", alt: "Private Dining" },
-    { src: "/images/gallery-4.png", alt: "Aerial View" },
+    { src: "/images/birds-view.jpg", alt: "Aerial Birds Eye View" },
+    { src: "/images/front-exterior.jpg", alt: "Resort Front Exterior" },
+    { src: "/images/room-collage.jpg", alt: "Backwater Villa Interior" },
+    { src: "/images/room-collage-2.jpg", alt: "Coconut Grove Suite Interior" },
+    { src: "/images/exterior-interior-collage.jpg", alt: "Heritage Nalukettu Courtyard" },
+    { src: "/images/indoor-activity.jpg", alt: "Guest Indoor Activities" },
+    { src: "/images/grill-area.jpg", alt: "Outdoor Barbecue Area" },
   ]
 
   const nextSlide = () => {

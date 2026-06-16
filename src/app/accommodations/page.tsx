@@ -17,7 +17,7 @@ const fallbackVillas = [
     name: 'Backwater Villa',
     description: 'Traditional Kerala architecture with modern amenities overlooking the serene backwaters',
     longDescription: 'Wake up to the gentle sound of water and the sight of fishing boats gliding past your window. Our Backwater Villas offer an immersive experience of Kerala\'s famous waterways, featuring traditional wooden architecture with modern comforts. Each villa has a private deck where you can watch the sunset paint the waters in golden hues.',
-    image: '/images/villa-1.png',
+    image: '/images/room-collage.jpg',
     price: '₹15,000',
     size: '120 m²',
     guests: 2,
@@ -31,7 +31,7 @@ const fallbackVillas = [
     name: 'Coconut Grove Suite',
     description: 'Nestled among swaying coconut palms with authentic Kerala decor',
     longDescription: 'Surrounded by towering coconut palms that sway in the gentle breeze, these suites offer a true tropical retreat. The interiors feature bamboo furniture and coconut wood accents, celebrating the versatile tree that Kerala is famous for. Enjoy your morning chai on the private balcony as birds sing in the grove.',
-    image: '/images/villa-2.png',
+    image: '/images/room-collage-2.jpg',
     price: '₹12,000',
     size: '95 m²',
     guests: 2,
@@ -45,7 +45,7 @@ const fallbackVillas = [
     name: 'Heritage Nalukettu',
     description: 'Traditional Kerala courtyard house with wooden architecture',
     longDescription: 'Experience authentic Kerala living in our Heritage Nalukettu villas. These traditional courtyard houses feature intricate wood carvings, a central open courtyard (nadumuttam), and architecture that has been perfected over centuries. The natural ventilation and earthy tones create a cool, serene atmosphere.',
-    image: '/images/villa-3.png',
+    image: '/images/exterior-interior-collage.jpg',
     price: '₹18,000',
     size: '150 m²',
     guests: 4,
@@ -73,7 +73,7 @@ const fallbackVillas = [
     name: 'Pool Villa',
     description: 'Private plunge pool with garden views',
     longDescription: 'Our Pool Villas offer the perfect blend of luxury and privacy. Each villa features a private plunge pool surrounded by tropical gardens, an outdoor shower, and a spacious deck for sunbathing. The interiors blend modern luxury with traditional Kerala aesthetics.',
-    image: '/images/gallery-3.png',
+    image: '/images/front-exterior.jpg',
     price: '₹25,000',
     size: '180 m²',
     guests: 2,
@@ -87,7 +87,7 @@ const fallbackVillas = [
     name: 'Royal Suite',
     description: 'Ultimate luxury with panoramic backwater views',
     longDescription: 'Our most exclusive accommodation, the Royal Suite offers unparalleled luxury with panoramic views of the backwaters. Features include a private infinity pool, personal butler service, spa treatment room, and a dining pavilion. Inspired by the royal palaces of Kerala, every detail speaks of opulence.',
-    image: '/images/gallery-4.png',
+    image: '/images/birds-view.jpg',
     price: '₹50,000',
     size: '250 m²',
     guests: 4,
@@ -145,7 +145,7 @@ function AccommodationsContent() {
       <PageHero 
         titleKey="nav.accommodations"
         subtitleKey="accommodations.subtitle"
-        imageSrc="/images/villa-1.png"
+        imageSrc="/images/room-collage.jpg"
         breadcrumbs={[{ name: 'Accommodations', href: '/accommodations' }]}
       />
 

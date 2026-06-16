@@ -126,7 +126,7 @@ async function main() {
       view: 'Backwater View',
       features: JSON.stringify(['Private Deck', 'Canoe Ride', 'Sunset View', 'Outdoor Bath']),
       amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']),
-      images: JSON.stringify(['/images/villa-1.png']),
+      images: JSON.stringify(['/images/room-collage.jpg']),
       active: true,
       sortOrder: 1
     },
@@ -143,7 +143,7 @@ async function main() {
       view: 'Garden View',
       features: JSON.stringify(['Garden View', 'Outdoor Bath', 'Bird Watching', 'Private Balcony']),
       amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']),
-      images: JSON.stringify(['/images/villa-2.png']),
+      images: JSON.stringify(['/images/room-collage-2.jpg']),
       active: true,
       sortOrder: 2
     },
@@ -160,7 +160,7 @@ async function main() {
       view: 'Courtyard View',
       features: JSON.stringify(['Courtyard', 'Wood Carvings', 'Heritage Style', 'Rain Shower']),
       amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']),
-      images: JSON.stringify(['/images/villa-3.png']),
+      images: JSON.stringify(['/images/exterior-interior-collage.jpg']),
       active: true,
       sortOrder: 3
     },
@@ -194,7 +194,7 @@ async function main() {
       view: 'Pool & Garden View',
       features: JSON.stringify(['Private Pool', 'Garden View', 'Outdoor Shower', 'Sun Deck']),
       amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker']),
-      images: JSON.stringify(['/images/gallery-3.png']),
+      images: JSON.stringify(['/images/front-exterior.jpg']),
       active: true,
       sortOrder: 5
     },
@@ -211,7 +211,7 @@ async function main() {
       view: 'Panoramic Backwater View',
       features: JSON.stringify(['Private Pool', 'Butler Service', 'Spa Room', 'Dining Pavilion']),
       amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Chef']),
-      images: JSON.stringify(['/images/gallery-4.png']),
+      images: JSON.stringify(['/images/birds-view.jpg']),
       active: true,
       sortOrder: 6
     }
@@ -338,7 +338,7 @@ async function main() {
       price: 2500,
       priceType: 'per_person',
       highlights: JSON.stringify(['Coir making', 'Fishing demo', 'Paddy fields', 'Local artisans']),
-      images: JSON.stringify(['/images/experience-3.png']),
+      images: JSON.stringify(['/images/indoor-activity.jpg']),
       active: true,
       featured: false,
       sortOrder: 3
@@ -680,18 +680,18 @@ async function main() {
 
   console.log('Seeding Gallery Images...')
   const galleryImages = [
-    { title: 'Sunrise over the Backwaters', description: 'The golden hour paints the waters in magical hues', category: 'backwaters', imageUrl: '/images/hero.png', featured: true, active: true, sortOrder: 1 },
-    { title: 'Heritage Villa', description: 'Traditional Kerala architecture meets modern comfort', category: 'resort', imageUrl: '/images/gallery-1.png', featured: false, active: true, sortOrder: 2 },
+    { title: 'Sunrise over the Backwaters', description: 'The golden hour paints the waters in magical hues', category: 'backwaters', imageUrl: '/images/birds-view.jpg', featured: true, active: true, sortOrder: 1 },
+    { title: 'Heritage Villa', description: 'Traditional Kerala architecture meets modern comfort', category: 'resort', imageUrl: '/images/room-collage.jpg', featured: false, active: true, sortOrder: 2 },
     { title: 'Kathakali Performance', description: 'The ancient art form of Kerala', category: 'culture', imageUrl: '/images/gallery-2.png', featured: true, active: true, sortOrder: 3 },
-    { title: 'Pool Villa', description: 'Private plunge pool with garden views', category: 'resort', imageUrl: '/images/gallery-3.png', featured: false, active: true, sortOrder: 4 },
-    { title: 'Ayurveda Treatment', description: 'Authentic healing therapies', category: 'wellness', imageUrl: '/images/gallery-4.png', featured: false, active: true, sortOrder: 5 },
+    { title: 'Pool Villa', description: 'Private plunge pool with garden views', category: 'resort', imageUrl: '/images/front-exterior.jpg', featured: false, active: true, sortOrder: 4 },
+    { title: 'Ayurveda Treatment', description: 'Authentic healing therapies', category: 'wellness', imageUrl: '/images/birds-view.jpg', featured: false, active: true, sortOrder: 5 },
     { title: 'Houseboat at Sunset', description: 'Cruising through paradise', category: 'backwaters', imageUrl: '/images/gallery-5.png', featured: true, active: true, sortOrder: 6 },
     { title: 'Kerala Sadya', description: 'Traditional feast on banana leaf', category: 'cuisine', imageUrl: '/images/gallery-6.png', featured: false, active: true, sortOrder: 7 },
-    { title: 'Backwater Villa', description: 'Serene views from your room', category: 'resort', imageUrl: '/images/villa-1.png', featured: false, active: true, sortOrder: 8 },
-    { title: 'Coconut Grove Suite', description: 'Amongst the coconut palms', category: 'resort', imageUrl: '/images/villa-2.png', featured: false, active: true, sortOrder: 9 },
-    { title: 'Heritage Nalukettu', description: 'Traditional courtyard house', category: 'resort', imageUrl: '/images/villa-3.png', featured: false, active: true, sortOrder: 10 },
+    { title: 'Backwater Villa', description: 'Serene views from your room', category: 'resort', imageUrl: '/images/room-collage.jpg', featured: false, active: true, sortOrder: 8 },
+    { title: 'Coconut Grove Suite', description: 'Amongst the coconut palms', category: 'resort', imageUrl: '/images/room-collage-2.jpg', featured: false, active: true, sortOrder: 9 },
+    { title: 'Heritage Nalukettu', description: 'Traditional courtyard house', category: 'resort', imageUrl: '/images/exterior-interior-collage.jpg', featured: false, active: true, sortOrder: 10 },
     { title: 'Houseboat Experience', description: 'Floating through the backwaters', category: 'backwaters', imageUrl: '/images/experience-1.png', featured: false, active: true, sortOrder: 11 },
-    { title: 'Village Tour', description: 'Experiencing local life', category: 'culture', imageUrl: '/images/experience-3.png', featured: false, active: true, sortOrder: 12 },
+    { title: 'Village Tour', description: 'Experiencing local life', category: 'culture', imageUrl: '/images/indoor-activity.jpg', featured: false, active: true, sortOrder: 12 },
     { title: 'Spa Interior', description: 'Tranquil wellness space', category: 'wellness', imageUrl: '/images/spa.png', featured: false, active: true, sortOrder: 13 },
     { title: 'Karimeen Pollichathu', description: 'Signature Kerala dish', category: 'cuisine', imageUrl: '/images/dining-1.png', featured: false, active: true, sortOrder: 14 },
     { title: 'Traditional Breakfast', description: 'Appam and stew', category: 'cuisine', imageUrl: '/images/dining-2.png', featured: false, active: true, sortOrder: 15 },

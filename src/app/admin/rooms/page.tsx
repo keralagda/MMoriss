@@ -53,7 +53,7 @@ const mockRooms: Room[] = [
     view: 'Backwater View',
     features: ['Private Deck', 'Canoe Ride', 'Sunset View', 'Outdoor Bath'],
     amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker'],
-    images: ['/images/villa-1.png'],
+    images: ['/images/room-collage.jpg'],
     active: true,
     sortOrder: 1
   },
@@ -69,7 +69,7 @@ const mockRooms: Room[] = [
     view: 'Garden View',
     features: ['Garden View', 'Outdoor Bath', 'Bird Watching', 'Private Balcony'],
     amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker'],
-    images: ['/images/villa-2.png'],
+    images: ['/images/room-collage-2.jpg'],
     active: true,
     sortOrder: 2
   },
@@ -85,7 +85,7 @@ const mockRooms: Room[] = [
     view: 'Courtyard View',
     features: ['Courtyard', 'Wood Carvings', 'Heritage Style', 'Rain Shower'],
     amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker'],
-    images: ['/images/villa-3.png'],
+    images: ['/images/exterior-interior-collage.jpg'],
     active: true,
     sortOrder: 3
   },
@@ -117,7 +117,7 @@ const mockRooms: Room[] = [
     view: 'Pool & Garden View',
     features: ['Private Pool', 'Garden View', 'Outdoor Shower', 'Sun Deck'],
     amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Tea Maker'],
-    images: ['/images/gallery-3.png'],
+    images: ['/images/front-exterior.jpg'],
     active: true,
     sortOrder: 5
   },
@@ -133,7 +133,7 @@ const mockRooms: Room[] = [
     view: 'Panoramic Backwater View',
     features: ['Private Pool', 'Butler Service', 'Spa Room', 'Dining Pavilion'],
     amenities: ['WiFi', 'Air Conditioning', 'Mini Bar', 'In-room Safe', 'Smart TV', 'Private Chef'],
-    images: ['/images/gallery-4.png'],
+    images: ['/images/birds-view.jpg'],
     active: false,
     sortOrder: 6
   }
