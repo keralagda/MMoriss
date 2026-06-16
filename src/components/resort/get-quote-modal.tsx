@@ -31,6 +31,33 @@ export function GetQuoteModal({ isOpen, onClose, roomType = '' }: GetQuoteModalP
     setSuccess(false)
 
     try {
+      // 1. Fetch Admin WhatsApp configurations
+      let whatsappNumber = '+91 98765 43210'
+      let whatsappTemplate = 'Hello Munroe Morris, I would like to request a quote.\n\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nRoom/Villa: {{roomType}}\nCheck-In: {{checkIn}}\nCheck-Out: {{checkOut}}\nGuests: {{guests}}\nMessage: {{message}}'
+
+      try {
+        const settingsRes = await fetch('/api/settings')
+        if (settingsRes.ok) {
+          const settings = await settingsRes.json()
+          if (settings.whatsapp_number) whatsappNumber = settings.whatsapp_number
+          if (settings.whatsapp_template) whatsappTemplate = settings.whatsapp_template
+        }
+      } catch (settingsErr) {
+        console.error('Failed to load WhatsApp settings:', settingsErr)
+      }
+
+      // 2. Format the WhatsApp message template
+      let formattedMsg = whatsappTemplate
+        .replace(/{{name}}/g, name || '')
+        .replace(/{{email}}/g, email || '')
+        .replace(/{{phone}}/g, phone || '')
+        .replace(/{{roomType}}/g, roomType || 'Not specified')
+        .replace(/{{checkIn}}/g, checkIn || 'Not specified')
+        .replace(/{{checkOut}}/g, checkOut || 'Not specified')
+        .replace(/{{guests}}/g, guests || '2')
+        .replace(/{{message}}/g, message || '')
+
+      // 3. Save Inquiry to the database (SSoT)
       const res = await fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,6 +74,10 @@ export function GetQuoteModal({ isOpen, onClose, roomType = '' }: GetQuoteModalP
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit quote request')
+
+      // 4. Redirect to WhatsApp
+      const cleanPhone = whatsappNumber.replace(/[^0-9]/g, '')
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(formattedMsg)}`, '_blank')
 
       setSuccess(true)
       // Reset form
