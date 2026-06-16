@@ -713,7 +713,9 @@ const DEFAULT_SETTINGS = [
   { key: 'resort_name', value: 'Munroe Morris Service Villa' },
   { key: 'resort_email', value: 'info@munroemorris.com' },
   { key: 'resort_phone', value: '+91 98765 43210' },
-  { key: 'resort_address', value: 'Munroe Island, Kollam, Kerala, India - 691502' }
+  { key: 'resort_address', value: 'Munroe Island, Kollam, Kerala, India - 691502' },
+  { key: 'brand_logo', value: '/mmoris logo.png' },
+  { key: 'brand_favicon', value: '/favicon.ico' }
 ]
 
 export async function POST(request: Request) {
