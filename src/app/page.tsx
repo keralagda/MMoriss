@@ -59,6 +59,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.experiences': 'Experiences',
     'nav.ayurveda': 'Ayurveda',
     'nav.dining': 'Dining',
+    'nav.diningOverview': 'Overview',
+    'nav.diningMenu': 'Menu',
     'nav.gallery': 'Gallery',
     'nav.book': 'Book Your Stay',
     
@@ -204,6 +206,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.experiences': 'അനുഭവങ്ങൾ',
     'nav.ayurveda': 'ആയുർവേദം',
     'nav.dining': 'ഭക്ഷണം',
+    'nav.diningOverview': 'വിവരണം',
+    'nav.diningMenu': 'മെനു',
     'nav.gallery': 'ഗാലറി',
     'nav.book': 'ബുക്ക് ചെയ്യുക',
     

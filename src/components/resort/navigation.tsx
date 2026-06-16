@@ -10,7 +10,8 @@ import {
   Sun,
   Moon,
   Globe,
-  Flower2
+  Flower2,
+  ChevronDown
 } from 'lucide-react'
 import { useLang } from './language-context'
 
@@ -98,6 +99,10 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
   const [logo, setLogo] = useState('')
   const [siteName, setSiteName] = useState('')
   const [user, setUser] = useState<{ id: string; email: string; role: 'admin' | 'guest'; name: string } | null>(null)
+  
+  // Dropdown states for nested menus
+  const [isDiningOpen, setIsDiningOpen] = useState(false)
+  const [isMobileDiningOpen, setIsMobileDiningOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -144,8 +149,14 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
     { name: t('nav.about'), href: '/about' },
     { name: t('nav.accommodations'), href: '/accommodations' },
     { name: t('nav.experiences'), href: '/experiences' },
-    { name: t('nav.ayurveda'), href: '/spa' },
-    { name: t('nav.dining'), href: '/dining' },
+    { 
+      name: t('nav.dining'), 
+      href: '/dining',
+      subItems: [
+        { name: t('nav.diningOverview'), href: '/dining' },
+        { name: t('nav.diningMenu'), href: '/menu' }
+      ]
+    },
     { name: t('nav.gallery'), href: '/gallery' },
     { name: t('nav.contact'), href: '/contact' },
   ]
@@ -192,17 +203,59 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
-                    shouldHaveBackground ? 'text-foreground' : 'text-white/90'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                if (link.subItems) {
+                  return (
+                    <div
+                      key={link.name}
+                      className="relative group py-2"
+                      onMouseEnter={() => setIsDiningOpen(true)}
+                      onMouseLeave={() => setIsDiningOpen(false)}
+                    >
+                      <button
+                        className={`flex items-center gap-1 text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                          shouldHaveBackground ? 'text-foreground' : 'text-white/90'
+                        }`}
+                      >
+                        {link.name}
+                        <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+                      </button>
+                      <AnimatePresence>
+                        {isDiningOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute left-0 mt-2 w-48 rounded-xl skeuo-panel bg-[#F0F2F5]/95 backdrop-blur-md border border-white/60 p-2 shadow-xl z-50"
+                          >
+                            {link.subItems.map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className="block px-4 py-2.5 rounded-lg text-xs font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-all active:scale-[0.98]"
+                              >
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )
+                }
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
+                      shouldHaveBackground ? 'text-foreground' : 'text-white/90'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* Right side */}
@@ -272,22 +325,66 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
             className="fixed inset-0 z-40 skeuo-panel lg:hidden pt-24"
           >
             <div className="flex flex-col items-center justify-center h-full gap-6">
-              {navLinks.map((link, index) => (
-                <motion.div
-                  key={link.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+              {navLinks.map((link, index) => {
+                if (link.subItems) {
+                  return (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <button
+                        onClick={() => setIsMobileDiningOpen(!isMobileDiningOpen)}
+                        className="font-serif text-2xl text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
+                      >
+                        {link.name}
+                        <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isMobileDiningOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      <AnimatePresence>
+                        {isMobileDiningOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="flex flex-col items-center gap-2 overflow-hidden"
+                          >
+                            {link.subItems.map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="font-serif text-lg text-muted-foreground hover:text-primary transition-colors py-1"
+                              >
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  )
+                }
+
+                return (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
                   >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
+                )
+              })}
 
               {user ? (
                 <>
