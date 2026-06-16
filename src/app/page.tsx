@@ -2055,13 +2055,12 @@ export default function Home() {
   }
 
   const visibleSections = sections.length > 0
-    ? sections.filter(s => s.visible)
+    ? sections.filter(s => s.visible && s.type !== 'ayurveda-section')
     : [
         { type: 'hero-section', props: {} },
         { type: 'about-section', props: {} },
         { type: 'accommodations-section', props: {} },
         { type: 'experiences-section', props: {} },
-        { type: 'ayurveda-section', props: {} },
         { type: 'dining-section', props: {} },
         { type: 'gallery-section', props: {} },
         { type: 'testimonials-section', props: {} },
