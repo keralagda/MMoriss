@@ -10,6 +10,7 @@ import {
   UtensilsCrossed, Coffee, Clock, MapPin, ArrowRight, Leaf,
   ChefHat, Wine, Users, Star
 } from 'lucide-react'
+import Link from 'next/link'
 
 const fallbackDishes = [
   {
@@ -279,9 +280,11 @@ function DiningContent() {
           </div>
 
           <div className="text-center mt-12">
-            <Button className="skeuo-button px-8 py-6">
-              View Full Menu
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button className="skeuo-button px-8 py-6" asChild>
+              <Link href="/menu">
+                View Full Menu
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </div>
         </div>

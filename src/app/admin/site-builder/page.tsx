@@ -1843,6 +1843,109 @@ export default function SiteBuilder() {
   const [isSaving, setIsSaving] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // Menu Manager States
+  const [isMenuManagerOpen, setIsMenuManagerOpen] = useState(false)
+  const [dishes, setDishes] = useState<any[]>([])
+  const [dishesLoading, setDishesLoading] = useState(false)
+  const [editingDish, setEditingDish] = useState<any | null>(null)
+  const [dishName, setDishName] = useState('')
+  const [dishDesc, setDishDesc] = useState('')
+  const [dishPrice, setDishPrice] = useState('')
+  const [dishVeg, setDishVeg] = useState(true)
+  const [dishImageUrl, setDishImageUrl] = useState('')
+
+  const fetchDishes = async () => {
+    setDishesLoading(true)
+    try {
+      const res = await fetch('/api/dishes')
+      if (res.ok) {
+        const data = await res.json()
+        setDishes(data)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setDishesLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (isMenuManagerOpen) {
+      fetchDishes()
+    }
+  }, [isMenuManagerOpen])
+
+  const handleSaveDish = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!dishName || !dishPrice) {
+      alert('Name and Price are required!')
+      return
+    }
+
+    const payload = {
+      name: dishName,
+      description: dishDesc,
+      price: Number(dishPrice),
+      veg: dishVeg,
+      imageUrl: dishImageUrl,
+    }
+
+    try {
+      let res
+      if (editingDish) {
+        res = await fetch(`/api/dishes/${editingDish.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+      } else {
+        res = await fetch('/api/dishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+      }
+
+      if (res.ok) {
+        fetchDishes()
+        setEditingDish(null)
+        setDishName('')
+        setDishDesc('')
+        setDishPrice('')
+        setDishVeg(true)
+        setDishImageUrl('')
+      } else {
+        alert('Failed to save dish')
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleDeleteDish = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this dish?')) return
+    try {
+      const res = await fetch(`/api/dishes/${id}`, {
+        method: 'DELETE'
+      })
+      if (res.ok) {
+        fetchDishes()
+        if (editingDish?.id === id) {
+          setEditingDish(null)
+          setDishName('')
+          setDishDesc('')
+          setDishPrice('')
+          setDishVeg(true)
+          setDishImageUrl('')
+        }
+      } else {
+        alert('Failed to delete dish')
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   useEffect(() => {
     Promise.resolve().then(async () => {
       setMounted(true)
@@ -2074,6 +2177,15 @@ export default function SiteBuilder() {
               <Redo className="h-4 w-4" />
             </Button>
             <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsMenuManagerOpen(true)}
+              className="text-muted-foreground border-primary/20 hover:bg-primary/5 mr-2"
+            >
+              <UtensilsCrossed className="h-4 w-4 mr-2" />
+              Menu Manager
+            </Button>
+            <Button 
               variant="ghost" 
               size="sm"
               className="text-muted-foreground"
@@ -2189,6 +2301,194 @@ export default function SiteBuilder() {
           onToggle={() => setRightCollapsed(!rightCollapsed)}
         />
       </div>
+
+      {/* Menu Manager Overlay Modal */}
+      {isMenuManagerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-background skeuo-panel rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl border border-border">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <div className="flex items-center gap-3">
+                <UtensilsCrossed className="h-6 w-6 text-primary" />
+                <div>
+                  <h2 className="font-serif text-2xl text-foreground">Dining Menu Manager</h2>
+                  <p className="text-xs text-muted-foreground">Manage dishes shown on the separate /menu page</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsMenuManagerOpen(false)}
+                className="p-2 rounded-lg hover:bg-primary/10 transition-colors font-semibold text-lg text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 grid md:grid-cols-2 gap-8">
+              {/* Form Side */}
+              <form onSubmit={handleSaveDish} className="space-y-4 skeuo-panel p-5 bg-muted/10 rounded-xl self-start">
+                <h3 className="font-serif text-lg font-medium text-foreground">
+                  {editingDish ? 'Edit Menu Item' : 'Add New Menu Item'}
+                </h3>
+                
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Dish Name</label>
+                  <Input 
+                    value={dishName}
+                    onChange={(e) => setDishName(e.target.value)}
+                    placeholder="e.g., Karimeen Pollichathu"
+                    className="skeuo-input"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Description</label>
+                  <Textarea 
+                    value={dishDesc}
+                    onChange={(e) => setDishDesc(e.target.value)}
+                    placeholder="Brief description of the recipe/ingredients..."
+                    className="skeuo-input min-h-[80px]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Price (INR)</label>
+                    <Input 
+                      type="number"
+                      value={dishPrice}
+                      onChange={(e) => setDishPrice(e.target.value)}
+                      placeholder="e.g., 650"
+                      className="skeuo-input"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Dietary Status</label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <input 
+                        type="checkbox" 
+                        id="dishVeg" 
+                        checked={dishVeg}
+                        onChange={(e) => setDishVeg(e.target.checked)}
+                        className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                      />
+                      <label htmlFor="dishVeg" className="text-sm font-medium flex items-center gap-1.5 cursor-pointer">
+                        <Leaf className="h-4 w-4 text-green-500" /> Veg
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Image URL</label>
+                  <Input 
+                    value={dishImageUrl}
+                    onChange={(e) => setDishImageUrl(e.target.value)}
+                    placeholder="e.g., /images/dining-1.png"
+                    className="skeuo-input"
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button type="submit" className="skeuo-button flex-1">
+                    {editingDish ? 'Update Dish' : 'Add Item'}
+                  </Button>
+                  {editingDish && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      onClick={() => {
+                        setEditingDish(null)
+                        setDishName('')
+                        setDishDesc('')
+                        setDishPrice('')
+                        setDishVeg(true)
+                        setDishImageUrl('')
+                      }}
+                      className="text-muted-foreground"
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              </form>
+
+              {/* List Side */}
+              <div className="space-y-4 flex flex-col min-h-[300px]">
+                <h3 className="font-serif text-lg font-medium text-foreground">Active Menu Items ({dishes.length})</h3>
+                
+                {dishesLoading ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                  </div>
+                ) : dishes.length === 0 ? (
+                  <div className="flex-1 flex items-center justify-center border-2 border-dashed border-border rounded-xl p-8 text-center text-muted-foreground italic">
+                    No dishes found in database. Add one to get started!
+                  </div>
+                ) : (
+                  <div className="flex-1 overflow-y-auto space-y-3 pr-2 max-h-[50vh]">
+                    {dishes.map((dish) => (
+                      <div key={dish.id} className="skeuo-card p-4 flex gap-4 items-center justify-between border border-border/40">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {dish.imageUrl ? (
+                            <img src={dish.imageUrl} alt={dish.name} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                              <UtensilsCrossed className="h-5 w-5" />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground truncate flex items-center gap-1.5">
+                              {dish.name}
+                              {dish.veg ? (
+                                <span className="inline-flex items-center justify-center p-0.5 border border-green-600 rounded bg-green-50 scale-75">
+                                  <span className="w-1 h-1 rounded-full bg-green-600" />
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center justify-center p-0.5 border border-red-600 rounded bg-red-50 scale-75">
+                                  <span className="w-1 h-1 rounded-full bg-red-600" />
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">{dish.description}</p>
+                            <p className="text-xs font-semibold text-primary mt-0.5">₹{dish.price}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              setEditingDish(dish)
+                              setDishName(dish.name)
+                              setDishDesc(dish.description || '')
+                              setDishPrice(String(dish.price))
+                              setDishVeg(dish.veg)
+                              setDishImageUrl(dish.imageUrl || '')
+                            }}
+                            className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteDish(dish.id)}
+                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

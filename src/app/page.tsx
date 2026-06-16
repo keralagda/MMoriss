@@ -1361,9 +1361,11 @@ function DiningSection({ props }: { props?: any }) {
               </div>
             </div>
 
-            <Button className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4">
-              {t('dining.menu')}
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button className="skeuo-button px-8 py-6 text-lg tracking-wide mt-4" asChild>
+              <Link href="/menu">
+                {t('dining.menu')}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </motion.div>
         </div>
