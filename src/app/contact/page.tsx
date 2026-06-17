@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,32 @@ function ContactContent() {
   const formInView = useInView(formRef, { once: true, margin: "-100px" })
   const [isSubmitted, setIsSubmitted] = useState(false)
 
+  // Dynamic settings states
+  const [email, setEmail] = useState('reservations@munroemorris.com')
+  const [phone, setPhone] = useState('+91 474 XXXXXXX')
+  const [whatsapp, setWhatsapp] = useState('+91 75610 11230')
+  const [address, setAddress] = useState('Munroe Island, Kollam District\nKerala 691502, India')
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.contact_email) setEmail(data.contact_email)
+          else if (data.resort_email) setEmail(data.resort_email)
+
+          if (data.contact_phone) setPhone(data.contact_phone)
+          else if (data.resort_phone) setPhone(data.resort_phone)
+
+          if (data.whatsapp_number) setWhatsapp(data.whatsapp_number)
+
+          if (data.address) setAddress(data.address)
+          else if (data.resort_address) setAddress(data.resort_address)
+        }
+      })
+      .catch(err => console.error('Failed to load contact settings:', err))
+  }, [])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Simulate form submission
@@ -30,17 +56,17 @@ function ContactContent() {
     {
       icon: <MapPin className="h-5 w-5" />,
       title: 'Location',
-      details: ['Munroe Island, Kollam District', 'Kerala 691502, India']
+      details: address.split('\n')
     },
     {
       icon: <Phone className="h-5 w-5" />,
       title: 'Phone',
-      details: ['+91 474 XXXXXXX', '+91 XXXXX XXXXX (WhatsApp)']
+      details: [phone, `${whatsapp} (WhatsApp)`]
     },
     {
       icon: <Mail className="h-5 w-5" />,
       title: 'Email',
-      details: ['reservations@munroemorris.com']
+      details: [email]
     },
     {
       icon: <Clock className="h-5 w-5" />,

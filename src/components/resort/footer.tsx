@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from 'lucide-react'
+import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 import { useLang } from './language-context'
 
 const defaultFooterLinks = [
@@ -45,9 +45,10 @@ export function Footer() {
   ]
 
   const socialLinks = [
-    { icon: <Instagram className="h-5 w-5" />, href: '#', label: 'Instagram' },
-    { icon: <Facebook className="h-5 w-5" />, href: '#', label: 'Facebook' },
-    { icon: <Twitter className="h-5 w-5" />, href: '#', label: 'Twitter' },
+    { icon: <MapPin className="h-5 w-5" />, href: 'https://maps.app.goo.gl/x9yYME3FYTTjk3Wy7', label: 'Google Maps' },
+    { icon: <Instagram className="h-5 w-5" />, href: 'https://www.instagram.com/munroemorrisservicevilla/', label: 'Instagram' },
+    { icon: <Facebook className="h-5 w-5" />, href: 'https://www.facebook.com/munroemorrisservicevilla', label: 'Facebook' },
+    { icon: <Youtube className="h-5 w-5" />, href: 'https://www.youtube.com/@MunroeMorrisVilla', label: 'YouTube' },
   ]
 
   return (
