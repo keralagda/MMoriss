@@ -24,12 +24,14 @@ import {
   Moon,
   Sun,
   Home,
-  Layout
+  Layout,
+  Sparkles
 } from 'lucide-react'
 
 const navItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Site Builder', href: '/admin/site-builder', icon: Layout },
+  { name: 'AI Studio', href: '/admin/ai-studio', icon: Sparkles },
   { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
   { name: 'Rooms', href: '/admin/rooms', icon: BedDouble },
   { name: 'Guests', href: '/admin/guests', icon: Users },
