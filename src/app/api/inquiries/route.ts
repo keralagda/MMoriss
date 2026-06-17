@@ -40,11 +40,12 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { name, email, phone, checkIn, checkOut, guests, roomType, message } = body
+    let { name, email, phone, checkIn, checkOut, guests, roomType, message } = body
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: 'Name, Email and Message are required fields' }, { status: 400 })
-    }
+    // Make all fields optional by providing fallback values to satisfy non-null DB schema constraints
+    name = name?.trim() || 'Guest'
+    email = email?.trim() || 'no-email@munroemorris.com'
+    message = message?.trim() || 'Requested a custom quote'
 
     const inquiry = await db.inquiry.create({
       data: {

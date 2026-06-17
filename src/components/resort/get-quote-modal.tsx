@@ -157,7 +157,6 @@ export function GetQuoteModal({ isOpen, onClose, roomType = '' }: GetQuoteModalP
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/60" />
                       <input
                         type="text"
-                        required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Rajesh Kumar"
@@ -173,7 +172,6 @@ export function GetQuoteModal({ isOpen, onClose, roomType = '' }: GetQuoteModalP
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/60" />
                         <input
                           type="email"
-                          required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="you@email.com"
