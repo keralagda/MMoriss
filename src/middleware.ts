@@ -21,9 +21,11 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('mm_session')?.value
   const session = token ? await decrypt(token) : null
 
-  if (isAdminRoute) {
+  const isAdminLogin = path === '/admin/login'
+
+  if (isAdminRoute && !isAdminLogin) {
     if (!session || session.role !== 'admin') {
-      const loginUrl = new URL('/login', request.url)
+      const loginUrl = new URL('/admin/login', request.url)
       loginUrl.searchParams.set('redirect', path)
       return NextResponse.redirect(loginUrl)
     }
