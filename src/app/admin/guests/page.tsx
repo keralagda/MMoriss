@@ -180,7 +180,7 @@ export default function GuestsPage() {
               return sum
             }, 0) : 0
             
-            let lastVisit = g.createdAt
+            let lastVisit = new Date(g.createdAt)
             if (g.bookings && g.bookings.length > 0) {
               const visits = g.bookings.map((b: any) => new Date(b.checkIn).getTime())
               lastVisit = new Date(Math.max(...visits))
