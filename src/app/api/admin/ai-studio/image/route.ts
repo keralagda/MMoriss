@@ -31,31 +31,37 @@ export async function POST(request: Request) {
     }
 
     // Call NVIDIA AI API for image generation
-    const response = await fetch('https://integrate.api.nvidia.com/v1/images/generations', {
+    const response = await fetch('https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        model: 'stabilityai/stable-diffusion-3.5-large',
-        prompt: prompt,
-        n: 1,
-        size: '1024x1024',
-        response_format: 'b64_json'
+        text_prompts: [
+          {
+            text: prompt,
+            weight: 1
+          }
+        ],
+        cfg_scale: 5,
+        steps: 25,
+        seed: 0,
+        samples: 1
       })
     })
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error('NVIDIA API error response:', errorText)
-      throw new Error(`Failed to generate image from NVIDIA AI API: ${response.status} ${response.statusText}`)
+      throw new Error(`Failed to generate image from NVIDIA AI API: ${response.status} ${response.statusText}. Error details: ${errorText}`)
     }
 
     const data = await response.json()
     
     // Extract base64 image data
-    const b64Data = data.data?.[0]?.b64_json || ''
+    const b64Data = data.artifacts?.[0]?.base64 || ''
     if (!b64Data) {
       throw new Error('No image data returned from NVIDIA AI API')
     }
