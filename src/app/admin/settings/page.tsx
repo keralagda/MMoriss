@@ -66,10 +66,10 @@ export default function SettingsPage() {
   const [secondaryColor, setSecondaryColor] = useState('#1c1c1c')
 
   // Contact Settings
-  const [contactEmail, setContactEmail] = useState('reservations@munroemorris.com')
+  const [contactEmail, setContactEmail] = useState('munroemorrisklm@gmail.com')
   const [contactPhone, setContactPhone] = useState('+91 474 XXXXXXX')
   const [whatsappNumber, setWhatsappNumber] = useState('+91 XXXXX XXXXX')
-  const [address, setAddress] = useState('Munroe Island, Kollam District\nKerala 691502, India')
+  const [address, setAddress] = useState('Manakkadavu, Munroe Island, Kerala 691502')
 
   // Notification Settings
   const [emailNotifications, setEmailNotifications] = useState(true)

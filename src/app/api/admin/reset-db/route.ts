@@ -660,14 +660,14 @@ const DEFAULT_INQUIRIES = [
 
 const DEFAULT_SETTINGS = [
   { key: 'resort_name', value: 'Munroe Morris Service Villa' },
-  { key: 'resort_email', value: 'reservations@munroemorris.com' },
+  { key: 'resort_email', value: 'munroemorrisklm@gmail.com' },
   { key: 'resort_phone', value: '+91 75610 11230' },
-  { key: 'resort_address', value: 'Munroe Island, Kollam District\nKerala 691502, India' },
+  { key: 'resort_address', value: 'Manakkadavu, Munroe Island, Kerala 691502' },
   { key: 'brand_logo', value: '/mmoris logo.png' },
   { key: 'brand_favicon', value: '/favicon.ico' },
   { key: 'whatsapp_number', value: '+91 75610 11230' },
   { key: 'whatsapp_template', value: 'Hello Munroe Morris, I would like to request a quote.\n\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nRoom/Villa: {{roomType}}\nCheck-In: {{checkIn}}\nCheck-Out: {{checkOut}}\nGuests: {{guests}}\nMessage: {{message}}' },
-  { key: 'contact_email', value: 'reservations@munroemorris.com' },
+  { key: 'contact_email', value: 'munroemorrisklm@gmail.com' },
   { key: 'contact_phone', value: '+91 75610 11230' }
 ]
 

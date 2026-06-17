@@ -556,9 +556,9 @@ function SectionPreview({ section }: { section: Section }) {
       const title = (section.props.title as string) || 'Plan Your Kerala Escape'
       const subtitle = (section.props.subtitle as string) || 'Get in Touch'
       const description = (section.props.description as string) || 'Our team is ready to help you plan an unforgettable experience in Munroe Island, Kollam.'
-      const location = (section.props.location as string) || 'Munroe Island, Kollam, Kerala 691502'
+      const location = (section.props.location as string) || 'Manakkadavu, Munroe Island, Kerala 691502'
       const phone = (section.props.phone as string) || '+91 474 XXXXXXX'
-      const email = (section.props.email as string) || 'reservations@munroemorris.com'
+      const email = (section.props.email as string) || 'munroemorrisklm@gmail.com'
       return (
         <div className="py-16 px-4 bg-background">
           <div className="max-w-6xl mx-auto">

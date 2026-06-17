@@ -273,7 +273,7 @@ function TermsContent() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <span className="text-muted-foreground text-sm">
-                reservations@munroemorris.com
+                munroemorrisklm@gmail.com
               </span>
             </div>
           </motion.div>

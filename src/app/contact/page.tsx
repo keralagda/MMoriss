@@ -20,10 +20,10 @@ function ContactContent() {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   // Dynamic settings states
-  const [email, setEmail] = useState('reservations@munroemorris.com')
+  const [email, setEmail] = useState('munroemorrisklm@gmail.com')
   const [phone, setPhone] = useState('+91 474 XXXXXXX')
   const [whatsapp, setWhatsapp] = useState('+91 75610 11230')
-  const [address, setAddress] = useState('Munroe Island, Kollam District\nKerala 691502, India')
+  const [address, setAddress] = useState('Manakkadavu, Munroe Island, Kerala 691502')
 
   useEffect(() => {
     fetch('/api/settings')

@@ -141,8 +141,8 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <span className="text-muted-foreground text-sm">
-                  Munroe Island, Kollam District<br />
-                  Kerala 691502, India
+                  Manakkadavu, Munroe Island<br />
+                  Kerala 691502
                 </span>
               </li>
               <li className="flex items-center gap-3">
