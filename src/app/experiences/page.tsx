@@ -26,7 +26,10 @@ function ExperiencesContent() {
       image: '/images/experience-1.png',
       duration: 'Full Day / Overnight',
       price: 'From ₹25,000/couple',
-      highlights: ['Private chef', 'Sunset views', 'Village life', 'Traditional cuisine']
+      highlights: ['Private chef', 'Sunset views', 'Village life', 'Traditional cuisine'],
+      minPeople: 2,
+      maxPeople: 10,
+      perHeadPrice: 12500
     },
     {
       id: 'ayurveda',
@@ -37,7 +40,10 @@ function ExperiencesContent() {
       image: '/images/spa.png',
       duration: '1-21 Days Programs',
       price: 'From ₹5,000/session',
-      highlights: ['Certified practitioners', 'Traditional herbs', 'Holistic healing', 'Custom programs']
+      highlights: ['Certified practitioners', 'Traditional herbs', 'Holistic healing', 'Custom programs'],
+      minPeople: 1,
+      maxPeople: 1,
+      perHeadPrice: 5000
     },
     {
       id: 'village',
@@ -48,7 +54,10 @@ function ExperiencesContent() {
       image: '/images/experience-3.png',
       duration: 'Half Day',
       price: 'From ₹2,500/person',
-      highlights: ['Coir making', 'Fishing demo', 'Paddy fields', 'Local artisans']
+      highlights: ['Coir making', 'Fishing demo', 'Paddy fields', 'Local artisans'],
+      minPeople: 2,
+      maxPeople: 15,
+      perHeadPrice: 2500
     },
     {
       id: 'kathakali',
@@ -59,7 +68,10 @@ function ExperiencesContent() {
       image: '/images/gallery-2.png',
       duration: '2-3 Hours',
       price: 'From ₹1,500/person',
-      highlights: ['Traditional makeup', 'Classical music', 'Epic stories', 'Photo opportunity']
+      highlights: ['Traditional makeup', 'Classical music', 'Epic stories', 'Photo opportunity'],
+      minPeople: 4,
+      maxPeople: 50,
+      perHeadPrice: 1500
     },
     {
       id: 'canoe',
@@ -70,7 +82,10 @@ function ExperiencesContent() {
       image: '/images/gallery-5.png',
       duration: '2 Hours',
       price: 'From ₹1,000/person',
-      highlights: ['Narrow canals', 'Sunset views', 'Bird watching', 'Village glimpses']
+      highlights: ['Narrow canals', 'Sunset views', 'Bird watching', 'Village glimpses'],
+      minPeople: 1,
+      maxPeople: 4,
+      perHeadPrice: 1000
     },
     {
       id: 'spice',
@@ -81,7 +96,10 @@ function ExperiencesContent() {
       image: '/images/gallery-6.png',
       duration: 'Full Day',
       price: 'From ₹3,500/person',
-      highlights: ['Cardamom fields', 'Pepper vines', 'Traditional lunch', 'Spice shopping']
+      highlights: ['Cardamom fields', 'Pepper vines', 'Traditional lunch', 'Spice shopping'],
+      minPeople: 2,
+      maxPeople: 12,
+      perHeadPrice: 3500
     },
     {
       id: 'cooking',
@@ -92,7 +110,10 @@ function ExperiencesContent() {
       image: '/images/gallery-1.png',
       duration: '3 Hours',
       price: 'From ₹2,000/person',
-      highlights: ['Fresh spices', 'Seafood prep', 'Recipe booklet', 'Meal included']
+      highlights: ['Fresh spices', 'Seafood prep', 'Recipe booklet', 'Meal included'],
+      minPeople: 2,
+      maxPeople: 8,
+      perHeadPrice: 2000
     },
     {
       id: 'yoga',
@@ -103,7 +124,10 @@ function ExperiencesContent() {
       image: '/images/spa.png',
       duration: '1-2 Hours',
       price: 'Complimentary for guests',
-      highlights: ['Hatha yoga', 'Pranayama', 'Backwater views', 'All levels welcome']
+      highlights: ['Hatha yoga', 'Pranayama', 'Backwater views', 'All levels welcome'],
+      minPeople: 1,
+      maxPeople: 20,
+      perHeadPrice: 0
     }
   ]
 
@@ -171,14 +195,34 @@ function ExperiencesContent() {
                     <p className="text-muted-foreground mb-4">{exp.description}</p>
 
                     {/* Duration & Price */}
-                    <div className="flex items-center gap-6 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4 text-primary" />
-                        <span>{exp.duration}</span>
+                    <div className="flex flex-col gap-2.5 mb-4">
+                      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="h-4 w-4 text-primary" />
+                          <span>{exp.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                          <Tag className="h-4 w-4" />
+                          <span>{exp.price}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                        <Tag className="h-4 w-4" />
-                        <span>{exp.price}</span>
+                      
+                      {/* Capacity and Per-Head Price Panel */}
+                      <div className="text-xs text-muted-foreground space-y-1 bg-black/5 p-2.5 rounded-lg border border-black/5">
+                        <div className="flex justify-between">
+                          <span>Group Size:</span>
+                          <span className="font-medium text-foreground">
+                            {exp.minPeople} - {exp.maxPeople} guests
+                          </span>
+                        </div>
+                        {exp.perHeadPrice > 0 && (
+                          <div className="flex justify-between">
+                            <span>Per Head Rate:</span>
+                            <span className="font-medium text-primary">
+                              ₹{exp.perHeadPrice.toLocaleString()}/person
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
