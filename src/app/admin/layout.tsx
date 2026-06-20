@@ -93,27 +93,66 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      await res.json().catch(() => {})
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
-      window.location.href = '/'
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 100)
     }
   }
 
   useEffect(() => {
     Promise.resolve().then(() => setMounted(true))
-  }, [])
 
-  if (!mounted) {
+    if (pathname === '/admin/login') {
+      setCheckingAuth(false)
+      return
+    }
+
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        const data = await res.json()
+        if (!res.ok || !data.user || data.user.role !== 'admin') {
+          window.location.href = `/admin/login?redirect=${encodeURIComponent(pathname)}`
+        } else {
+          setCheckingAuth(false)
+        }
+      } catch (err) {
+        window.location.href = `/admin/login?redirect=${encodeURIComponent(pathname)}`
+      }
+    }
+
+    checkAuth()
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload()
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow)
+    }
+  }, [pathname])
+
+  if (!mounted || (checkingAuth && pathname !== '/admin/login')) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse">Loading...</div>
       </div>
     )
+  }
+
+  if (pathname === '/admin/login') {
+    return <>{children}</>
   }
 
   return (
