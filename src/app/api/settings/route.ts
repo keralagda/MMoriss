@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { db, checkDbConnection } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   // Database connection check
   const dbCheck = await checkDbConnection()
@@ -23,7 +25,11 @@ export async function GET() {
       return acc
     }, {} as Record<string, string>)
 
-    return NextResponse.json(settingsObj)
+    return NextResponse.json(settingsObj, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+      },
+    })
   } catch (error: any) {
     console.error('Failed to fetch settings:', error)
     return NextResponse.json(

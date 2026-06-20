@@ -10,6 +10,7 @@ import {
   Phone, MapPin, Clock, Users, Flower2, Palette, Upload, Trash2,
   Layout, Plus, ArrowUp, ArrowDown
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 const tabs = [
   { id: 'general', name: 'General', icon: Globe },
@@ -48,6 +49,7 @@ const defaultFooterLinks = [
 ]
 
 export default function SettingsPage() {
+  const { toast } = useToast()
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
   const [saving, setSaving] = useState(false)
@@ -388,9 +390,17 @@ export default function SettingsPage() {
       if (!res.ok) {
         throw new Error('Failed to save settings')
       }
+      toast({
+        title: 'Settings Saved',
+        description: 'Your configuration changes have been saved successfully.',
+      })
     } catch (err) {
       console.error('Failed to save settings:', err)
-      alert('Failed to save settings')
+      toast({
+        title: 'Error Saving Settings',
+        description: 'Failed to save configuration changes. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
