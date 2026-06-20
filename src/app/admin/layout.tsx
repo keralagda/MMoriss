@@ -96,12 +96,11 @@ export default function AdminLayout({
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('/api/auth/logout', { method: 'POST' })
-      if (res.ok) {
-        window.location.href = '/'
-      }
+      await fetch('/api/auth/logout', { method: 'POST' })
     } catch (err) {
       console.error('Logout error:', err)
+    } finally {
+      window.location.href = '/'
     }
   }
 
