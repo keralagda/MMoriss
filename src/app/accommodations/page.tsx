@@ -220,14 +220,18 @@ function AccommodationsContent() {
                   </div>
 
                   {/* Details */}
-                  <div className="flex items-center gap-6 pt-3 border-t border-border">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Eye className="h-4 w-4" />
+                  <div className="flex items-center gap-4 pt-3 border-t border-border flex-wrap">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Eye className="h-3.5 w-3.5" />
                       <span>{villa.size}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Users className="h-3.5 w-3.5" />
                       <span>{villa.guests} Guests</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                      <Heart className="h-3.5 w-3.5 fill-primary/10" />
+                      <span>Couples Allowed</span>
                     </div>
                   </div>
 

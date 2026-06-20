@@ -185,6 +185,31 @@ function RoomDetailsContent() {
                 </div>
               </div>
 
+              {/* Room Rules & Policies */}
+              <div className="skeuo-card p-5 border border-white/60 space-y-3 bg-[#E6EAF0]/20">
+                <span className="text-[10px] uppercase tracking-wider text-primary font-semibold flex items-center gap-1.5">
+                  <Shield className="h-4 w-4" /> Guest Rules & Policies
+                </span>
+                <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span>Couples allowed</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span>Age 18+ only</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span>KYC documents required</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span>No pet policy</span>
+                  </div>
+                </div>
+              </div>
+
               {/* CTA Booking Button */}
               <div className="skeuo-card p-6 border border-white/60 bg-gradient-to-br from-primary/5 to-gold-dark/5 space-y-4">
                 <div className="text-center md:text-left">

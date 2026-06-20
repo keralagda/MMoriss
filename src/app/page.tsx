@@ -993,14 +993,18 @@ function AccommodationsSection({ props }: { props?: any }) {
                 </div>
 
                 {/* Details */}
-                <div className="flex items-center gap-6 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <BedDouble className="h-4 w-4" />
+                <div className="flex items-center gap-4 pt-4 border-t border-border flex-wrap">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <BedDouble className="h-3.5 w-3.5" />
                     <span>{room.size}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Users className="h-3.5 w-3.5" />
                     <span>{room.guests} {t('accommodations.guests')}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-primary font-medium">
+                    <Heart className="h-3.5 w-3.5 fill-primary/10" />
+                    <span>Couples Allowed</span>
                   </div>
                 </div>
 
