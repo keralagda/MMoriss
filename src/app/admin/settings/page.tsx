@@ -206,6 +206,11 @@ export default function SettingsPage() {
       } finally {
         setLoading(false)
         setMounted(true)
+        const params = new URLSearchParams(window.location.search)
+        const tab = params.get('tab')
+        if (tab && tabs.some(t => t.id === tab)) {
+          setActiveTab(tab)
+        }
       }
     }
     loadSettings()

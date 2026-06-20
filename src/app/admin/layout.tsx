@@ -92,6 +92,18 @@ export default function AdminLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      if (res.ok) {
+        window.location.href = '/'
+      }
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
+  }
 
   useEffect(() => {
     Promise.resolve().then(() => setMounted(true))
@@ -262,15 +274,63 @@ export default function AdminLayout({
                 <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
               </button>
 
-              {/* User Menu */}
-              <div className="flex items-center gap-3 pl-3 border-l border-border">
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-medium text-foreground">Admin User</p>
-                  <p className="text-xs text-muted-foreground">admin@munroemorris.com</p>
-                </div>
-                <button className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center text-primary-foreground font-medium">
-                  A
+              {/* User Menu Dropdown */}
+              <div className="relative">
+                <button 
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-3 pl-3 border-l border-border hover:opacity-80 transition-opacity text-left"
+                >
+                  <div className="hidden sm:block text-right">
+                    <p className="text-sm font-medium text-foreground">Admin User</p>
+                    <p className="text-xs text-muted-foreground">admin@munroemorris.com</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-gold-dark flex items-center justify-center text-primary-foreground font-medium shadow-md">
+                    A
+                  </div>
+                  <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
                 </button>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <>
+                      {/* Overlay to close when clicking outside */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setProfileOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-56 rounded-xl skeuo-panel bg-card border border-border p-2 shadow-xl z-50 text-foreground"
+                      >
+                        <div className="px-4 py-2 border-b border-border mb-1">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Logged In As</p>
+                          <p className="text-sm font-medium text-foreground truncate">admin@munroemorris.com</p>
+                        </div>
+                        <Link
+                          href="/admin/settings?tab=security"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-all text-left w-full"
+                        >
+                          <Settings className="h-4 w-4" />
+                          Change Password
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setProfileOpen(false)
+                            handleLogout()
+                          }}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-red-500 hover:bg-red-500/10 transition-all text-left w-full mt-1 border-t border-border/50 pt-2.5"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
