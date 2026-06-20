@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, User, Phone, Shield, ArrowRight, Sparkles, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-type Tab = 'guest-login' | 'guest-signup' | 'admin-login'
+type Tab = 'guest-login' | 'guest-signup'
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<Tab>('guest-login')
@@ -63,7 +63,7 @@ export default function LoginPage() {
           window.location.href = '/dashboard'
         }, 1500)
       } else {
-        const role = activeTab === 'admin-login' ? 'admin' : 'guest'
+        const role = 'guest'
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -74,11 +74,7 @@ export default function LoginPage() {
 
         setSuccessMsg('Login successful! Redirecting...')
         setTimeout(() => {
-          if (role === 'admin') {
-            window.location.href = '/admin'
-          } else {
-            window.location.href = '/dashboard'
-          }
+          window.location.href = '/dashboard'
         }, 1500)
       }
     } catch (err: any) {
@@ -143,7 +139,7 @@ export default function LoginPage() {
 
         {/* Tab Controls */}
         <div className="flex p-1.5 skeuo-inset rounded-2xl bg-black/35 border border-white/5">
-          {(['guest-login', 'guest-signup', 'admin-login'] as Tab[]).map((tab) => (
+          {(['guest-login', 'guest-signup'] as Tab[]).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -155,7 +151,6 @@ export default function LoginPage() {
             >
               {tab === 'guest-login' && 'Guest Log In'}
               {tab === 'guest-signup' && 'Sign Up'}
-              {tab === 'admin-login' && 'Admin Portal'}
             </button>
           ))}
         </div>
@@ -279,7 +274,6 @@ export default function LoginPage() {
                 <>
                   {activeTab === 'guest-login' && 'Log In to Sanctuary'}
                   {activeTab === 'guest-signup' && 'Create Sanctuary Account'}
-                  {activeTab === 'admin-login' && 'Log In to Admin Console'}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}
