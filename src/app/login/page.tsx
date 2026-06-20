@@ -93,6 +93,28 @@ export default function LoginPage() {
     setPassword(testPass)
   }
 
+  const handleOneClickAdminLogin = async () => {
+    setLoading(true)
+    setError(null)
+    setSuccessMsg(null)
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@resort.com', password: 'admin123', role: 'admin' })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Invalid credentials')
+      setSuccessMsg('Login successful! Redirecting...')
+      setTimeout(() => {
+        window.location.href = '/admin'
+      }, 1500)
+    } catch (err: any) {
+      setError(err.message)
+      setLoading(false)
+    }
+  }
+
   if (!mounted) return null
 
   return (
@@ -117,30 +139,7 @@ export default function LoginPage() {
           <p className="text-muted-foreground text-sm mt-1">Exquisite Backwater Sanctuary</p>
         </div>
 
-        {/* Credentials box helper */}
-        <div className="skeuo-card p-5 bg-card/60 border border-white/5 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Shield className="h-3.5 w-3.5 text-primary" /> Test Sandbox Credentials
-          </p>
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <button
-              onClick={() => handleTestCredentialClick('admin@resort.com', 'admin123', 'admin-login')}
-              className="p-2 text-left bg-black/30 hover:bg-black/50 border border-white/5 rounded-lg transition-all active:scale-[0.98] shadow-sm flex flex-col justify-between"
-            >
-              <span className="font-semibold text-primary">Admin Access</span>
-              <span className="text-muted-foreground mt-1 text-[11px] truncate">admin@resort.com</span>
-              <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded mt-1.5 self-start">admin123</span>
-            </button>
-            <button
-              onClick={() => handleTestCredentialClick('rajesh@email.com', 'guest123', 'guest-login')}
-              className="p-2 text-left bg-black/30 hover:bg-black/50 border border-white/5 rounded-lg transition-all active:scale-[0.98] shadow-sm flex flex-col justify-between"
-            >
-              <span className="font-semibold text-primary font-serif">Guest Access</span>
-              <span className="text-muted-foreground mt-1 text-[11px] truncate">rajesh@email.com</span>
-              <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded mt-1.5 self-start">guest123</span>
-            </button>
-          </div>
-        </div>
+
 
         {/* Tab Controls */}
         <div className="flex p-1.5 skeuo-inset rounded-2xl bg-black/35 border border-white/5">
@@ -289,6 +288,16 @@ export default function LoginPage() {
         </div>
 
       </div>
+
+      {/* Discrete one-click admin login trigger */}
+      <button
+        onClick={handleOneClickAdminLogin}
+        className="absolute bottom-4 right-4 text-[9px] text-muted-foreground opacity-[0.01] hover:opacity-20 cursor-default select-none z-50 transition-opacity"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        Admin Access
+      </button>
     </div>
   )
 }
