@@ -62,7 +62,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.diningOverview': 'Overview',
     'nav.diningMenu': 'Menu',
     'nav.gallery': 'Gallery',
-    'nav.book': 'Book Your Stay',
+    'nav.book': 'Get Quote',
     
     // Hero
     'hero.welcome': "Welcome to God's Own Country",
@@ -209,7 +209,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.diningOverview': 'വിവരണം',
     'nav.diningMenu': 'മെനു',
     'nav.gallery': 'ഗാലറി',
-    'nav.book': 'ബുക്ക് ചെയ്യുക',
+    'nav.book': 'ക്വോട്ട് ലഭിക്കുക',
     
     // Hero
     'hero.welcome': 'ദൈവത്തിന്റെ സ്വന്തം നാട്ടിലേക്ക് സ്വാഗതം',
@@ -469,6 +469,7 @@ function Navigation() {
   const [logo, setLogo] = useState('')
   const [siteName, setSiteName] = useState('')
   const [user, setUser] = useState<{ id: string; email: string; role: 'admin' | 'guest'; name: string } | null>(null)
+  const [whatsappNumber, setWhatsappNumber] = useState('+91 75610 11230')
 
   const handleLogout = async () => {
     try {
@@ -479,6 +480,12 @@ function Navigation() {
     } catch (err) {
       console.error('Logout error:', err)
     }
+  }
+
+  const handleGetQuote = () => {
+    const cleanPhone = whatsappNumber.replace(/[^0-9]/g, '')
+    const msg = 'Hello Munroe Morris, I would like to make a general inquiry.'
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   useEffect(() => {
@@ -494,6 +501,7 @@ function Navigation() {
         if (data) {
           if (data.brand_logo) setLogo(data.brand_logo)
           if (data.site_name) setSiteName(data.site_name)
+          if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
         }
       })
       .catch(err => console.error('Failed to load branding settings:', err))
@@ -578,37 +586,7 @@ function Navigation() {
               <LanguageToggle />
               <ThemeToggle />
 
-              {user ? (
-                <>
-                  <Link
-                    href={user.role === 'admin' ? '/admin' : '/dashboard'}
-                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
-                      isScrolled ? 'text-foreground' : 'text-white/90'
-                    }`}
-                  >
-                    {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
-                      isScrolled ? 'text-foreground' : 'text-white/90'
-                    }`}
-                  >
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className={`text-sm font-medium tracking-wide transition-colors duration-300 hover:text-primary ${
-                    isScrolled ? 'text-foreground' : 'text-white/90'
-                  }`}
-                >
-                  Sign In
-                </Link>
-              )}
-
-              <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
+              <Button onClick={handleGetQuote} className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
                 {t('nav.book')}
               </Button>
             </div>
@@ -654,60 +632,13 @@ function Navigation() {
                 </motion.a>
               ))}
 
-              {user ? (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: navLinks.length * 0.1 }}
-                  >
-                    <Link
-                      href={user.role === 'admin' ? '/admin' : '/dashboard'}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
-                    >
-                      {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
-                    </Link>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: (navLinks.length + 1) * 0.1 }}
-                  >
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false)
-                        handleLogout()
-                      }}
-                      className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </motion.div>
-                </>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: navLinks.length * 0.1 }}
-                >
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="font-serif text-2xl text-foreground hover:text-primary transition-colors"
-                  >
-                    Sign In
-                  </Link>
-                </motion.div>
-              )}
-
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (navLinks.length + 2) * 0.1 }}
                 className="mt-4"
               >
-                <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">
+                <Button onClick={handleGetQuote} className="skeuo-button px-8 py-3 font-medium tracking-wide">
                   {t('nav.book')}
                 </Button>
               </motion.div>

@@ -116,6 +116,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
   const [logo, setLogo] = useState('')
   const [siteName, setSiteName] = useState('')
   const [user, setUser] = useState<{ id: string; email: string; role: 'admin' | 'guest'; name: string } | null>(null)
+  const [whatsappNumber, setWhatsappNumber] = useState('+91 75610 11230')
   
   // Dropdown states for nested menus
   const [isDiningOpen, setIsDiningOpen] = useState(false)
@@ -135,6 +136,12 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
     }
   }
 
+  const handleGetQuote = () => {
+    const cleanPhone = whatsappNumber.replace(/[^0-9]/g, '')
+    const msg = 'Hello Munroe Morris, I would like to make a general inquiry.'
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank')
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
@@ -148,6 +155,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
         if (data) {
           if (data.brand_logo) setLogo(data.brand_logo)
           if (data.site_name) setSiteName(data.site_name)
+          if (data.whatsapp_number) setWhatsappNumber(data.whatsapp_number)
           if (data.header_menu) {
             try {
               setNavLinks(JSON.parse(data.header_menu))
@@ -275,7 +283,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
               <LanguageToggle />
               <ThemeToggle />
 
-              <Button className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
+              <Button onClick={handleGetQuote} className="skeuo-button px-6 py-2.5 font-medium tracking-wide">
                 {t('nav.book')}
               </Button>
             </div>
@@ -376,7 +384,7 @@ export function Navigation({ isTransparent = false }: NavigationProps) {
                 transition={{ delay: (navLinks.length + 2) * 0.1 }}
                 className="mt-4"
               >
-                <Button className="skeuo-button px-8 py-3 font-medium tracking-wide">
+                <Button onClick={handleGetQuote} className="skeuo-button px-8 py-3 font-medium tracking-wide">
                   {t('nav.book')}
                 </Button>
               </motion.div>
