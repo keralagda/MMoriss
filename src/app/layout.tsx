@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { db } from "@/lib/db";
+import { MobileBottomNav } from "@/components/resort/mobile-bottom-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,6 +77,10 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content={primaryColor || "#c5a880"} />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         {favicon && <link rel="icon" href={favicon} />}
         {(primaryColor || secondaryColor) && (
           <style dangerouslySetInnerHTML={{ __html: `
@@ -89,11 +94,26 @@ export default async function RootLayout({
             }
           `}} />
         )}
+        <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js').then(
+                function(registration) {
+                  console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                },
+                function(err) {
+                  console.log('ServiceWorker registration failed: ', err);
+                }
+              );
+            });
+          }
+        `}} />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground pb-20 lg:pb-0`}
       >
         {children}
+        <MobileBottomNav />
         <Toaster />
       </body>
     </html>

@@ -1,0 +1,23 @@
+{
+  "name": "Munroe Morris Service Villa",
+  "short_name": "Munroe Morris",
+  "description": "Luxury Backwater Resort in Munroe Island, Kerala",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0F12",
+  "theme_color": "#c5a880",
+  "icons": [
+    {
+      "src": "/mmoris logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
